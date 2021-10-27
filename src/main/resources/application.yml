@@ -1,0 +1,30 @@
+refresh_token: 28aed1db61a44c88b2b083370a4de502
+api_url: https://api.aliyundrive.com/v2
+
+server:
+  port: 8080
+
+spring:
+  application:
+    name: AliPan
+
+  #热部署
+  devtools:
+    restart:
+      enabled: true
+      additional-paths: src/main/java
+
+  #模板引擎
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML5
+    encoding: UTF-8
+    cache: false
+    servlet:
+      content-type: text/html
+
+  #MVC
+  mvc:
+    static-path-pattern: static/**
+
