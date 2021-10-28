@@ -1,4 +1,4 @@
-package com.rawchen.controller;
+package com.rawchen.alipan.controller;
 
 import org.springframework.stereotype.Controller;
 

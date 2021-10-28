@@ -52,25 +52,6 @@
 			<version>5.3.5</version>
 		</dependency>
 
-<!--		&lt;!&ndash; jackson &ndash;&gt;-->
-<!--		<dependency>-->
-<!--			<groupId>com.fasterxml.jackson.core</groupId>-->
-<!--			<artifactId>jackson-core</artifactId>-->
-<!--			<version>2.9.5</version>-->
-<!--		</dependency>-->
-
-<!--		<dependency>-->
-<!--			<groupId>com.fasterxml.jackson.core</groupId>-->
-<!--			<artifactId>jackson-annotations</artifactId>-->
-<!--			<version>2.9.5</version>-->
-<!--		</dependency>-->
-
-<!--		<dependency>-->
-<!--			<groupId>com.fasterxml.jackson.core</groupId>-->
-<!--			<artifactId>jackson-databind</artifactId>-->
-<!--			<version>2.9.5</version>-->
-<!--		</dependency>-->
-
 	</dependencies>
 
 	<build>

@@ -1,5 +1,12 @@
-refresh_token: 28aed1db61a44c88b2b083370a4de502
-api_url: https://api.aliyundrive.com/v2
+alipan:
+  # 刷新令牌
+  refresh_token: 28aed1db61a44c88b2b083370a4de502
+  # 根节点文件夹ID，默认为root
+  parent_file_id: root
+  # 阿里云盘API，默认不改动
+  api_url: https://api.aliyundrive.com/v2
+  # 阿里云盘请求来源
+  referer_url: https://www.aliyundrive.com
 
 server:
   port: 8080
@@ -7,14 +14,21 @@ server:
 spring:
   application:
     name: AliPan
+  web:
+    resources:
+      chain:
+        strategy:
+          content:
+            enabled: true
+            paths: /**
 
-  #热部署
+  # 热部署
   devtools:
     restart:
       enabled: true
       additional-paths: src/main/java
 
-  #模板引擎
+  # 模板引擎
   thymeleaf:
     prefix: classpath:/templates/
     suffix: .html
@@ -24,7 +38,11 @@ spring:
     servlet:
       content-type: text/html
 
-  #MVC
+  # MVC
   mvc:
     static-path-pattern: static/**
 
+logging:
+  level:
+    root: info
+    org.springframework.web: trace
