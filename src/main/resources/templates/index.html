@@ -5,6 +5,11 @@
 	<title>Title</title>
 </head>
 <body>
-1212
+<div class="block-thumb" th:each="file : ${data}">
+	<div class="">
+		<a th:if="${file.type} eq 'folder'" th:href="@{|/folder/${file.url}|}">[[${file.name}]]</a>
+		<a th:if="${file.type} eq 'file'" th:href="@{|/file/${file.url}|}">[[${file.name}]]</a>
+	</div>
+</div>
 </body>
 </html>
