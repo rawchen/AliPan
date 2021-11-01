@@ -86,7 +86,7 @@ public class ApiController {
 		requestJson.put("parent_file_id", fileId);
 		requestJson.put("video_thumbnail_process", "video/snapshot,t_0,f_jpg,w_50");
 
-		Map headerMap = new HashMap();
+		Map<String, String> headerMap = new HashMap<>();
 		headerMap.put("Content-Type", "application/json");
 		headerMap.put("Authorization", "Bearer " + Constants.ACCESS_TOKEN);
 
@@ -101,11 +101,47 @@ public class ApiController {
 	@GetMapping(path = "/t")
 	public void r1(HttpServletRequest request, HttpServletResponse response) {
 		try {
-			response.sendRedirect("https://bj29.cn-beijing.data.alicloudccp.com/LQNLJSNv%2F1030023%2F60b107e2fcc924f1282d49a38cc5a489398685ea%2F60b107e25893e4688d7d4475805c574b23cda10c?di=bj29&dr=1030023&f=60b107e2fcc924f1282d49a38cc5a489398685ea&response-content-disposition=attachment%3B%20filename%2A%3DUTF-8%27%27cover.jpg&u=78d03043fe2f4ddcb830cdbe8613e2ee&x-oss-access-key-id=LTAIsE5mAn2F493Q&x-oss-additional-headers=referer&x-oss-expires=1635523246&x-oss-signature=%2B7Imb4DAiOkmY38uO0iJMgx1k8DVUzkYCFFbsIHaGNM%3D&x-oss-signature-version=OSS2");
+			response.sendRedirect("https://bj29.cn-beijing.data.alicloudccp.com/LQNLJSNv%2F1030023%2F60b107e2fcc924f1282d49a38cc5a489398685ea%2F60b107e25893e4688d7d4475805c574b23cda10c?x-oss-access-key-id=LTAIsE5mAn2F493Q&x-oss-additional-headers=referer&x-oss-expires=1635728391&x-oss-process=image%2Fresize%2Cw_1920%2Fformat%2Cjpeg&x-oss-signature=vtn97WYur6I94eV4Dw2chYSVNYIgMDV07pF%2Bmp9bErY%3D&x-oss-signature-version=OSS2");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 //		return "redirect:"+"https://bj29.cn-beijing.data.alicloudccp.com/LQNLJSNv%2F1030023%2F60b107e2fcc924f1282d49a38cc5a489398685ea%2F60b107e25893e4688d7d4475805c574b23cda10c?di=bj29&dr=1030023&f=60b107e2fcc924f1282d49a38cc5a489398685ea&response-content-disposition=attachment%3B%20filename%2A%3DUTF-8%27%27cover.jpg&u=78d03043fe2f4ddcb830cdbe8613e2ee&x-oss-access-key-id=LTAIsE5mAn2F493Q&x-oss-additional-headers=referer&x-oss-expires=1635523246&x-oss-signature=%2B7Imb4DAiOkmY38uO0iJMgx1k8DVUzkYCFFbsIHaGNM%3D&x-oss-signature-version=OSS2";
+	}
+
+	/**
+	 * 获取下载链接，过期15分钟
+	 *
+	 * @param fileId
+	 * @return
+	 */
+	@RequestMapping(value = "/down/{fileId}")
+	public String down(@PathVariable("fileId") String fileId, Model model, HttpServletRequest request, HttpServletResponse response) {
+
+		JSONObject requestJson = new JSONObject();
+		requestJson.put("drive_id", Constants.DEFAULT_DRIVE_ID);
+		requestJson.put("file_id", fileId);
+		requestJson.put("expire_sec", 14400);
+		Map<String, String> headerMap = new HashMap<>();
+		headerMap.put("Content-Type", "application/json");
+		headerMap.put("Authorization", "Bearer " + Constants.ACCESS_TOKEN);
+
+		String result = HttpClientUtil.doPost(apiUrl + "/file/get_download_url",
+				requestJson.toString(), headerMap);
+		JSONObject jsonObject = JSONObject.parseObject(result);
+		String res = (String) jsonObject.get("url");
+		model.addAttribute("url", res);
+		System.out.println("res: " + res);
+		return "index2";
+
+//		try {
+//			request.getRequestDispatcher(res).forward(request, response);
+//		} catch (IOException | ServletException e) {
+//			e.printStackTrace();
+//		}
+//		return "redirect:" + res;
+//		Map<String, Object> map = new HashMap<>();
+//		map.put("data", jsonObject);
+//		return map;
 	}
 
 	/**
@@ -130,7 +166,7 @@ public class ApiController {
 		requestJson.put("parent_file_id", fileId);
 		requestJson.put("video_thumbnail_process", "video/snapshot,t_0,f_jpg,w_50");
 
-		Map headerMap = new HashMap();
+		Map<String, String> headerMap = new HashMap<>();
 		headerMap.put("Content-Type", "application/json");
 		headerMap.put("Authorization", "Bearer " + Constants.ACCESS_TOKEN);
 
@@ -147,13 +183,15 @@ public class ApiController {
 				PanFile panFile = new PanFile();
 				panFile.setType("folder");
 				panFile.setName((String) dataObj.get("name"));
-				panFile.setUrl((String) dataObj.get("file_id"));
+				panFile.setFileId((String) dataObj.get("file_id"));
+				panFile.setUrl((String) dataObj.get("url"));
 				panFileList.add(panFile);
 			} else {
 				PanFile panFile = new PanFile();
 				panFile.setType("file");
 				panFile.setName((String) dataObj.get("name"));
-				panFile.setUrl((String) dataObj.get("file_id"));
+				panFile.setFileId((String) dataObj.get("file_id"));
+				panFile.setUrl((String) dataObj.get("url"));
 				panFileList.add(panFile);
 			}
 
