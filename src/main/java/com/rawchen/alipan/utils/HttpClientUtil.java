@@ -3,12 +3,15 @@ package com.rawchen.alipan.utils;
 import cn.hutool.core.util.StrUtil;
 import com.rawchen.alipan.config.Constants;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.client.utils.URIUtils;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
@@ -22,11 +25,15 @@ import org.apache.http.util.EntityUtils;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -39,23 +46,28 @@ public class HttpClientUtil {
 	 *
 	 * @param url
 	 * @param path
-	 * @param method
 	 * @param headers
 	 * @param querys
 	 * @return
 	 * @throws Exception
 	 */
-	public static HttpResponse doGet(String url, String path, String method,
-			Map<String, String> headers, Map<String, String> querys)
-			throws Exception {
-		HttpClient httpClient = wrapClient(url);
+	public static String doGet(String url, String path,
+			Map<String, String> headers, Map<String, String> querys) {
+		try {
+			HttpClient httpClient = wrapClient(url);
 
-		HttpGet request = new HttpGet(buildUrl(url, path, querys));
-		for (Map.Entry<String, String> e : headers.entrySet()) {
-			request.addHeader(e.getKey(), e.getValue());
+			HttpGet request = new HttpGet(buildUrl(url, path, querys));
+			for (Map.Entry<String, String> e : headers.entrySet()) {
+				request.addHeader(e.getKey(), e.getValue());
+			}
+
+			HttpResponse response = httpClient.execute(request);
+			HttpEntity entity = response.getEntity();
+			return EntityUtils.toString(entity);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-
-		return httpClient.execute(request);
+		return null;
 	}
 
 	/**
@@ -213,5 +225,40 @@ public class HttpClientUtil {
 		} catch (NoSuchAlgorithmException ex) {
 			throw new RuntimeException(ex);
 		}
+	}
+
+	/**
+	 * 处理跳转链接，获取重定向地址
+	 * @param url   源地址
+	 * @return      目标网页的绝对地址
+	 */
+	public static String getAbsUrl(String url){
+		CloseableHttpClient httpclient = HttpClients.createDefault();
+		HttpClientContext context = HttpClientContext.create();
+		HttpGet httpget = new HttpGet(url);
+		httpget.setHeader("Referer", "https://www.aliyundrive.com/");
+		httpget.setHeader("Host", "bj29.cn-beijing.data.alicloudccp.com");
+		CloseableHttpResponse response = null;
+		String absUrl = null;
+		try {
+			response = httpclient.execute(httpget, context);
+			HttpHost target = context.getTargetHost();
+			List<URI> redirectLocations = context.getRedirectLocations();
+			URI location = URIUtils.resolve(httpget.getURI(), target, redirectLocations);
+			System.out.println("Final HTTP location: " + location.toASCIIString());
+			absUrl = location.toASCIIString();
+		}catch(IOException e){
+			e.printStackTrace();
+		}catch (URISyntaxException e) {
+			e.printStackTrace();
+		}finally {
+			try {
+				httpclient.close();
+				response.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return absUrl;
 	}
 }
