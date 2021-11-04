@@ -9,26 +9,32 @@
 	<div class="">
 		<img th:src="${url}" alt="" style="width: 100px; height: 100px;">
 		<a th:href="${url}">[[${url}]]</a>
+<!--		<a href="javascript:void(0);" th:onclick="window.open('[[${url}]]')">123</a>-->
 	</div>
 </div>
 </body>
-<script>"[[${url}]]"
-downloadData=(excelUrl,reportName)=>{
-	let token = "Bearer " + sessionStorage.getItem('token')
-	fetch(DOWNLOAD + excelUrl, {
-		headers: {
-			'Content-type': 'application/json;charset=UTF-8',
-			'Authorization': token
-		}
-	}).then(res => res.blob().then(blob => {
-		var filename=`${reportName}.xls`
-		var a = document.createElement('a');
-		var url = window.URL.createObjectURL(blob);
-		a.href = url;
-		a.download = filename;
-		a.click();
-		window.URL.revokeObjectURL(url);
-	}))
-}
+<script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"/>
+<script>
+	// alert('[[${url}]]');
+	// window.open('[[${url}]]');
+
+	// location.href = '[[${url}]]';
+
+	this.$ajax.get('[[${url}]]', {
+		headers: {"Referer": "https://"},
+		responseType: 'blob',
+		params: {}
+	}).then(response => {
+		let url = window.URL.createObjectURL(new Blob([response.data]))
+		let link = document.createElement('a')
+		link.style.display = 'none'
+		link.href = url
+		link.setAttribute('download', '用户数据' + filtersTime.filters.yearMonthTime(new Date()) + '.xls')
+		document.body.appendChild(link)
+		link.click()
+	}, response => {
+		console.log("获取信息失败");
+		console.log(response);
+	});
 </script>
 </html>
