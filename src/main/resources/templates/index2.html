@@ -4,8 +4,8 @@
 	<meta name="referrer" content="never">
 	<meta charset="UTF-8">
 	<title>Title</title>
-	<link rel="shortcut icon" href="./img/favicon.ico">
-	<link rel="apple-touch-icon" href="./img/favicon.ico">
+	<link rel="shortcut icon" th:href="@{/static/img/favicon.ico}">
+	<link rel="apple-touch-icon" th:href="@{/static/img/favicon.ico}">
 	<meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" name="viewport">
 	<script src="https://s0.pstatp.com/cdn/expire-1-M/ionicons/4.5.6/ionicons.js"></script>
 	<script src="https://s0.pstatp.com/cdn/expire-1-M/marked/0.6.2/marked.min.js"></script>
@@ -100,7 +100,6 @@
 				<div class="info">
 					<div class="file-name"></div>
 					<div class="btn download">下载</div>
-					<div class="btn quote">引用</div>
 					<div class="btn share">分享</div>
 				</div>
 				<div class="content"></div>
@@ -116,11 +115,35 @@
 </div>
 </body>
 <script>
-	sendRequest("POST",
-		"http://localhost:8080/folder/" + "[[${fileId}]]",
-		{'Content-type': 'application/x-www-form-urlencoded'},
-		renderPage
-	);
+	document.addEventListener('DOMContentLoaded', () => {
+		if ("[[${type}]]" === "folder") {
+			sendRequest("POST",
+				"/getFolder/" + "[[${fileId}]]",
+				{'Content-type': 'application/x-www-form-urlencoded'},
+				renderPage
+			);
+		} else {
+			sendRequest("POST",
+				"/getFile/" + "[[${fileId}]]",
+				{'Content-type': 'application/x-www-form-urlencoded'},
+				renderPage2
+			);
+		}
+		if (window.history && window.history.pushState) {
+			$(window).on('popstate', function () {
+				window.history.pushState('forward', null, '');
+				window.history.forward(1);
+				back();
+			});
+		}
+
+		window.history.pushState('forward', null, ''); //在IE中必须得有这两行
+		window.history.forward(1);
+	});
+
+	function domain_index() {
+		location.reload();
+	}
 
 	function createCORSRequest(method, url, timeout) {
 		let xhr = new XMLHttpRequest();
@@ -175,71 +198,34 @@
 		let files;
 		files = JSON.parse(data);
 		renderFileList(files);
+		renderTreeNode(files);
 	}
 
-	function renderFileList(files) {
-		const createFileWrapper = (type, name, time, size, fileId, url) => {
+	function renderPage2(data, cache) {
+		let file;
+		file = JSON.parse(data);
+		dealFile("[[${fileId}]]", file.data.url, formatSize(file.data.size), file.data.name, file.data.download_url);
+	}
+
+
+		function renderFileList(files) {
+		const createFileWrapper = (type, name, time, size, fileId, url, downloadUrl) => {
 			let fileWrapper = document.getElementById('file-wrapper-templete').content.cloneNode(true);
 			fileWrapper.querySelector('ion-icon').setAttribute('name', type);
 			fileWrapper.querySelector('.name').innerHTML = name;
 			fileWrapper.querySelector('.time').innerHTML = time;
 			fileWrapper.querySelector('.size').innerHTML = size;
-			addFileListLineListener(fileWrapper.querySelector('.row.file-wrapper'), fileId, url, size, name);
+			addFileListLineListener(fileWrapper.querySelector('.row.file-wrapper'), fileId, url, size, name, downloadUrl);
 			return fileWrapper;
-		};
-
-		const formatDate = date => {
-			const addZero = num => num > 9 ? num : '0' + num;
-			date = new Date(date);
-			const year = date.getFullYear();
-			const month = addZero(date.getMonth() + 1);
-			const day = addZero(date.getDate());
-			const hour = addZero(date.getHours());
-			const minute = addZero(date.getMinutes());
-			const second = addZero(date.getSeconds());
-			return 'yyyy-MM-dd HH:mm:ss'
-				.replace('yyyy', year)
-				.replace('MM', month)
-				.replace('dd', day)
-				.replace('HH', hour)
-				.replace('mm', minute)
-				.replace('ss', second);
-		};
-
-		const formatSize = size => {
-			let count = 0;
-			while (size >= 1024) {
-				size /= 1024;
-				count++;
-			}
-			size = size.toFixed(2);
-			switch (count) {
-				case 1:
-					size += ' KB';
-					break;
-				case 2:
-					size += ' MB';
-					break;
-				case 3:
-					size += ' GB';
-					break;
-				case 4:
-					size += ' TB';
-					break;
-				case 5:
-					size += ' PB';
-					break;
-				default:
-					size += ' B';
-			}
-			return size;
 		};
 
 		let fileList = document.getElementById('file-list');
 		fileList.innerHTML = '';
 
+		document.getElementById('readme').innerHTML = '';
+		// document.getElementsByClassName("markdown-body")[0].innerHTML = '';
+
 		files.data.items.forEach(file => {
-			document.getElementById('readme').innerHTML = '';
 			if (file.type === 'file' && file.name === "README.md") {
 				renderMarkdown(file.url, true);
 			}
@@ -252,7 +238,8 @@
 						formatDate(file.created_at),
 						file.size ? formatSize(file.size) : '未知',
 						file.file_id,
-						file.url
+						file.url,
+						file.download_url
 					)
 				);
 			}
@@ -260,7 +247,6 @@
 	}
 
 	async function renderMarkdown(url, isReadMeMarkdown) {
-		document.getElementById('readme').innerHTML = '';
 		const render = text => {
 			let markedText;
 			try {
@@ -292,306 +278,325 @@
 	}
 
 
-	function addFileListLineListener(elem, fileId, url, size, name) {
+	function dealFile(fileId, url, size, name, downloadUrl) {
+		// window.backFordwardCache.preview = true;
+		switchRightDisplay('preview');
+		const previewHandler = {
+			copyTextContent: (source, text) => {
+				let result = false;
+				let target = document.createElement('pre');
+				target.style.opacity = '0';
+				target.textContent = text || source.textContent;
+				document.body.appendChild(target);
+				try {
+					let range = document.createRange();
+					range.selectNode(target);
+					window.getSelection().removeAllRanges();
+					window.getSelection().addRange(range);
+					document.execCommand('copy');
+					window.getSelection().removeAllRanges();
+					result = true;
+				} catch (e) { }
+				document.body.removeChild(target);
+				return result;
+			},
+			fileType: suffix => {
+				Array.prototype.contains = function (search) {
+					const object = this;
+					for (const key in object) {
+						if (object.hasOwnProperty(key)) {
+							if ((eval('/^' + search + '$/i')).test(object[key])) {
+								return true;
+							}
+						}
+					}
+					return false;
+				};
+				if (['bmp', 'jpg', 'png', 'svg', 'webp', 'gif'].contains(suffix)) {
+					return 'image';
+				} else if (['mp3', 'flac', 'wav'].contains(suffix)) {
+					return 'audio';
+				} else if (['mp4', 'avi', 'mkv', 'flv', 'm3u8'].contains(suffix)) {
+					return 'video';
+				} else if (
+					[
+						'txt', 'js', 'json', 'css', 'html', 'java', 'c', 'cpp', 'php',
+						'cmd', 'ps1', 'bat', 'sh', 'py', 'go', 'asp', 'reg', 'sql'
+					].contains(suffix)
+				) {
+					return 'text';
+				} else if (
+					['doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'mpp', 'rtf', 'vsd', 'vsdx'].contains(suffix)
+				) {
+					return 'office';
+				} else if (['pdf'].contains(suffix)) {
+					return 'pdf';
+				} else if (['md'].contains(suffix)) {
+					return 'markdown';
+				};
+			},
+			loadResource: (resource, callback) => {
+				let type;
+				switch (resource.split('.').pop()) {
+					case 'css':
+						type = 'link';
+						break;
+					case 'js':
+						type = 'script';
+						break;
+				}
+				let element = document.createElement(type);
+				let loaded = false;
+				if (typeof callback === 'function') {
+					element.onload = element.onreadystatechange = () => {
+						if (!loaded && (!element.readyState || /loaded|complete/.test(
+							element.readyState))) {
+							element.onload = element.onreadystatechange = null;
+							loaded = true;
+							callback();
+						}
+					}
+				}
+				if (type === 'link') {
+					element.href = resource;
+					element.rel = 'stylesheet';
+				} else {
+					element.src = resource;
+				}
+				document.getElementsByTagName('head')[0].appendChild(element);
+			},
+
+			createDplayer: (video, type, elem) => {
+				const host = 'https://s0.pstatp.com/cdn/expire-1-M';
+				const resources = [
+					'/dplayer/1.25.0/DPlayer.min.css',
+					'/dplayer/1.25.0/DPlayer.min.js',
+					'/hls.js/0.12.4/hls.light.min.js',
+					'/flv.js/1.5.0/flv.min.js'
+				];
+				let unloadedResourceCount = resources.length;
+				resources.forEach(resource => {
+					previewHandler.loadResource(host + resource, () => {
+						if (!--unloadedResourceCount) {
+							let option = {
+								url: video
+							}
+							if (type === 'flv') {
+								option.type = 'flv';
+							}
+							new DPlayer({
+								container: elem,
+								volume: 0.5,
+								screenshot: true,
+								video: option
+							});
+						}
+					})
+				});
+			}
+		}
+		const suffix = name.split('.').pop();
+		let content = document.querySelector('.content');
+		let contentType = previewHandler.fileType(suffix);
+		switch (contentType) {
+			case 'image':
+				let img = new Image();
+				img.style.maxWidth = '100%';
+				img.style.border = '4px dotted #94b4d1';
+				img.style.padding = '6px';
+				img.src = url;
+				let fancy = document.createElement('a');
+				fancy.setAttribute('data-fancybox', 'image');
+				fancy.href = img.src;
+				fancy.append(img);
+				content.innerHTML = '';
+				content.append(fancy);
+				break;
+			case 'audio':
+				let audio = new Audio();
+				audio.style.outline = 'none';
+				audio.preload = 'auto';
+				audio.volume = 0.3;
+				audio.controls = 'controls';
+				audio.style.width = '100%';
+				audio.src = url;
+				content.innerHTML = '';
+				content.append(audio);
+				break;
+			case 'video':
+				let video = document.createElement('div');
+				previewHandler.createDplayer(url, suffix, video);
+				content.innerHTML = '';
+				content.append(video);
+
+				/*
+				var x = document.createElement("VIDEO");
+				x.setAttribute("width", "100%");
+				x.setAttribute("controls", "controls");
+				alert(url);
+				x.setAttribute("src", url);
+				content.append(x);
+				*/
+
+				break;
+			case 'text':
+				let pre = document.createElement('pre');
+				let code = document.createElement('code');
+				pre.append(code);
+				//pre.style.background = 'rgb(245,245,245)';
+				pre.style['overflow-x'] = 'scroll';
+				pre.classList.add(suffix);
+				content.style['text-align'] = 'initial';
+				content.innerHTML = '';
+				content.append(pre);
+				sendRequest('GET', url, null, data => {
+					code.textContent = data;
+					// alert(size)
+					if (size.indexOf(' B') >= 0 || size.indexOf(' KB') && size.split(' ')[0] < 100) {
+						//hljs.highlightBlock(pre);
+						$('pre code').each(function(i, block) {
+							hljs.highlightBlock(block);
+							hljs.lineNumbersBlock(block);
+						});
+					}
+				});
+				break;
+			case 'office':
+				const officeOnline = 'https://view.officeapps.live.com/op/view.aspx?src=' + encodeURIComponent(url);
+				//window.open(officeOnline);
+				let div = document.createElement('div');
+				div.className = 'target-blank';
+				div.innerHTML = '点我新窗口打开';
+				div.addEventListener('click', () => window.open(officeOnline));
+				content.innerHTML = '';
+				content.appendChild(div);
+				if (document.body.clientWidth >= 480) {
+					let iframe = document.createElement('iframe');
+					iframe.width = '100%';
+					iframe.style.height = '41em';
+					iframe.style.border = '0';
+					iframe.src = officeOnline;
+					content.appendChild(iframe);
+				}
+				break;
+			case 'pdf':
+				//const pdfOnline = '//web.jisupdf.com/?file=' + encodeURIComponent(url);
+				//const pdfOnline = '//mozilla.github.io/pdf.js/web/viewer.html?file=' + encodeURIComponent(url);
+				const pdfOnline = 'https://pdf.rawchen.com/web?file=' + encodeURIComponent(url);
+				//window.open(pdfOnline);
+				let div2 = document.createElement('div');
+				div2.className = 'target-blank';
+				div2.innerHTML = '点我新窗口打开';
+				div2.addEventListener('click', () => window.open(pdfOnline));
+				content.innerHTML = '';
+				content.appendChild(div2);
+				if (document.body.clientWidth >= 300) {
+					let iframe2 = document.createElement('iframe');
+					iframe2.width = '100%';
+					iframe2.style.height = '41em';
+					iframe2.style.border = '0';
+					iframe2.src = pdfOnline;
+					content.appendChild(iframe2);
+				}
+				break;
+			case 'markdown':
+				renderMarkdown(url, false);
+				break;
+			default:
+				// content.style['color'] = 'white';
+				// content.style['background-color'] = '#131313';
+				// content.style['font-size'] = '20px';
+				content.style['text-align'] = 'center';
+				content.innerHTML = '该文件不支持预览';
+				break;
+
+		}
+		let address;
+		if (url) {
+			address = window.location.host + "/file/" + fileId;
+		} else {
+			address = window.location.host + "/folder/" + fileId;
+		}
+		document.querySelector('.file-name').innerHTML = address;
+		document.querySelector('.btn.download').addEventListener('click',
+			() => {
+				previewHandler.copyTextContent(null,downloadUrl);
+				location.href = downloadUrl;
+				const btn = document.querySelector('.btn.download');
+				btn.innerHTML = '已复制';
+				setTimeout(() => btn.innerHTML = '下载', 3000);
+			}
+		);
+		document.querySelector('.btn.share').addEventListener('click',
+			() => {
+				previewHandler.copyTextContent(null, address);
+				const btn = document.querySelector('.btn.share');
+				btn.innerHTML = '已复制';
+				setTimeout(() => btn.innerHTML = '分享', 3000);
+			}
+		);
+
+		let start = null;
+		let right = document.querySelector('.right');
+		const scrollToBottom = (timestamp) => {
+			if (!start) start = timestamp;
+			let progress = timestamp - start;
+			let last = right.scrollTop;
+			right.scrollTo(0, right.scrollTop + 14);
+			if (right.scrollTop !== last && progress < 1000 * 2) {
+				window.requestAnimationFrame(scrollToBottom);
+			}
+		};
+		window.requestAnimationFrame(scrollToBottom);
+	}
+
+	function switchBackForwardStatus(path) {
+		if (path) {
+			window.backFordwardCache.deepest = path;
+		}
+		if (window.backFordwardCache.root !== window.backFordwardCache.current) {
+			window.backFordwardCache.backable = true;
+			document.getElementById('arrow-back').style.color = '#545454';
+		} else {
+			// window.backFordwardCache.backable = false;
+			// document.getElementById('arrow-back').style.color = 'rgb(218, 215, 215)';
+		}
+		if (window.backFordwardCache.deepest !== window.backFordwardCache.current) {
+			window.backFordwardCache.forwardable = true;
+			document.getElementById('arrow-forward').style.color = '#545454';
+		} else {
+			window.backFordwardCache.forwardable = false;
+			document.getElementById('arrow-forward').style.color = '#545454';
+		}
+	}
+
+	function addPathListener(elem, path) {
+		elem.addEventListener('click', event => {
+			// fetchFileList(path);
+			switchBackForwardStatus(path);
+		});
+	}
+
+	function addTreeNodeListener(elem, path) {
+		elem.addEventListener('click', event => {
+			// alert("123")
+			// fetchFileList(path);
+			// renderTreeNode(files);
+			switchBackForwardStatus(path);
+		});
+	}
+
+	function addFileListLineListener(elem, fileId, url, size, name, downloadUrl) {
 		var path = "/";
 		//如果url不为空则时文件，为空就是文件夹
 		if (url) {
 			elem.addEventListener('click', event => {
-				window.backFordwardCache.preview = true;
-				const previewHandler = {
-					copyTextContent: (source, text) => {
-						let result = false;
-						let target = document.createElement('pre');
-						target.style.opacity = '0';
-						target.textContent = text || source.textContent;
-						document.body.appendChild(target);
-						try {
-							let range = document.createRange();
-							range.selectNode(target);
-							window.getSelection().removeAllRanges();
-							window.getSelection().addRange(range);
-							document.execCommand('copy');
-							window.getSelection().removeAllRanges();
-							result = true;
-						} catch (e) { }
-						document.body.removeChild(target);
-						return result;
-					},
-					fileType: suffix => {
-						Array.prototype.contains = function (search) {
-							const object = this;
-							for (const key in object) {
-								if (object.hasOwnProperty(key)) {
-									if ((eval('/^' + search + '$/i')).test(object[key])) {
-										return true;
-									}
-								}
-							}
-							return false;
-						};
-						if (['bmp', 'jpg', 'png', 'svg', 'webp', 'gif'].contains(suffix)) {
-							return 'image';
-						} else if (['mp3', 'flac', 'wav'].contains(suffix)) {
-							return 'audio';
-						} else if (['mp4', 'avi', 'mkv', 'flv', 'm3u8'].contains(suffix)) {
-							return 'video';
-						} else if (
-							[
-								'txt', 'js', 'json', 'css', 'html', 'java', 'c', 'cpp', 'php',
-								'cmd', 'ps1', 'bat', 'sh', 'py', 'go', 'asp', 'reg'
-							].contains(suffix)
-						) {
-							return 'text';
-						} else if (
-							['doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'mpp', 'rtf', 'vsd', 'vsdx'].contains(suffix)
-						) {
-							return 'office';
-						} else if (['pdf'].contains(suffix)) {
-							return 'pdf';
-						} else if (['md'].contains(suffix)) {
-							return 'markdown';
-						};
-					},
-					loadResource: (resource, callback) => {
-						let type;
-						switch (resource.split('.').pop()) {
-							case 'css':
-								type = 'link';
-								break;
-							case 'js':
-								type = 'script';
-								break;
-						}
-						let element = document.createElement(type);
-						let loaded = false;
-						if (typeof callback === 'function') {
-							element.onload = element.onreadystatechange = () => {
-								if (!loaded && (!element.readyState || /loaded|complete/.test(
-									element.readyState))) {
-									element.onload = element.onreadystatechange = null;
-									loaded = true;
-									callback();
-								}
-							}
-						}
-						if (type === 'link') {
-							element.href = resource;
-							element.rel = 'stylesheet';
-						} else {
-							element.src = resource;
-						}
-						document.getElementsByTagName('head')[0].appendChild(element);
-					},
-
-					createDplayer: (video, type, elem) => {
-						const host = 'https://s0.pstatp.com/cdn/expire-1-M';
-						const resources = [
-							'/dplayer/1.25.0/DPlayer.min.css',
-							'/dplayer/1.25.0/DPlayer.min.js',
-							'/hls.js/0.12.4/hls.light.min.js',
-							'/flv.js/1.5.0/flv.min.js'
-						];
-						let unloadedResourceCount = resources.length;
-						resources.forEach(resource => {
-							previewHandler.loadResource(host + resource, () => {
-								if (!--unloadedResourceCount) {
-									let option = {
-										url: video
-									}
-									if (type === 'flv') {
-										option.type = 'flv';
-									}
-									new DPlayer({
-										container: elem,
-										volume: 0.5,
-										screenshot: true,
-										video: option
-									});
-								}
-							})
-						});
-					}
-				}
-				const suffix = name.split('.').pop();
-				let content = document.querySelector('.content');
-				let contentType = previewHandler.fileType(suffix);
-				switch (contentType) {
-					case 'image':
-						let img = new Image();
-						img.style.maxWidth = '100%';
-						img.style.border = '4px dotted #94b4d1';
-						img.style.padding = '6px';
-						img.src = url;
-						let fancy = document.createElement('a');
-						fancy.setAttribute('data-fancybox', 'image');
-						fancy.href = img.src;
-						fancy.append(img);
-						content.innerHTML = '';
-						content.append(fancy);
-						break;
-					case 'audio':
-						let audio = new Audio();
-						audio.style.outline = 'none';
-						audio.preload = 'auto';
-						audio.volume = 0.3;
-						audio.controls = 'controls';
-						audio.style.width = '100%';
-						audio.src = url;
-						content.innerHTML = '';
-						content.append(audio);
-						break;
-					case 'video':
-						let video = document.createElement('div');
-						previewHandler.createDplayer(url, suffix, video);
-						content.innerHTML = '';
-						content.append(video);
-
-						/*
-						var x = document.createElement("VIDEO");
-						x.setAttribute("width", "100%");
-						x.setAttribute("controls", "controls");
-						alert(url);
-						x.setAttribute("src", url);
-						content.append(x);
-						*/
-
-						break;
-					case 'text':
-						let pre = document.createElement('pre');
-						let code = document.createElement('code');
-						pre.append(code);
-						//pre.style.background = 'rgb(245,245,245)';
-						pre.style['overflow-x'] = 'scroll';
-						pre.classList.add(suffix);
-						content.style['text-align'] = 'initial';
-						content.innerHTML = '';
-						content.append(pre);
-						sendRequest('GET', url, null, data => {
-							code.textContent = data;
-							if (size.indexOf(' B') >= 0 || size.indexOf(' KB') &&
-								size.split(' ')[0] < 100
-							) {
-								//hljs.highlightBlock(pre);
-								$('pre code').each(function(i, block) {
-									hljs.highlightBlock(block);
-									hljs.lineNumbersBlock(block);
-								});
-							}
-						});
-						break;
-					case 'office':
-						const officeOnline = 'https://view.officeapps.live.com/op/view.aspx?src=' + encodeURIComponent(url);
-						//window.open(officeOnline);
-						let div = document.createElement('div');
-						div.className = 'target-blank';
-						div.innerHTML = '点我新窗口打开';
-						div.addEventListener('click', () => window.open(officeOnline));
-						content.innerHTML = '';
-						content.appendChild(div);
-						if (document.body.clientWidth >= 480) {
-							let iframe = document.createElement('iframe');
-							iframe.width = '100%';
-							iframe.style.height = '41em';
-							iframe.style.border = '0';
-							iframe.src = officeOnline;
-							content.appendChild(iframe);
-						}
-						break;
-					case 'pdf':
-						//const pdfOnline = '//web.jisupdf.com/?file=' + encodeURIComponent(url);
-						//const pdfOnline = '//mozilla.github.io/pdf.js/web/viewer.html?file=' + encodeURIComponent(url);
-						const pdfOnline = 'https://pdf.rawchen.com/web?file=' + encodeURIComponent(url);
-						//window.open(pdfOnline);
-						let div2 = document.createElement('div');
-						div2.className = 'target-blank';
-						div2.innerHTML = '点我新窗口打开';
-						div2.addEventListener('click', () => window.open(pdfOnline));
-						content.innerHTML = '';
-						content.appendChild(div2);
-						if (document.body.clientWidth >= 300) {
-							let iframe2 = document.createElement('iframe');
-							iframe2.width = '100%';
-							iframe2.style.height = '41em';
-							iframe2.style.border = '0';
-							iframe2.src = pdfOnline;
-							content.appendChild(iframe2);
-						}
-						break;
-					case 'markdown':
-						renderMarkdown(url, false);
-						break;
-					default:
-						// content.style['color'] = 'white';
-						// content.style['background-color'] = '#131313';
-						// content.style['font-size'] = '20px';
-						content.style['text-align'] = 'center';
-						content.innerHTML = '该文件不支持预览';
-						break;
-
-				}
-				path = window.GLOBAL_CONFIG.SCF_GATEWAY + '/?file=' + path;
-				document.querySelector('.file-name').innerHTML = path;
-				document.querySelector('.btn.download').addEventListener('click',
-					() => {
-						previewHandler.copyTextContent(null,url);
-						location.href = url;
-						const btn = document.querySelector('.btn.download');
-						btn.innerHTML = '已复制';
-						setTimeout(() => btn.innerHTML = '下载', 3000);
-					}
-				);
-				document.querySelector('.btn.quote').addEventListener('click',
-					event => {
-						previewHandler.copyTextContent(null, path);
-						const btn = document.querySelector('.btn.quote');
-						btn.innerHTML = '已复制';
-						setTimeout(() => btn.innerHTML = '引用', 3000);
-					}
-				);
-				document.querySelector('.btn.share').addEventListener('click',
-					event => {
-						const sharePath = () => {
-							let arr = window.backFordwardCache.current.split('/');
-							let r = '';
-							for (let i = 1; i < arr.length; i++) {
-								r += '/' + arr[i];
-							}
-							return r;
-						}
-						previewHandler.copyTextContent(null,
-							window.location.origin +
-							window.location.pathname +
-							'?path=' + sharePath());
-						const btn = document.querySelector('.btn.share');
-						btn.innerHTML = '已复制';
-						setTimeout(() => btn.innerHTML = '分享', 3000);
-					}
-				);
-				switchRightDisplay('preview');
-
-				let start = null;
-				let right = document.querySelector('.right');
-				const scrollToBottom = (timestamp) => {
-					if (!start) start = timestamp;
-					let progress = timestamp - start;
-					let last = right.scrollTop;
-					right.scrollTo(0, right.scrollTop + 14);
-					if (right.scrollTop !== last && progress < 1000 * 2) {
-						window.requestAnimationFrame(scrollToBottom);
-					}
-				};
-				window.requestAnimationFrame(scrollToBottom);
+				dealFile(fileId, url, size, name, downloadUrl);
 			});
 		} else {
 			elem.addEventListener('click', event => {
-				// sendRequest(window.api.method,
-				// 	"http://localhost:8080/folder/root",
-				// 	window.api.formatPayload(path),
-				// 	window.api.headers,
-				// 	renderPage
-				// );
 				sendRequest("POST",
-					"http://localhost:8080/folder/" + fileId,
+					"/getFolder/" + fileId,
 					{'Content-type': 'application/x-www-form-urlencoded'},
 					renderPage
 				);
@@ -633,7 +638,146 @@
 		}
 	}
 
+	const formatDate = date => {
+		const addZero = num => num > 9 ? num : '0' + num;
+		date = new Date(date);
+		const year = date.getFullYear();
+		const month = addZero(date.getMonth() + 1);
+		const day = addZero(date.getDate());
+		const hour = addZero(date.getHours());
+		const minute = addZero(date.getMinutes());
+		const second = addZero(date.getSeconds());
+		return 'yyyy-MM-dd HH:mm:ss'
+			.replace('yyyy', year)
+			.replace('MM', month)
+			.replace('dd', day)
+			.replace('HH', hour)
+			.replace('mm', minute)
+			.replace('ss', second);
+	};
 
+	const formatSize = size => {
+		let count = 0;
+		while (size >= 1024) {
+			size /= 1024;
+			count++;
+		}
+		size = size.toFixed(2);
+		switch (count) {
+			case 1:
+				size += ' KB';
+				break;
+			case 2:
+				size += ' MB';
+				break;
+			case 3:
+				size += ' GB';
+				break;
+			case 4:
+				size += ' TB';
+				break;
+			case 5:
+				size += ' PB';
+				break;
+			default:
+				size += ' B';
+		}
+		return size;
+	};
+
+	async function renderTreeNode(files) {
+		const createTreeNodeWrapper = (array, type, name, path, fileId) => {
+			let treeNodeWrapper = document.getElementById('tree-node-wrapper-template').content
+				.cloneNode(true);
+			let icons = treeNodeWrapper.querySelectorAll('ion-icon');
+			icons[0].setAttribute('name', array);
+			icons[1].setAttribute('name', type);
+			treeNodeWrapper.querySelector('.tree-node-name').innerText = name;
+			treeNodeWrapper.appendNode = node => treeNodeWrapper.querySelector('.tree-node-wrapper').append(
+				node);
+			addTreeNodeListener(treeNodeWrapper.querySelector('.tree-node'), path);
+			return treeNodeWrapper;
+		}
+
+		// const paths = files.parent.split('/');
+		// const paths = files.parent.split('/');
+		const paths = "/".split('/');
+		let absolutePath = max => {
+			let absolutePath = '';
+			for (let j = 1; j <= max; j++) {
+				absolutePath += '/' + paths[j];
+			}
+			return absolutePath;
+		};
+		let maxIndex = paths.length - 1;
+		let currentTreeNode = createTreeNodeWrapper('arrow-dropdown',
+			'folder-open',
+			paths[maxIndex],
+			absolutePath(maxIndex)
+		);
+		files.data.items.forEach(file => {
+			if (!file.url) {
+				currentTreeNode.appendNode(createTreeNodeWrapper('arrow-dropright',
+					'folder',
+					file.name,
+					files.parent + '/' + file.name,
+					file.file_id
+				));
+			}
+		});
+
+		for (let i = maxIndex - 1; i > 0; i--) {
+			const currentTreeNodeParentAbsolutePath = absolutePath(i);
+			let currentTreeNodeParent = createTreeNodeWrapper('arrow-dropdown',
+				'folder',
+				paths[i],
+				currentTreeNodeParentAbsolutePath
+			);
+			let cache = window.fileCache.get(currentTreeNodeParentAbsolutePath);
+			if (cache) {
+				cache.files.forEach(file => {
+					if (!file.url) {
+						if (file.name === paths[i + 1]) {
+							currentTreeNodeParent.appendNode(currentTreeNode);
+						} else {
+							currentTreeNodeParent.appendNode(createTreeNodeWrapper(
+								'arrow-dropright',
+								'folder',
+								file.name,
+								currentTreeNodeParentAbsolutePath + '/' + file.name
+							));
+						}
+					}
+				});
+			} else {
+				currentTreeNodeParent.appendNode(currentTreeNode);
+			}
+			currentTreeNode = currentTreeNodeParent;
+		}
+
+		const treeRoot = document.getElementById('tree-root');
+		treeRoot.innerHTML = '';
+		const cache = window.fileCache.get(window.api.root);
+		const currentNodeName = currentTreeNode.querySelector('.tree-node-name').innerText;
+		if (cache) {
+			cache.files.forEach(file => {
+				if (!file.url) {
+					if (file.name === currentNodeName) {
+						treeRoot.append(currentTreeNode);
+					} else {
+						treeRoot.append(createTreeNodeWrapper(
+							'arrow-dropright',
+							'folder',
+							file.name,
+							window.api.root + file.name
+						));
+					}
+				}
+			});
+		} else {
+			treeRoot.append(currentTreeNode);
+		}
+	}
 
 
 	window.GLOBAL_CONFIG = {

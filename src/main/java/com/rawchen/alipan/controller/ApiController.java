@@ -42,7 +42,7 @@ public class ApiController {
 	 * @return
 	 */
 	@ResponseBody
-	@RequestMapping(value = "/file/{fileId}")
+	@RequestMapping(value = "/getFile/{fileId}")
 	public Map<String, Object> getFile(@PathVariable("fileId") String fileId) {
 
 		JSONObject requestJson = new JSONObject();
@@ -70,7 +70,7 @@ public class ApiController {
 	 * @return
 	 */
 	@ResponseBody
-	@RequestMapping(value = "/folder/{fileId}")
+	@RequestMapping(value = "/getFolder/{fileId}")
 	public Map<String, Object> getFolder(@PathVariable("fileId") String fileId) {
 
 		JSONObject requestJson = new JSONObject();
@@ -94,7 +94,35 @@ public class ApiController {
 				requestJson.toString(), headerMap);
 		JSONObject jsonObject = JSONObject.parseObject(result);
 		Map<String, Object> map = new HashMap<>();
+
+		//返回基于根的parent路径
+		String t = fileId;
+		String fullPath = "/";
+		String fullPathFileId = "/";
+		JSONObject requestJson2 = new JSONObject();
+		requestJson2.put("drive_id", Constants.DEFAULT_DRIVE_ID);
+
+		Map<String, String> headerMap2 = new HashMap<>();
+		headerMap2.put("Content-Type", "application/json");
+		headerMap2.put("Authorization", "Bearer " + Constants.ACCESS_TOKEN);
+
+		while (!"root".equals(t)) {
+			requestJson2.put("file_id", t);
+			String result2 = HttpClientUtil.doPost(apiUrl + "/file/get",
+					requestJson2.toString(), headerMap2);
+			JSONObject jsonObject2 = JSONObject.parseObject(result2);
+//			System.out.println("result2::::" + result2);
+			t = (String) jsonObject2.get("parent_file_id");
+			fullPath ="/" + jsonObject2.get("name") + fullPath;
+			fullPathFileId ="/" + jsonObject2.get("parent_file_id") + fullPathFileId;
+
+		}
+		System.out.println("fullPath::::::::::::::::" + fullPath);
+
+
 		map.put("data", jsonObject);
+		map.put("parent", fullPath);
+		map.put("fullPathFileId", fullPathFileId);
 		return map;
 	}
 
@@ -114,8 +142,9 @@ public class ApiController {
 	 * @param fileId
 	 * @return
 	 */
+	@ResponseBody
 	@RequestMapping(value = "/down/{fileId}")
-	public String down(@PathVariable("fileId") String fileId, Model model, HttpServletRequest request, HttpServletResponse response) {
+	public Map<String, Object> down(@PathVariable("fileId") String fileId, Model model, HttpServletRequest request, HttpServletResponse response) {
 
 		JSONObject requestJson = new JSONObject();
 		requestJson.put("drive_id", Constants.DEFAULT_DRIVE_ID);
@@ -128,10 +157,14 @@ public class ApiController {
 		String result = HttpClientUtil.doPost(apiUrl + "/file/get_download_url",
 				requestJson.toString(), headerMap);
 		JSONObject jsonObject = JSONObject.parseObject(result);
-		String res = (String) jsonObject.get("url");
-		model.addAttribute("url", res);
-		System.out.println("res: " + res);
-		return "index2";
+		Map<String, Object> map = new HashMap<>();
+		map.put("data", jsonObject);
+		map.put("fileId", fileId);
+
+//		String res = (String) jsonObject.get("url");
+//		model.addAttribute("url", res);
+//		System.out.println("res: " + res);
+		return map;
 
 //		try {
 //			request.getRequestDispatcher(res).forward(request, response);
