@@ -316,12 +316,14 @@
 					return 'image';
 				} else if (['mp3', 'flac', 'wav'].contains(suffix)) {
 					return 'audio';
-				} else if (['mp4', 'avi', 'mkv', 'flv', 'm3u8'].contains(suffix)) {
+				} else if (['mp4', 'avi', 'mkv', 'flv', 'm3u8', 'mov'].contains(suffix)) {
 					return 'video';
 				} else if (
 					[
-						'txt', 'js', 'json', 'css', 'html', 'java', 'c', 'cpp', 'php',
-						'cmd', 'ps1', 'bat', 'sh', 'py', 'go', 'asp', 'reg', 'sql'
+						'txt', 'js', 'json', 'css','htm', 'html', 'java', 'c', 'cpp',
+						'vue', 'py', 'h', 'hpp', 'gitignore', 'php', 'conf', 'ini',
+						'cmd', 'ps1', 'bat', 'sh', 'py', 'go', 'asp', 'reg', 'sql',
+						'properties', 'yml'
 					].contains(suffix)
 				) {
 					return 'text';
@@ -582,6 +584,7 @@
 			// alert("123")
 			// fetchFileList(path);
 			// renderTreeNode(files);
+			123
 			switchBackForwardStatus(path);
 		});
 	}
@@ -687,14 +690,12 @@
 
 	async function renderTreeNode(files) {
 		const createTreeNodeWrapper = (array, type, name, path, fileId) => {
-			let treeNodeWrapper = document.getElementById('tree-node-wrapper-template').content
-				.cloneNode(true);
+			let treeNodeWrapper = document.getElementById('tree-node-wrapper-template').content.cloneNode(true);
 			let icons = treeNodeWrapper.querySelectorAll('ion-icon');
 			icons[0].setAttribute('name', array);
 			icons[1].setAttribute('name', type);
 			treeNodeWrapper.querySelector('.tree-node-name').innerText = name;
-			treeNodeWrapper.appendNode = node => treeNodeWrapper.querySelector('.tree-node-wrapper').append(
-				node);
+			treeNodeWrapper.appendNode = node => treeNodeWrapper.querySelector('.tree-node-wrapper').append(node);
 			addTreeNodeListener(treeNodeWrapper.querySelector('.tree-node'), path);
 			return treeNodeWrapper;
 		}
