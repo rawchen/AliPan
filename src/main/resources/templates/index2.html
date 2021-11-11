@@ -70,7 +70,7 @@
                 </span>
 		</div>
 		<a class="site" id="nav-site" href="javascript:void(0);" onclick="domain_index()" title="刷新">ONEDRIVE</a>
-		<a class="site" id="git-branch-a" target="_black" href="https://rawchen.com/enjoy/onedrive.html" title="你也想要属于自己的云盘？"><ion-icon id="git-branch" name="git-branch" class="logo"></ion-icon></a>
+		<a class="site" id="git-branch-a" target="_black" href="https://rawchen.com/enjoy/alipan.html" title="你也想要属于自己的云盘？"><ion-icon id="git-branch" name="git-branch" class="logo"></ion-icon></a>
 
 	</div>
 </div>
@@ -198,6 +198,7 @@
 		let files;
 		files = JSON.parse(data);
 		renderFileList(files);
+		//初始化根节点列表的树
 		renderTreeNode(files);
 	}
 
@@ -581,10 +582,11 @@
 
 	function addTreeNodeListener(elem, path) {
 		elem.addEventListener('click', event => {
-			// alert("123")
+			alert("123")
 			// fetchFileList(path);
+
+			//每次点击需要根据elem的file_id去向下一级通过list接口获取列表
 			// renderTreeNode(files);
-			123
 			switchBackForwardStatus(path);
 		});
 	}
@@ -690,6 +692,7 @@
 
 	async function renderTreeNode(files) {
 		const createTreeNodeWrapper = (array, type, name, path, fileId) => {
+			//创建树节点包含图标
 			let treeNodeWrapper = document.getElementById('tree-node-wrapper-template').content.cloneNode(true);
 			let icons = treeNodeWrapper.querySelectorAll('ion-icon');
 			icons[0].setAttribute('name', array);
@@ -734,25 +737,26 @@
 				paths[i],
 				currentTreeNodeParentAbsolutePath
 			);
-			let cache = window.fileCache.get(currentTreeNodeParentAbsolutePath);
-			if (cache) {
-				cache.files.forEach(file => {
-					if (!file.url) {
-						if (file.name === paths[i + 1]) {
-							currentTreeNodeParent.appendNode(currentTreeNode);
-						} else {
-							currentTreeNodeParent.appendNode(createTreeNodeWrapper(
-								'arrow-dropright',
-								'folder',
-								file.name,
-								currentTreeNodeParentAbsolutePath + '/' + file.name
-							));
-						}
-					}
-				});
-			} else {
-				currentTreeNodeParent.appendNode(currentTreeNode);
-			}
+			// let cache = window.fileCache.get(currentTreeNodeParentAbsolutePath);
+			// if (cache) {
+			// 	cache.files.forEach(file => {
+			// 		if (!file.url) {
+			// 			if (file.name === paths[i + 1]) {
+			// 				currentTreeNodeParent.appendNode(currentTreeNode);
+			// 			} else {
+			// 				currentTreeNodeParent.appendNode(createTreeNodeWrapper(
+			// 					'arrow-dropright',
+			// 					'folder',
+			// 					file.name,
+			// 					currentTreeNodeParentAbsolutePath + '/' + file.name
+			// 				));
+			// 			}
+			// 		}
+			// 	});
+			// } else {
+			//
+			// }
+			currentTreeNodeParent.appendNode(currentTreeNode);
 			currentTreeNode = currentTreeNodeParent;
 		}
 
