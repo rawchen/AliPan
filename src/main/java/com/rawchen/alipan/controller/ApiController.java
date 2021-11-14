@@ -90,39 +90,41 @@ public class ApiController {
 		headerMap.put("Content-Type", "application/json");
 		headerMap.put("Authorization", "Bearer " + Constants.ACCESS_TOKEN);
 
-		String result = HttpClientUtil.doPost(apiUrl + "/file/list",
-				requestJson.toString(), headerMap);
+		String result = HttpClientUtil.doPost(apiUrl + "/file/list", requestJson.toString(), headerMap);
 		JSONObject jsonObject = JSONObject.parseObject(result);
+		if (jsonObject == null) {
+			result = HttpClientUtil.doPost(apiUrl + "/file/list", requestJson.toString(), headerMap);
+			jsonObject = JSONObject.parseObject(result);
+		}
 		Map<String, Object> map = new HashMap<>();
 
 		//返回基于根的parent路径
-		String t = fileId;
-		String fullPath = "/";
-		String fullPathFileId = "/";
-		JSONObject requestJson2 = new JSONObject();
-		requestJson2.put("drive_id", Constants.DEFAULT_DRIVE_ID);
+//		String t = fileId;
+//		String fullPath = "/";
+//		String fullPathFileId = "/";
+//		JSONObject requestJson2 = new JSONObject();
+//		requestJson2.put("drive_id", Constants.DEFAULT_DRIVE_ID);
+//
+//		Map<String, String> headerMap2 = new HashMap<>();
+//		headerMap2.put("Content-Type", "application/json");
+//		headerMap2.put("Authorization", "Bearer " + Constants.ACCESS_TOKEN);
 
-		Map<String, String> headerMap2 = new HashMap<>();
-		headerMap2.put("Content-Type", "application/json");
-		headerMap2.put("Authorization", "Bearer " + Constants.ACCESS_TOKEN);
-
-		while (!"root".equals(t)) {
-			requestJson2.put("file_id", t);
-			String result2 = HttpClientUtil.doPost(apiUrl + "/file/get",
-					requestJson2.toString(), headerMap2);
-			JSONObject jsonObject2 = JSONObject.parseObject(result2);
-//			System.out.println("result2::::" + result2);
-			t = (String) jsonObject2.get("parent_file_id");
-			fullPath ="/" + jsonObject2.get("name") + fullPath;
-			fullPathFileId ="/" + jsonObject2.get("parent_file_id") + fullPathFileId;
-
-		}
-		System.out.println("fullPath::::::::::::::::" + fullPath);
+//		while (!"root".equals(t)) {
+//			requestJson2.put("file_id", t);
+//			String result2 = HttpClientUtil.doPost(apiUrl + "/file/get",
+//					requestJson2.toString(), headerMap2);
+//			JSONObject jsonObject2 = JSONObject.parseObject(result2);
+//			t = (String) jsonObject2.get("parent_file_id");
+//			fullPath ="/" + jsonObject2.get("name") + fullPath;
+//			fullPathFileId ="/" + jsonObject2.get("parent_file_id") + fullPathFileId;
+//
+//		}
+//		System.out.println("fullPath::::::::::::::::" + fullPath);
 
 
 		map.put("data", jsonObject);
-		map.put("parent", fullPath);
-		map.put("fullPathFileId", fullPathFileId);
+//		map.put("parent", fullPath);
+//		map.put("fullPathFileId", fullPathFileId);
 		return map;
 	}
 

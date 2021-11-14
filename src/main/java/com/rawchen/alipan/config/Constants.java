@@ -12,7 +12,7 @@ public class Constants {
 	// 默认驱动器ID
 	public static String DEFAULT_DRIVE_ID = "";
 
-	// 设置连接主机服务超时main间
+	// 设置连接主机服务超时时间
 	public static final int CONNECT_TIMEOUT = 35000;
 	// 设置连接请求超时时间
 	public static final int CONNECTION_REQUEST_TIMEOUT = 35000;
