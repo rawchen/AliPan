@@ -7,36 +7,23 @@
 	<link rel="shortcut icon" th:href="@{/static/img/favicon.ico}">
 	<link rel="apple-touch-icon" th:href="@{/static/img/favicon.ico}">
 	<meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" name="viewport">
+	<script src="https://cdn.bootcdn.net/ajax/libs/layui/2.5.6/layui.all.min.js"></script>
 	<script src="https://s0.pstatp.com/cdn/expire-1-M/ionicons/4.5.6/ionicons.js"></script>
 	<script src="https://s0.pstatp.com/cdn/expire-1-M/marked/0.6.2/marked.min.js"></script>
 	<script src="https://s0.pstatp.com/cdn/expire-1-M/highlight.js/9.15.6/highlight.min.js"></script>
-	<link href="https://s0.pstatp.com/cdn/expire-1-M/highlight.js/9.15.6/styles/monokai-sublime.min.css" rel="stylesheet" />
+	<link href="https://s0.pstatp.com/cdn/expire-1-M/highlight.js/9.15.6/styles/monokai-sublime.min.css"
+		  rel="stylesheet"/>
 	<script src="https://cdn.jsdelivr.net/npm/highlightjs-line-numbers.js@2.6.0/dist/highlightjs-line-numbers.min.js"></script>
-	<link href="https://s0.pstatp.com/cdn/expire-1-M/github-markdown-css/3.0.1/github-markdown.min.css" rel="stylesheet" />
+	<link href="https://s0.pstatp.com/cdn/expire-1-M/github-markdown-css/3.0.1/github-markdown.min.css"
+		  rel="stylesheet"/>
 	<script src="https://s0.pstatp.com/cdn/expire-1-M/jquery/3.4.0/jquery.min.js"></script>
 	<script src="https://s0.pstatp.com/cdn/expire-1-M/fancybox/3.5.7/jquery.fancybox.min.js"></script>
-	<link href="https://s0.pstatp.com/cdn/expire-1-M/fancybox/3.5.7/jquery.fancybox.min.css" rel="stylesheet" />
+	<link href="https://s0.pstatp.com/cdn/expire-1-M/fancybox/3.5.7/jquery.fancybox.min.css" rel="stylesheet"/>
 
-	<link th:href="@{/static/css/mystyle.css}" rel="stylesheet" />
-<!--	<script th:src="@{/static/js/myjs.js}"></script>-->
+	<link th:href="@{/static/css/mystyle.css}" rel="stylesheet"/>
+	<script th:src="@{/static/js/myjs.js}"></script>
 </head>
-<!--<body>-->
-<!--<div class="block-thumb">-->
-<!--	<div class="">-->
-<!--		<img th:src="${url}" alt="" style="width: 100px; height: 100px;">-->
-<!--		<a th:href="${url}">下载</a>-->
-<!--&lt;!&ndash;		<a href="javascript:void(0);" th:onclick="window.open('[[${url}]]')">123</a>&ndash;&gt;-->
-<!--	</div>-->
-<!--</div>-->
-<!--</body>-->
-
-
 <body>
-<!--<div id="loading_all">-->
-<!--	<div id="loading_bg">-->
-<!--		<div class="loader">Loading...</div>-->
-<!--	</div>-->
-<!--</div>-->
 
 <template id="tree-node-wrapper-template">
 	<div class="tree-node-wrapper">
@@ -57,6 +44,7 @@
 		</div>
 	</div>
 </template>
+
 <div class="loading-wrapper">
 	<div class="loading">Loading...</div>
 </div>
@@ -70,7 +58,10 @@
                 </span>
 		</div>
 		<a class="site" id="nav-site" href="javascript:void(0);" onclick="domain_index()" title="刷新">ONEDRIVE</a>
-		<a class="site" id="git-branch-a" target="_black" href="https://rawchen.com/enjoy/alipan.html" title="你也想要属于自己的云盘？"><ion-icon id="git-branch" name="git-branch" class="logo"></ion-icon></a>
+		<a class="site" id="git-branch-a" target="_black" href="https://rawchen.com/enjoy/alipan.html"
+		   title="你也想要属于自己的云盘？">
+			<ion-icon id="git-branch" name="git-branch" class="logo"></ion-icon>
+		</a>
 
 	</div>
 </div>
@@ -113,6 +104,14 @@
 		</div>
 	</div>
 </div>
+
+<div class="contextmenu" id="context">
+	<ul id="contextmenu-ul">
+		<li><a id="open" href="javascript:;">打开</a></li>
+		<li><a id="share" href="javascript:;">分享</a></li>
+		<li><a id="download" href="javascript:;">下载</a></li>
+	</ul>
+</div>
 </body>
 <script>
 	document.addEventListener('DOMContentLoaded', () => {
@@ -120,15 +119,25 @@
 			sendRequest("POST",
 				"/getFolder/" + "[[${fileId}]]",
 				{'Content-type': 'application/x-www-form-urlencoded'},
-				renderPage
+				function (data) {
+					renderFileList(JSON.parse(data));
+					//初始化根节点列表的树
+					renderTreeNode(JSON.parse(data));
+				}
 			);
 		} else {
 			sendRequest("POST",
 				"/getFile/" + "[[${fileId}]]",
 				{'Content-type': 'application/x-www-form-urlencoded'},
-				renderPage2
+				function (data) {
+					let file = JSON.parse(data);
+					dealFile("[[${fileId}]]", file.data.url, formatSize(file.data.size), file.data.name, file.data.download_url);
+				}
 			);
 		}
+
+		addBackForwardListener();
+
 		if (window.history && window.history.pushState) {
 			$(window).on('popstate', function () {
 				window.history.pushState('forward', null, '');
@@ -137,9 +146,18 @@
 			});
 		}
 
-		window.history.pushState('forward', null, ''); //在IE中必须得有这两行
+		//在IE中必须得有这两行
+		window.history.pushState('forward', null, '');
 		window.history.forward(1);
 	});
+
+	function addBackForwardListener() {
+		// document.getElementById('arrow-back').addEventListener('click', back);
+		// document.getElementById('arrow-forward').addEventListener('click', forward);
+		document.querySelector('#main-page').addEventListener('click', () => {
+			location.href = document.location.protocol + "//" + window.location.host;
+		});
+	}
 
 	function domain_index() {
 		location.reload();
@@ -164,10 +182,8 @@
 	function sendRequest(method, url, headers, callback, error, times) {
 		let xhr = createCORSRequest(method, url, 2500);
 		xhr.onreadystatechange = () => {
-			if (xhr.readyState == 4 && xhr.status == 200) {
-				// alert(xhr.responseText)
+			if (xhr.readyState === 4 && xhr.status === 200) {
 				callback(xhr.responseText);
-
 			}
 		};
 		xhr.timeout = xhr.onerror = () => {
@@ -194,22 +210,7 @@
 		xhr.send();
 	}
 
-	function renderPage(data, cache) {
-		let files;
-		files = JSON.parse(data);
-		renderFileList(files);
-		//初始化根节点列表的树
-		renderTreeNode(files);
-	}
-
-	function renderPage2(data, cache) {
-		let file;
-		file = JSON.parse(data);
-		dealFile("[[${fileId}]]", file.data.url, formatSize(file.data.size), file.data.name, file.data.download_url);
-	}
-
-
-		function renderFileList(files) {
+	function renderFileList(files) {
 		const createFileWrapper = (type, name, time, size, fileId, url, downloadUrl) => {
 			let fileWrapper = document.getElementById('file-wrapper-templete').content.cloneNode(true);
 			fileWrapper.querySelector('ion-icon').setAttribute('name', type);
@@ -224,14 +225,15 @@
 		fileList.innerHTML = '';
 
 		document.getElementById('readme').innerHTML = '';
+		if (files === null) {
+			location.reload();
+		}
 		// document.getElementsByClassName("markdown-body")[0].innerHTML = '';
-
 		files.data.items.forEach(file => {
 			if (file.type === 'file' && file.name === "README.md") {
 				renderMarkdown(file.url, true);
 			}
 			if (file.name !== "README.md") {
-				const parent = files.parent === window.api.root ? "" : files.parent;
 				fileList.appendChild(
 					createFileWrapper(
 						file.url ? "document" : "folder",
@@ -297,7 +299,8 @@
 					document.execCommand('copy');
 					window.getSelection().removeAllRanges();
 					result = true;
-				} catch (e) { }
+				} catch (e) {
+				}
 				document.body.removeChild(target);
 				return result;
 			},
@@ -321,7 +324,7 @@
 					return 'video';
 				} else if (
 					[
-						'txt', 'js', 'json', 'css','htm', 'html', 'java', 'c', 'cpp',
+						'txt', 'js', 'json', 'css', 'htm', 'html', 'java', 'c', 'cpp',
 						'vue', 'py', 'h', 'hpp', 'gitignore', 'php', 'conf', 'ini',
 						'cmd', 'ps1', 'bat', 'sh', 'py', 'go', 'asp', 'reg', 'sql',
 						'properties', 'yml'
@@ -336,7 +339,8 @@
 					return 'pdf';
 				} else if (['md'].contains(suffix)) {
 					return 'markdown';
-				};
+				}
+				;
 			},
 			loadResource: (resource, callback) => {
 				let type;
@@ -431,22 +435,11 @@
 				previewHandler.createDplayer(url, suffix, video);
 				content.innerHTML = '';
 				content.append(video);
-
-				/*
-				var x = document.createElement("VIDEO");
-				x.setAttribute("width", "100%");
-				x.setAttribute("controls", "controls");
-				alert(url);
-				x.setAttribute("src", url);
-				content.append(x);
-				*/
-
 				break;
 			case 'text':
 				let pre = document.createElement('pre');
 				let code = document.createElement('code');
 				pre.append(code);
-				//pre.style.background = 'rgb(245,245,245)';
 				pre.style['overflow-x'] = 'scroll';
 				pre.classList.add(suffix);
 				content.style['text-align'] = 'initial';
@@ -454,10 +447,8 @@
 				content.append(pre);
 				sendRequest('GET', url, null, data => {
 					code.textContent = data;
-					// alert(size)
 					if (size.indexOf(' B') >= 0 || size.indexOf(' KB') && size.split(' ')[0] < 100) {
-						//hljs.highlightBlock(pre);
-						$('pre code').each(function(i, block) {
+						$('pre code').each(function (i, block) {
 							hljs.highlightBlock(block);
 							hljs.lineNumbersBlock(block);
 						});
@@ -466,7 +457,6 @@
 				break;
 			case 'office':
 				const officeOnline = 'https://view.officeapps.live.com/op/view.aspx?src=' + encodeURIComponent(url);
-				//window.open(officeOnline);
 				let div = document.createElement('div');
 				div.className = 'target-blank';
 				div.innerHTML = '点我新窗口打开';
@@ -483,10 +473,7 @@
 				}
 				break;
 			case 'pdf':
-				//const pdfOnline = '//web.jisupdf.com/?file=' + encodeURIComponent(url);
-				//const pdfOnline = '//mozilla.github.io/pdf.js/web/viewer.html?file=' + encodeURIComponent(url);
 				const pdfOnline = 'https://pdf.rawchen.com/web?file=' + encodeURIComponent(url);
-				//window.open(pdfOnline);
 				let div2 = document.createElement('div');
 				div2.className = 'target-blank';
 				div2.innerHTML = '点我新窗口打开';
@@ -506,9 +493,6 @@
 				renderMarkdown(url, false);
 				break;
 			default:
-				// content.style['color'] = 'white';
-				// content.style['background-color'] = '#131313';
-				// content.style['font-size'] = '20px';
 				content.style['text-align'] = 'center';
 				content.innerHTML = '该文件不支持预览';
 				break;
@@ -516,14 +500,14 @@
 		}
 		let address;
 		if (url) {
-			address = window.location.host + "/file/" + fileId;
+			address = document.location.protocol + "//" + window.location.host + "/file/" + fileId;
 		} else {
-			address = window.location.host + "/folder/" + fileId;
+			address = document.location.protocol + "//" + window.location.host + "/folder/" + fileId;
 		}
 		document.querySelector('.file-name').innerHTML = address;
 		document.querySelector('.btn.download').addEventListener('click',
 			() => {
-				previewHandler.copyTextContent(null,downloadUrl);
+				previewHandler.copyTextContent(null, downloadUrl);
 				location.href = downloadUrl;
 				const btn = document.querySelector('.btn.download');
 				btn.innerHTML = '已复制';
@@ -580,34 +564,63 @@
 		});
 	}
 
-	function addTreeNodeListener(elem, path) {
+	function addTreeNodeListener(elem, fileId) {
 		elem.addEventListener('click', event => {
-			alert("123")
-			// fetchFileList(path);
+			if (fileId !== null) {
+				sendRequest("POST",
+					"/getFolder/" + fileId,
+					{'Content-type': 'application/x-www-form-urlencoded'},
+					function (data) {
+						let files = JSON.parse(data);
+						renderFileList(files);
 
-			//每次点击需要根据elem的file_id去向下一级通过list接口获取列表
-			// renderTreeNode(files);
-			switchBackForwardStatus(path);
+						let folderCount = 0;
+						files.data.items.forEach(file => {
+							folderCount++;
+						});
+						if (folderCount === 0) {
+							layer.msg("找不到东西哦");
+						}
+
+						files.data.items.forEach(file => {
+							if (!file.url) {
+								elem.parentElement.append(createTreeNodeWrapper(
+									'arrow-dropright',
+									'folder-open',
+									file.name,
+									file.file_id
+								));
+							}
+						});
+					}
+				);
+			}
 		});
 	}
 
 	function addFileListLineListener(elem, fileId, url, size, name, downloadUrl) {
-		var path = "/";
 		//如果url不为空则时文件，为空就是文件夹
 		if (url) {
 			elem.addEventListener('click', event => {
 				dealFile(fileId, url, size, name, downloadUrl);
 			});
+
+			//为elem添加右键点击事件，传数据
+			elem.setAttribute("fileId", fileId);
+			elem.setAttribute("fileDownloadUrl", downloadUrl);
+			rightmenu(elem, "file");
 		} else {
 			elem.addEventListener('click', event => {
 				sendRequest("POST",
 					"/getFolder/" + fileId,
 					{'Content-type': 'application/x-www-form-urlencoded'},
-					renderPage
+					function (data) {
+						renderFileList(JSON.parse(data));
+					}
 				);
-				// alert("123");
-				// switchBackForwardStatus(path);
 			});
+			elem.setAttribute("fileId", fileId);
+			rightmenu(elem, "folder");
 		}
 	}
 
@@ -690,100 +703,124 @@
 		return size;
 	};
 
-	async function renderTreeNode(files) {
-		const createTreeNodeWrapper = (array, type, name, path, fileId) => {
-			//创建树节点包含图标
-			let treeNodeWrapper = document.getElementById('tree-node-wrapper-template').content.cloneNode(true);
-			let icons = treeNodeWrapper.querySelectorAll('ion-icon');
-			icons[0].setAttribute('name', array);
-			icons[1].setAttribute('name', type);
-			treeNodeWrapper.querySelector('.tree-node-name').innerText = name;
-			treeNodeWrapper.appendNode = node => treeNodeWrapper.querySelector('.tree-node-wrapper').append(node);
-			addTreeNodeListener(treeNodeWrapper.querySelector('.tree-node'), path);
-			return treeNodeWrapper;
-		}
+	const createTreeNodeWrapper = (array, type, name, fileId) => {
+		//创建树节点包含图标
+		let treeNodeWrapper = document.getElementById('tree-node-wrapper-template').content.cloneNode(true);
+		let icons = treeNodeWrapper.querySelectorAll('ion-icon');
+		icons[0].setAttribute('name', array);
+		icons[1].setAttribute('name', type);
+		treeNodeWrapper.querySelector('.tree-node-name').innerText = name;
+		treeNodeWrapper.appendNode = node => treeNodeWrapper.querySelector('.tree-node-wrapper').append(node);
+		addTreeNodeListener(treeNodeWrapper.querySelector('.tree-node'), fileId);
+		return treeNodeWrapper;
+	}
 
-		// const paths = files.parent.split('/');
-		// const paths = files.parent.split('/');
-		const paths = "/".split('/');
-		let absolutePath = max => {
-			let absolutePath = '';
-			for (let j = 1; j <= max; j++) {
-				absolutePath += '/' + paths[j];
-			}
-			return absolutePath;
-		};
-		let maxIndex = paths.length - 1;
-		let currentTreeNode = createTreeNodeWrapper('arrow-dropdown',
-			'folder-open',
-			paths[maxIndex],
-			absolutePath(maxIndex)
-		);
+	function renderTreeNode(files) {
+
+		const treeRoot = document.getElementById('tree-root');
+		treeRoot.innerHTML = '';
 		files.data.items.forEach(file => {
 			if (!file.url) {
-				currentTreeNode.appendNode(createTreeNodeWrapper('arrow-dropright',
+				treeRoot.append(createTreeNodeWrapper('arrow-dropright',
 					'folder',
 					file.name,
-					files.parent + '/' + file.name,
 					file.file_id
 				));
 			}
 		});
+	}
 
-		for (let i = maxIndex - 1; i > 0; i--) {
-			const currentTreeNodeParentAbsolutePath = absolutePath(i);
-			let currentTreeNodeParent = createTreeNodeWrapper('arrow-dropdown',
-				'folder',
-				paths[i],
-				currentTreeNodeParentAbsolutePath
-			);
-			// let cache = window.fileCache.get(currentTreeNodeParentAbsolutePath);
-			// if (cache) {
-			// 	cache.files.forEach(file => {
-			// 		if (!file.url) {
-			// 			if (file.name === paths[i + 1]) {
-			// 				currentTreeNodeParent.appendNode(currentTreeNode);
-			// 			} else {
-			// 				currentTreeNodeParent.appendNode(createTreeNodeWrapper(
-			// 					'arrow-dropright',
-			// 					'folder',
-			// 					file.name,
-			// 					currentTreeNodeParentAbsolutePath + '/' + file.name
-			// 				));
-			// 			}
-			// 		}
-			// 	});
-			// } else {
-			//
-			// }
-			currentTreeNodeParent.appendNode(currentTreeNode);
-			currentTreeNode = currentTreeNodeParent;
-		}
-
-		const treeRoot = document.getElementById('tree-root');
-		treeRoot.innerHTML = '';
-		const cache = window.fileCache.get(window.api.root);
-		const currentNodeName = currentTreeNode.querySelector('.tree-node-name').innerText;
-		if (cache) {
-			cache.files.forEach(file => {
-				if (!file.url) {
-					if (file.name === currentNodeName) {
-						treeRoot.append(currentTreeNode);
-					} else {
-						treeRoot.append(createTreeNodeWrapper(
-							'arrow-dropright',
-							'folder',
-							file.name,
-							window.api.root + file.name
-						));
-					}
+	function js_method_open(type, fileId) {
+		if (type === "folder") {
+			sendRequest("POST",
+				"/getFolder/" + fileId,
+				{'Content-type': 'application/x-www-form-urlencoded'},
+				function (data) {
+					renderFileList(JSON.parse(data));
 				}
-			});
+			);
 		} else {
-			treeRoot.append(currentTreeNode);
+			sendRequest("POST",
+				"/getFile/" + fileId,
+				{'Content-type': 'application/x-www-form-urlencoded'},
+				function (data) {
+					let file;
+					file = JSON.parse(data);
+					dealFile("[[${fileId}]]", file.data.url, formatSize(file.data.size), file.data.name, file.data.download_url);
+				}
+			);
 		}
 	}
 
+	function js_method_share(type, fileId) {
+		let address;
+		if (type === "folder") {
+			address = document.location.protocol + "//" + window.location.host + "/folder/" + fileId;
+		} else if (type === "file") {
+			address = document.location.protocol + "//" + window.location.host + "/file/" + fileId;
+		}
+
+		let target = document.createElement('pre');
+		target.style.opacity = '0';
+		target.textContent = address;
+		document.body.appendChild(target);
+		try {
+			let range = document.createRange();
+			range.selectNode(target);
+			window.getSelection().removeAllRanges();
+			window.getSelection().addRange(range);
+			if (document.execCommand('copy')) {
+				document.execCommand('copy');
+				layer.msg("已复制");
+			}
+			window.getSelection().removeAllRanges();
+		} catch (e) {
+		}
+		document.body.removeChild(target);
+	}
+
+	function js_method_download(type, url) {
+		if (type === "file") {
+			location.href = url;
+		}
+	}
+
+	function rightmenu(element, type) {
+		const context = document.getElementById("context");
+		element.oncontextmenu = function (env) {
+			//env 表示event事件、兼容event事件写法
+			var e = env || window.event;
+			let aList = context.getElementsByTagName('a')
+			for (var i = 0; i < aList.length; i++) {
+				aList[i].addEventListener('click', function () {
+					if (this.id === "open") {
+						this.href = "javascript:js_method_open(\"" + type + "\",\"" + element.getAttribute("fileId") + "\");"
+					} else if (this.id === "share") {
+						this.href = "javascript:js_method_share(\"" + type + "\",\"" + element.getAttribute("fileId") + "\");"
+					} else if (this.id === "download") {
+						this.href = "javascript:js_method_download(\"" + type + "\",\"" + element.getAttribute("fileDownloadUrl") + "\");"
+					}
+				});
+			}
+
+			if (type === "folder") {
+				document.getElementById("download").parentElement.style.display = "none";
+			} else {
+				document.getElementById("download").parentElement.style.display = "block";
+			}
+			context.style.display = "block";
+			var x = e.clientX;
+			var y = e.clientY;
+			var w = window.innerWidth;
+			var h = window.innerHeight;
+			context.style.left = Math.min(w - 202, x) + "px";
+			context.style.top = Math.min(h - 230, y) + "px";
+			return false;
+		};
+		document.onclick = function () {
+			context.style.display = "none";
+		};
+	}
 
 	window.GLOBAL_CONFIG = {
 		SCF_GATEWAY: "https://fodi.rawchen.workers.dev",
@@ -820,35 +857,9 @@
 		preview: false
 	}
 	window.fileCache = new Map();
-	// const initialPath = new URLSearchParams(window.location.search).get('path') || window.api.root;
 	window.api.accessToken = {
 		encrypted: '',
 		plain: ''
 	};
-	// fetchFileList("/");
-	// addBackForwardListener();
-
-	// alert('[[${url}]]');
-	// alert("132");
-	// window.open('[[${url}]]');
-
-	// location.href = '[[${url}]]';
-
-	// this.$ajax.get('[[${url}]]', {
-	// 	headers: {"Referer": "https://www.aliyundrive.com/"},
-	// 	responseType: 'blob',
-	// 	params: {}
-	// }).then(response => {
-	// 	let url = window.URL.createObjectURL(new Blob([response.data]))
-	// 	let link = document.createElement('a')
-	// 	link.style.display = 'none'
-	// 	link.href = url
-	// 	link.setAttribute('download', '用户数据' + filtersTime.filters.yearMonthTime(new Date()) + '.xls')
-	// 	document.body.appendChild(link)
-	// 	link.click()
-	// }, response => {
-	// 	console.log("获取信息失败");
-	// 	console.log(response);
-	// });
 </script>
 </html>

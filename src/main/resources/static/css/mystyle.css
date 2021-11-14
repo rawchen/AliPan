@@ -530,6 +530,46 @@ body {
 	padding: 0 0.7em;
 }
 
+.contextmenu ul {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.contextmenu {
+	width: 160px;
+	border: 1px solid #999;
+	box-shadow: 2px 2px 4px #0000002b;
+	background-color: #fff;
+	position: absolute;
+	top: 10px;
+	left: 10px;
+	display: none;
+}
+
+.contextmenu li {
+	border-bottom: dashed #e5e5e5 1px;
+	height: 40px;
+	line-height: 40px;
+}
+
+.contextmenu li:last-child {
+	border-bottom: none;
+}
+
+.contextmenu li a {
+	text-decoration: none;
+	color: #333;
+	display: block;
+	padding: 0 30px;
+}
+
+.contextmenu li a:hover {
+	color: #fff;
+	background-color: #000000;
+	font-weight: bold;
+}
+
 @media screen and (max-width: 1000px) {
 	.left {
 		display: none;
