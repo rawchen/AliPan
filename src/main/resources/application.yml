@@ -1,6 +1,6 @@
 alipan:
   # 刷新令牌
-  refresh_token: ee5a9dec1fd14b699fb4cae66aa6e65a
+  refresh_token: e8532b0fde304c4383c68f0de4a468f5
   # 根节点文件夹ID，默认为root
   parent_file_id: root
   # 阿里云盘API，默认不改动

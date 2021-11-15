@@ -72,7 +72,6 @@ public class ApiController {
 	@ResponseBody
 	@RequestMapping(value = "/getFolder/{fileId}")
 	public Map<String, Object> getFolder(@PathVariable("fileId") String fileId) {
-
 		JSONObject requestJson = new JSONObject();
 		requestJson.put("param1", 30);
 		requestJson.put("all", false);

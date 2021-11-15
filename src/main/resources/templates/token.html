@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta name="referrer" content="never">
+	<meta charset="UTF-8">
+	<title>TOKEN</title>
+	<link rel="shortcut icon" th:href="@{/static/img/favicon.ico}">
+	<link rel="apple-touch-icon" th:href="@{/static/img/favicon.ico}">
+	<meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" name="viewport">
+	<script src="https://s0.pstatp.com/cdn/expire-1-M/jquery/3.4.0/jquery.min.js"></script>
+	<link href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" crossorigin="anonymous" rel="stylesheet">
+	<link href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css" crossorigin="anonymous" rel="stylesheet">
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/js-base64@3.6.0/base64.min.js"></script>
+	<link th:href="@{/static/css/mystyle.css}" rel="stylesheet"/>
+	<script th:src="@{/static/layer/layer.js}"></script>
+</head>
+<style>
+	html {
+		background-color: #656f83;
+	}
+	code {
+		padding: 4px 4px;
+		margin: 0 5px;
+		font-size: 90%;
+		color: #c7254e;
+		background-color: #f9f2f4;
+		border-radius: 4px;
+	}
+	p {
+		margin: 10px 0;
+	}
+</style>
+<body style="padding: 20px; max-width: 850px;margin: 0 auto;">
+	<div class="alert alert-success" role="alert">
+		<a href="https://passport.aliyundrive.com/mini_login.htm?lang=zh_cn&appName=aliyun_drive&appEntrance=web&styleType=auto&bizParams=&notLoadSsoView=false&notKeepLogin=false&isMobile=true&hidePhoneCode=true&rnd=0.9186864872885723"
+		   target="_blank">
+			移动端网页登录链接
+		</a>
+	</div>
+	<p>
+	<span class="label label-info">1</span>
+	点击上面链接，F12打开浏览器开发者工具，点击第四项<code>网络</code>栏。
+	<p>
+	<span class="label label-warning">2</span>
+	选择一种方式登录，查看是否存在<code>login.do?appName...</code>，有则复制响应。
+	<p>
+	<span class="label label-danger">3</span>
+	粘贴响应信息到文本框后解析。
+	<p>
+	<textarea class="form-control" id="content-text" rows="3" placeholder="请粘贴 Response 数据"></textarea>
+	<p>
+	<button id="getCode" type="button" class="btn btn-success">解析 RefreshToken</button>
+	<p>
+	<img th:src="@{/static/img/0.png}" style="width: 100%; border: dashed 5px #eeeeee;" alt=""/>
+</body>
+<script>
+	document.addEventListener('DOMContentLoaded', () => {
+
+	});
+
+	function dkim(str) {
+		try {
+			var d = JSON.parse(str);
+			var bizExt = (d.content.data.bizExt);
+			var bizExt_decode = Base64.decode(bizExt);
+			var bizExt_json = eval("(" + bizExt_decode + ")");
+			var refreshToken = (bizExt_json.pds_login_result.refreshToken);
+
+			let target = document.createElement('pre');
+			target.style.opacity = '0';
+			target.textContent = refreshToken;
+			document.body.appendChild(target);
+			try {
+				let range = document.createRange();
+				range.selectNode(target);
+				window.getSelection().removeAllRanges();
+				window.getSelection().addRange(range);
+				if (document.execCommand('copy')) {
+					document.execCommand('copy');
+				}
+				window.getSelection().removeAllRanges();
+			} catch (e) {
+			}
+			document.body.removeChild(target);
+
+			layer.open({
+				title: '解析成功，已复制',
+				content: refreshToken,
+				shadeClose: true
+			});
+		} catch (error) {
+			layer.msg("请正确复制响应到文本框");
+			console.log(`JSON error : ${error}`);
+		}
+	}
+
+	document.getElementById("getCode").addEventListener('click', function () {
+		var str = document.getElementById("content-text").value;
+		if (str === '') {
+			layer.msg("请粘贴响应内容");
+			return false
+		}
+		dkim(str);
+		return false
+	})
+</script>
+</html>

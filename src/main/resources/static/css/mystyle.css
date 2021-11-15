@@ -86,7 +86,7 @@ pre * {
 	text-align: center;
 }
 
-.btn {
+.info .btn {
 	float: right;
 	text-align: center;
 	border: solid rgb(218, 215, 215) 1px;
@@ -103,12 +103,12 @@ pre * {
 	-ms-user-select: none;
 }
 
-.btn:hover {
+.info .btn:hover {
 	color: white;
 	background: rgb(0 0 0);
 }
 
-.btn.download {
+.info .btn.download {
 	margin-right: 1em;
 }
 
@@ -633,7 +633,7 @@ body {
 		padding: 0 .3em;
 	}
 
-	.btn.download {
+	.info .btn.download {
 		margin-right: .3em;
 	}
 

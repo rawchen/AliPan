@@ -36,4 +36,9 @@ public class IndexController {
 		model.addAttribute("type", "file");
 		return "index";
 	}
+
+	@RequestMapping("/token")
+	public String token(){
+		return "token";
+	}
 }
