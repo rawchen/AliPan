@@ -61,7 +61,7 @@ pre * {
 
 .content {
 	clear: both;
-	padding: 1em 1em 0.2em 1em;
+	padding: 0em 1em 0.2em 1em;
 	margin: 0 auto;
 	/*text-align: center;*/
 }

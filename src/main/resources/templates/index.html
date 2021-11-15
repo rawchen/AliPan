@@ -493,7 +493,8 @@
 		} else {
 			address = document.location.protocol + "//" + window.location.host + "/folder/" + fileId;
 		}
-		document.querySelector('.file-name').innerHTML = address;
+		// document.querySelector('.file-name').innerHTML = address + "\t" + name;
+		document.querySelector('.file-name').innerHTML = name;
 		document.querySelector('.btn.download').addEventListener('click',
 			() => {
 				previewHandler.copyTextContent(null, downloadUrl);
@@ -571,16 +572,27 @@
 							layer.msg("找不到东西哦");
 						}
 
-						files.data.items.forEach(file => {
-							if (!file.url) {
-								elem.parentElement.append(createTreeNodeWrapper(
-									'arrow-dropright',
-									'folder-open',
-									file.name,
-									file.file_id
-								));
-							}
-						});
+						//判断是否重复添加列表元素(判断新增的文件夹只要存在同名肯定重复，抛异常)
+						try {
+							files.data.items.forEach(file => {
+								elem.parentElement.querySelectorAll('.tree-node-name').forEach(item => {
+									if (item.textContent === file.name) {
+										throw Error();
+									}
+								});
+
+								if (!file.url) {
+									elem.parentElement.append(createTreeNodeWrapper(
+										'arrow-dropright',
+										'folder-open',
+										file.name,
+										file.file_id
+									));
+								}
+							});
+						} catch (e) {
+							// console.log('error : ' + e);
+						}
 					}
 				);
 			}
