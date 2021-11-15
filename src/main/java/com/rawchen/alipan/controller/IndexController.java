@@ -19,7 +19,7 @@ public class IndexController {
 //		return "forward:"+"/down/" + ;
 		model.addAttribute("type", "folder");
 		model.addAttribute("fileId", parentFileId);
-		return "index2";
+		return "index";
 
 	}
 
@@ -27,13 +27,13 @@ public class IndexController {
 	public String toFolder(@PathVariable("fileId") String fileId, Model model){
 		model.addAttribute("fileId", fileId);
 		model.addAttribute("type", "folder");
-		return "index2";
+		return "index";
 	}
 
 	@RequestMapping("/file/{fileId}")
 	public String toFile(@PathVariable("fileId") String fileId, Model model){
 		model.addAttribute("fileId", fileId);
 		model.addAttribute("type", "file");
-		return "index2";
+		return "index";
 	}
 }

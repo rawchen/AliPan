@@ -81,8 +81,8 @@ public class ApiController {
 		requestJson.put("image_thumbnail_process", "image/resize,w_50");
 		requestJson.put("image_url_process", "image/resize,w_1920/format,jpeg");
 		requestJson.put("limit", 100);
-		requestJson.put("order_by", "updated_at");
-		requestJson.put("order_direction", "DESC");
+		requestJson.put("order_by", "name");
+		requestJson.put("order_direction", "ASC");
 		requestJson.put("parent_file_id", fileId);
 		requestJson.put("video_thumbnail_process", "video/snapshot,t_0,f_jpg,w_50");
 
@@ -196,8 +196,8 @@ public class ApiController {
 		requestJson.put("image_thumbnail_process", "image/resize,w_50");
 		requestJson.put("image_url_process", "image/resize,w_1920/format,jpeg");
 		requestJson.put("limit", 100);
-		requestJson.put("order_by", "updated_at");
-		requestJson.put("order_direction", "DESC");
+		requestJson.put("order_by", "name");
+		requestJson.put("order_direction", "ASC");
 		requestJson.put("parent_file_id", fileId);
 		requestJson.put("video_thumbnail_process", "video/snapshot,t_0,f_jpg,w_50");
 
