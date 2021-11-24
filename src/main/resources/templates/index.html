@@ -137,11 +137,20 @@
 	});
 
 	function addBackForwardListener() {
-		// document.getElementById('arrow-back').addEventListener('click', back);
-		// document.getElementById('arrow-forward').addEventListener('click', forward);
+		document.getElementById('arrow-back').addEventListener('click', back);
+		document.getElementById('arrow-forward').addEventListener('click', forward);
 		document.querySelector('#main-page').addEventListener('click', () => {
 			location.href = document.location.protocol + "//" + window.location.host;
 		});
+	}
+
+	function back() {
+		//根据该文件夹或文件的fileId去请求parent再渲染列表
+
+	}
+
+	function forward() {
+
 	}
 
 	function domain_index() {
@@ -314,7 +323,7 @@
 						'txt', 'js', 'json', 'css', 'htm', 'html', 'java', 'c', 'cpp',
 						'vue', 'py', 'h', 'hpp', 'gitignore', 'php', 'conf', 'ini',
 						'cmd', 'ps1', 'bat', 'sh', 'py', 'go', 'asp', 'reg', 'sql',
-						'properties', 'yml'
+						'properties', 'yml', 'xml'
 					].contains(suffix)
 				) {
 					return 'text';
