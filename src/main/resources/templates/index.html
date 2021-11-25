@@ -111,6 +111,9 @@
 </div>
 </body>
 <script>
+	//记录全局的文件fileId
+	let fullFileId = '';
+
 	document.addEventListener('DOMContentLoaded', () => {
 		if ("[[${type}]]" === "folder") {
 			sendRequest("POST",
@@ -118,6 +121,7 @@
 				{'Content-type': 'application/x-www-form-urlencoded'},
 				function (data) {
 					renderFileList(JSON.parse(data));
+					fullFileId = '[[${fileId}]]';
 					//初始化根节点列表的树
 					renderTreeNode(JSON.parse(data));
 				}
@@ -145,7 +149,29 @@
 	}
 
 	function back() {
+
+
 		//根据该文件夹或文件的fileId去请求parent再渲染列表
+		sendRequest("POST",
+			"/getFolder/" + fullFileId,
+			{'Content-type': 'application/x-www-form-urlencoded'},
+			function (data) {
+				let files = JSON.parse(data);
+				// renderFileList(files);
+
+				sendRequest("POST",
+					"/getFile/" + data.parent_file_id,
+					{'Content-type': 'application/x-www-form-urlencoded'},
+					function (data) {
+						let files = JSON.parse(data);
+						renderFileList(files);
+					}
+				);
+
+
+			}
+		);
+
 
 	}
 
@@ -205,6 +231,7 @@
 	}
 
 	function renderFileList(files) {
+		console.log(fullFileId);
 		switchRightDisplay();
 
 		const createFileWrapper = (type, name, time, size, fileId, url, downloadUrl) => {
@@ -572,6 +599,7 @@
 					function (data) {
 						let files = JSON.parse(data);
 						renderFileList(files);
+						fullFileId = fileId;
 
 						let folderCount = 0;
 						files.data.items.forEach(file => {
@@ -626,6 +654,7 @@
 					{'Content-type': 'application/x-www-form-urlencoded'},
 					function (data) {
 						renderFileList(JSON.parse(data));
+						fullFileId = fileId;
 					}
 				);
 			});
@@ -747,6 +776,7 @@
 				{'Content-type': 'application/x-www-form-urlencoded'},
 				function (data) {
 					renderFileList(JSON.parse(data));
+					fullFileId = fileId;
 				}
 			);
 		} else {
