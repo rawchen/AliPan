@@ -106,16 +106,42 @@ pre * {
 .info .btn:hover {
 	color: white;
 	background: rgb(0 0 0);
+	transition: all 0.2s;
+	cursor: pointer;
 }
 
 .info .btn.download {
 	margin-right: 1em;
 }
 
+ion-icon {
+	display: block;
+	height: 1em;
+	width: 1em;
+}
+
 #arrow-back,
 #arrow-forward {
 	/*color: rgb(218, 215, 215);*/
 	color: #545454;
+	padding: 0em 0.3em;
+}
+
+#main-page {
+	padding: 0em 0.2em;
+}
+
+#arrow-back:hover,
+#arrow-forward:hover,
+#git-branch:hover,
+#main-page:hover {
+	/*color: rgb(218, 215, 215);*/
+	color: #181818;
+	cursor: pointer;
+	/*font-size: 1.6em;*/
+	transform: scale(1.1);
+	transition: transform 0.2s ease;
+
 }
 
 /*********LoadingPage*************/
@@ -315,7 +341,7 @@ body {
 
 .header {
 	box-shadow: 0px 1px 5px #e1e1e1;
-	padding: 0 0.5em 0 0.2em;
+	padding: 0 0.5em 0 0.5em;
 	height: 100%;
 	display: flex;
 	align-items: center;
@@ -332,7 +358,10 @@ body {
 		padding-left: 2em; */
 }
 
-#arrow-back:hover, #arrow-forward:hover, #git-branch:hover {
+#arrow-back:hover,
+#arrow-forward:hover,
+#git-branch:hover,
+#main-page:hover {
 	background-color: #f3f3f3;
 	border-radius: 5px;
 }
@@ -365,12 +394,6 @@ body {
 	background-color: #0f0f0f;
 	cursor: pointer;
 }
-
-#main-page:hover {
-	color: rgb(255 145 93);
-	cursor: pointer;
-}
-
 
 .container {
 	position: fixed;
@@ -434,7 +457,7 @@ body {
 .row.file-wrapper {
 	font-size: .8em;
 	padding: 0 1em;
-	height: 4em;
+	height: 3em;
 	transition: all 0.2s;
 }
 
