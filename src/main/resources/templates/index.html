@@ -48,7 +48,7 @@
 <div class="header-wrapper">
 	<div class="header">
 		<ion-icon id="arrow-back" class="logo" name="arrow-back"></ion-icon>
-		<ion-icon id="arrow-forward" class="logo" name="arrow-forward"></ion-icon>
+<!--		<ion-icon id="arrow-forward" class="logo" name="arrow-forward"></ion-icon>-->
 		<ion-icon id="main-page" class="logo" name="home"></ion-icon>
 		<div class="nav">
                 <span id="path">
@@ -113,6 +113,7 @@
 <script>
 	//记录全局的文件fileId
 	let fullFileId = '';
+	let fullFileIdArr = [];
 
 	document.addEventListener('DOMContentLoaded', () => {
 		if ("[[${type}]]" === "folder") {
@@ -122,6 +123,8 @@
 				function (data) {
 					renderFileList(JSON.parse(data));
 					fullFileId = '[[${fileId}]]';
+					fullFileIdArr.push('[[${fileId}]]')
+					// console.log(fullFileId);
 					//初始化根节点列表的树
 					renderTreeNode(JSON.parse(data));
 				}
@@ -138,45 +141,52 @@
 		}
 
 		addBackForwardListener();
+
+		if (window.history && window.history.pushState) {
+			$(window).on('popstate', function () {
+				window.history.pushState('forward', null, '');
+				window.history.forward();
+				back();
+			});
+		}
+
+		//在IE中必须得有这两行
+		window.history.pushState('forward', null, '');
+		window.history.forward();
 	});
 
 	function addBackForwardListener() {
 		document.getElementById('arrow-back').addEventListener('click', back);
-		document.getElementById('arrow-forward').addEventListener('click', forward);
+		// document.getElementById('arrow-forward').addEventListener('click', forward);
 		document.querySelector('#main-page').addEventListener('click', () => {
 			location.href = document.location.protocol + "//" + window.location.host;
 		});
 	}
 
 	function back() {
-
-
+		// console.log(fullFileIdArr)//root
+		let parentFileId = '';
+		let fullFileIdLastSecond = fullFileIdArr[fullFileIdArr.length - 2];
+		if (typeof(fullFileIdLastSecond) === 'undefined') {
+			parentFileId = fullFileIdArr[0];
+		} else {
+			parentFileId = fullFileIdLastSecond;
+		}
 		//根据该文件夹或文件的fileId去请求parent再渲染列表
 		sendRequest("POST",
-			"/getFolder/" + fullFileId,
+			"/getFolder/" + parentFileId,
 			{'Content-type': 'application/x-www-form-urlencoded'},
 			function (data) {
 				let files = JSON.parse(data);
-				// renderFileList(files);
-
-				sendRequest("POST",
-					"/getFile/" + data.parent_file_id,
-					{'Content-type': 'application/x-www-form-urlencoded'},
-					function (data) {
-						let files = JSON.parse(data);
-						renderFileList(files);
-					}
-				);
-
-
+				renderFileList(files);
 			}
 		);
-
-
+		if (fullFileIdArr.length > 1) {
+			fullFileIdArr.pop();
+		}
 	}
 
 	function forward() {
-
 	}
 
 	function domain_index() {
@@ -231,7 +241,6 @@
 	}
 
 	function renderFileList(files) {
-		console.log(fullFileId);
 		switchRightDisplay();
 
 		const createFileWrapper = (type, name, time, size, fileId, url, downloadUrl) => {
@@ -436,8 +445,9 @@
 				img.style.padding = '6px';
 				img.src = url;
 				let fancy = document.createElement('a');
-				fancy.setAttribute('data-fancybox', 'image');
+				// fancy.setAttribute('data-fancybox', 'image');
 				fancy.href = img.src;
+				fancy.target = '_blank';
 				fancy.append(img);
 				content.innerHTML = '';
 				content.append(fancy);
@@ -600,6 +610,7 @@
 						let files = JSON.parse(data);
 						renderFileList(files);
 						fullFileId = fileId;
+						fullFileIdArr.push(fileId)
 
 						let folderCount = 0;
 						files.data.items.forEach(file => {
@@ -655,6 +666,7 @@
 					function (data) {
 						renderFileList(JSON.parse(data));
 						fullFileId = fileId;
+						fullFileIdArr.push(fileId)
 					}
 				);
 			});
@@ -777,6 +789,7 @@
 				function (data) {
 					renderFileList(JSON.parse(data));
 					fullFileId = fileId;
+					fullFileIdArr.push(fileId)
 				}
 			);
 		} else {
@@ -902,16 +915,5 @@
 	// 	plain: ''
 	// };
 
-	// if (window.history && window.history.pushState) {
-	// 	$(window).on('popstate', function () {
-	// 		window.history.pushState('forward', null, '');
-	// 		window.history.forward(1);
-	// 		back();
-	// 	});
-	// }
-	//
-	// //在IE中必须得有这两行
-	// window.history.pushState('forward', null, '');
-	// window.history.forward(1);
 </script>
 </html>

@@ -1,6 +1,6 @@
 alipan:
   # 刷新令牌
-  refresh_token: e8532b0fde304c4383c68f0de4a468f5
+  refresh_token: a506cd6845174af6aab0a876f36dd961
   # 根节点文件夹ID，默认为root
   parent_file_id: root
   # 阿里云盘API，默认不改动
@@ -45,4 +45,4 @@ spring:
 logging:
   level:
     root: info
-    org.springframework.web: trace
+#    org.springframework.web: trace

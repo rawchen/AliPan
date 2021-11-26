@@ -14,9 +14,6 @@ public class IndexController {
 
 	@RequestMapping("/")
 	public String toIndexHtml(Model model){
-		System.out.println("Index启动");
-//		return "redirect:"+"/folder2/root";
-//		return "forward:"+"/down/" + ;
 		model.addAttribute("type", "folder");
 		model.addAttribute("fileId", parentFileId);
 		return "index";
