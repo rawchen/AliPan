@@ -114,6 +114,7 @@
 	//记录全局的文件fileId
 	let fullFileId = '';
 	let fullFileIdArr = [];
+	let watchFileState = false;
 
 	document.addEventListener('DOMContentLoaded', () => {
 		document.getElementById('arrow-back').style.color = '#818181';
@@ -166,8 +167,10 @@
 
 	function back() {
 		if (fullFileIdArr.length === 1) {
-			document.getElementById('arrow-back').style.color = '#818181';
-			return;
+			if (watchFileState === false) {
+				document.getElementById('arrow-back').style.color = '#818181';
+				return;
+			}
 		}
 
 		// console.log(fullFileIdArr)//root
@@ -253,6 +256,7 @@
 		}
 
 		switchRightDisplay();
+		watchFileState = false;
 
 		const createFileWrapper = (type, name, time, size, fileId, url, downloadUrl) => {
 			let fileWrapper = document.getElementById('file-wrapper-templete').content.cloneNode(true);
@@ -326,7 +330,9 @@
 
 	function dealFile(fileId, url, size, name, downloadUrl) {
 		// window.backFordwardCache.preview = true;
+		document.getElementById('arrow-back').style.color = '#545454';
 		switchRightDisplay('preview');
+		watchFileState = true;
 		const previewHandler = {
 			copyTextContent: (source, text) => {
 				let result = false;
