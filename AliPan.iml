@@ -69,5 +69,11 @@
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpcore:4.4.14" level="project" />
     <orderEntry type="library" name="Maven: commons-codec:commons-codec:1.15" level="project" />
     <orderEntry type="library" name="Maven: cn.hutool:hutool-all:5.3.5" level="project" />
+    <orderEntry type="library" name="marked" level="application" />
+    <orderEntry type="library" name="highlight" level="application" />
+    <orderEntry type="library" name="monokai-sublime" level="application" />
+    <orderEntry type="library" name="highlightjs-line-numbers.js" level="application" />
+    <orderEntry type="library" name="github-markdown" level="application" />
+    <orderEntry type="library" name="jquery" level="application" />
   </component>
 </module>

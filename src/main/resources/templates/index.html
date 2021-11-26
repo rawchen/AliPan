@@ -14,8 +14,8 @@
 	<script src="https://cdn.jsdelivr.net/npm/highlightjs-line-numbers.js@2.6.0/dist/highlightjs-line-numbers.min.js"></script>
 	<link href="https://s0.pstatp.com/cdn/expire-1-M/github-markdown-css/3.0.1/github-markdown.min.css" rel="stylesheet"/>
 	<script src="https://s0.pstatp.com/cdn/expire-1-M/jquery/3.4.0/jquery.min.js"></script>
-	<script src="https://s0.pstatp.com/cdn/expire-1-M/fancybox/3.5.7/jquery.fancybox.min.js"></script>
-	<link href="https://s0.pstatp.com/cdn/expire-1-M/fancybox/3.5.7/jquery.fancybox.min.css" rel="stylesheet"/>
+<!--	<script src="https://s0.pstatp.com/cdn/expire-1-M/fancybox/3.5.7/jquery.fancybox.min.js"></script>-->
+<!--	<link href="https://s0.pstatp.com/cdn/expire-1-M/fancybox/3.5.7/jquery.fancybox.min.css" rel="stylesheet"/>-->
 
 	<link th:href="@{/static/css/mystyle.css}" rel="stylesheet"/>
 	<script th:src="@{/static/layer/layer.js}"></script>
@@ -116,6 +116,7 @@
 	let fullFileIdArr = [];
 
 	document.addEventListener('DOMContentLoaded', () => {
+		document.getElementById('arrow-back').style.color = '#818181';
 		if ("[[${type}]]" === "folder") {
 			sendRequest("POST",
 				"/getFolder/" + "[[${fileId}]]",
@@ -164,6 +165,11 @@
 	}
 
 	function back() {
+		if (fullFileIdArr.length === 1) {
+			document.getElementById('arrow-back').style.color = '#818181';
+			return;
+		}
+
 		// console.log(fullFileIdArr)//root
 		let parentFileId = '';
 		let fullFileIdLastSecond = fullFileIdArr[fullFileIdArr.length - 2];
@@ -241,6 +247,11 @@
 	}
 
 	function renderFileList(files) {
+
+		if (fullFileIdArr.length > 0) {
+			document.getElementById('arrow-back').style.color = '#545454';
+		}
+
 		switchRightDisplay();
 
 		const createFileWrapper = (type, name, time, size, fileId, url, downloadUrl) => {
