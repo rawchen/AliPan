@@ -11,6 +11,9 @@
 * Windows或Linux下载安装 JRE 8 或 JDK 8 及以上版本，下载ZIP解压为项目文件夹。IDEA打开，配置yml中的refresh_token(刷新令牌)和parent_file_id(根文件夹)，Maven打包jar运行。
 * 以后会添加jar包直接运行，后台配置参数。
 
+**refresh_token获取方法：**
+> https://pan.rawchen.com/token
+
 
 ## 功能（持续开发中）
 * - [x] Thymeleaf模板引擎
@@ -23,7 +26,7 @@
 * - [x] 右键弹出菜单
 * - [ ] 文件夹加密
 * - [ ] 后台自定义配置
-* - [ ] 后退前进监听
+* - [x] 后退监听
 * - [ ] RefreshToken续期
 * - [ ] 移动终端下载
 
