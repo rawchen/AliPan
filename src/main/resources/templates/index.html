@@ -329,6 +329,7 @@
 
 
 	function dealFile(fileId, url, size, name, downloadUrl) {
+		fullFileIdArr.push(fileId);
 		// window.backFordwardCache.preview = true;
 		document.getElementById('arrow-back').style.color = '#545454';
 		switchRightDisplay('preview');
