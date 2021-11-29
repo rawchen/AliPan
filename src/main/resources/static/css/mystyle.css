@@ -74,6 +74,7 @@ pre * {
 	/*padding: 1em 1em 0;*/
 	margin: 1.2em .2em;
 	padding-left: 1em;
+	font-weight: bold;
 	white-space: nowrap;
 	overflow: hidden;
 }
