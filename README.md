@@ -6,10 +6,16 @@
 >
 > JDK 8 + IDEA 2021.2.3
 
-## 使用（暂时）
+## 使用
 
-* Windows或Linux下载安装 JRE 8 或 JDK 8 及以上版本，下载ZIP解压为项目文件夹。IDEA打开，配置yml中的refresh_token(刷新令牌)和parent_file_id(根文件夹)，Maven打包jar运行。
-* 以后会添加jar包直接运行，后台配置参数。
+* 确保java8及以上环境，在[releases](https://github.com/rawchen/AliPan/releases)页面下载jar运行文件。
+* 通过`java -jar AliPan.jar`运行该程序，默认运行在[http://localhost:8899](http://localhost:8899)。
+* 通过以下 [refresh_token获取方法](https://pan.rawchen.com/token)拿到后，粘贴到jar包同路径下生成的配置文件`AiPanConfig`中（可记事本编辑）。
+* 访问 [http://localhost:8899/refresh](http://localhost:8899/refresh)刷新token后即可正常访问[http://localhost:8899](http://localhost:8899)
+
+## 开发
+
+* 确保java8及以上环境，下载项目后通过IDEA打开，可配置application.yml中的端口号、parent_file_id(要展示的节点目录)等，Maven打包jar运行。
 
 **refresh_token获取方法：**
 > https://pan.rawchen.com/token
@@ -25,7 +31,7 @@
 * - [x] 目录树监听
 * - [x] 右键弹出菜单
 * - [ ] 文件夹加密
-* - [ ] 后台自定义配置
+* - [x] 后台自定义配置
 * - [x] 后退监听
 * - [ ] RefreshToken续期
 * - [ ] 移动终端下载
