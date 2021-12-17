@@ -9,6 +9,8 @@ public class Constants {
 
 	// 访问令牌
 	public static String ACCESS_TOKEN = "";
+	// 刷新令牌
+	public static String REFRESH_TOKEN = "";
 	// 默认驱动器ID
 	public static String DEFAULT_DRIVE_ID = "";
 
@@ -26,6 +28,14 @@ public class Constants {
 
 	public static void setAccessToken(String accessToken) {
 		ACCESS_TOKEN = accessToken;
+	}
+
+	public static String getRefreshToken() {
+		return REFRESH_TOKEN;
+	}
+
+	public static void setRefreshToken(String refreshToken) {
+		REFRESH_TOKEN = refreshToken;
 	}
 
 	public static String getDefaultDriveId() {

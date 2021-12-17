@@ -19,21 +19,18 @@ import org.springframework.stereotype.Component;
 @EnableScheduling
 public class ScheduleTask {
 
-	@Value("${alipan.refresh_token}")
-	String refreshToken;
-
 	@Value("${alipan.api_url}")
 	String apiUrl;
 
 	/**
-	 * 启动执行一次 && 每7200秒执行一次
+	 * 启动执行一次 && 每7200秒执行一次刷新access_token
 	 */
 	@Scheduled(fixedRate = 7200 * 1000)
 	private void scheduleTask() {
 		System.err.println("2h定时任务执行: " + DateUtil.date());
 		JSONObject paramJson = new JSONObject();
 		paramJson.put("grant_type", "refresh_token");
-		paramJson.put("refresh_token", refreshToken);
+		paramJson.put("refresh_token", Constants.getRefreshToken());
 		String result = HttpClientUtil.doPost(apiUrl + "/account/token", paramJson.toString());
 		JSONObject jsonObject = JSONObject.parseObject(result);
 		Constants.setAccessToken((String) jsonObject.get("access_token"));

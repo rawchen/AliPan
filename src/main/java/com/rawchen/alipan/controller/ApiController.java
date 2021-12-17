@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.rawchen.alipan.config.Constants;
 import com.rawchen.alipan.entity.PanFile;
+import com.rawchen.alipan.utils.FileUtil;
 import com.rawchen.alipan.utils.HttpClientUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,10 +23,6 @@ import java.util.Map;
 @CrossOrigin
 @Controller
 public class ApiController {
-
-	@Value("${alipan.refresh_token}")
-	String refreshToken;
-
 
 	@Value("${alipan.parent_file_id}")
 	String parentFileId;
@@ -241,18 +239,26 @@ public class ApiController {
 	 */
 	@ResponseBody
 	@GetMapping(value = "/refresh")
-	public Map<String, JSONObject> test() {
+//	public Map<String, JSONObject> refresh() {
+	public String refresh() {
 
+		String s = FileUtil.textFileToString(
+				new File(System.getProperty("user.dir") +
+				File.separator + "AiPanConfig"));
+		Constants.setRefreshToken(s);
 		JSONObject requestJson = new JSONObject();
-		requestJson.put("refresh_token", refreshToken);
-		Map<String, String> headerMap = new HashMap<>();
-		headerMap.put("Content-Type", "application/json");
-		String result = HttpClientUtil.doPost(apiUrl + "/token/refresh", requestJson.toString(), headerMap);
+		requestJson.put("grant_type", "refresh_token");
+		requestJson.put("refresh_token", Constants.getRefreshToken());
+
+		String result = HttpClientUtil.doPost(apiUrl + "/account/token", requestJson.toString());
 		JSONObject jsonObject = JSONObject.parseObject(result);
+		if (jsonObject.get("access_token") == null) {
+			return "确认配置文件 AiPanConfig 首行是否为你的 refresh_token！";
+		}
 		Constants.setAccessToken((String) jsonObject.get("access_token"));
 		Constants.setDefaultDriveId((String) jsonObject.get("default_drive_id"));
-		Map<String, JSONObject> map = new HashMap<>();
-		map.put("data", jsonObject);
-		return map;
+//		Map<String, JSONObject> map = new HashMap<>();
+//		map.put("data", jsonObject);
+		return "刷新配置文件成功，刷新 access_token 成功！";
 	}
 }

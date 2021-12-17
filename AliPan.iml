@@ -15,8 +15,8 @@
     </facet>
   </component>
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8">
-    <output url="file://$MODULE_DIR$/target/classes" />
-    <output-test url="file://$MODULE_DIR$/target/test-classes" />
+    <output url="file://$MODULE_DIR$/../../repository/org/springframework/boot/spring-boot-starter-parent/2.5.6/target/classes" />
+    <output-test url="file://$MODULE_DIR$/../../repository/org/springframework/boot/spring-boot-starter-parent/2.5.6/target/test-classes" />
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/resources" type="java-resource" />
@@ -25,6 +25,12 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="marked" level="application" />
+    <orderEntry type="library" name="highlight" level="application" />
+    <orderEntry type="library" name="monokai-sublime" level="application" />
+    <orderEntry type="library" name="highlightjs-line-numbers.js" level="application" />
+    <orderEntry type="library" name="github-markdown" level="application" />
+    <orderEntry type="library" name="jquery" level="application" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-thymeleaf:2.5.6" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter:2.5.6" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-logging:2.5.6" level="project" />
@@ -69,11 +75,5 @@
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpcore:4.4.14" level="project" />
     <orderEntry type="library" name="Maven: commons-codec:commons-codec:1.15" level="project" />
     <orderEntry type="library" name="Maven: cn.hutool:hutool-all:5.3.5" level="project" />
-    <orderEntry type="library" name="marked" level="application" />
-    <orderEntry type="library" name="highlight" level="application" />
-    <orderEntry type="library" name="monokai-sublime" level="application" />
-    <orderEntry type="library" name="highlightjs-line-numbers.js" level="application" />
-    <orderEntry type="library" name="github-markdown" level="application" />
-    <orderEntry type="library" name="jquery" level="application" />
   </component>
 </module>
