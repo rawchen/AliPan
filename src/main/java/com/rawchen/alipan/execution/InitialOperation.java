@@ -23,7 +23,7 @@ public class InitialOperation implements CommandLineRunner {
 		//如果jar同级目录不存在该token文件则生成文件，并要求用户填入
 		String absAddress = System.getProperty("user.dir");
 		System.out.println(absAddress);
-		File file = new File(absAddress + File.separator + "AiPanConfig");
+		File file = new File(absAddress + File.separator + "AliPanConfig");
 		if (!file.exists()) {
 			file.createNewFile();
 		}

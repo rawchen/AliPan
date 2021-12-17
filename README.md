@@ -10,7 +10,7 @@
 
 * 确保java8及以上环境，在[releases](https://github.com/rawchen/AliPan/releases)页面下载jar运行文件。
 * 通过`java -jar AliPan.jar`运行该程序，默认运行在[http://localhost:8899](http://localhost:8899)。
-* 通过以下 [refresh_token获取方法](https://pan.rawchen.com/token)拿到后，粘贴到jar包同路径下生成的配置文件`AiPanConfig`中（可记事本编辑）。
+* 通过以下 [refresh_token获取方法](https://pan.rawchen.com/token)拿到后，粘贴到jar包同路径下生成的配置文件`AliPanConfig`中（可记事本编辑）。
 * 访问 [http://localhost:8899/refresh](http://localhost:8899/refresh)刷新token后即可正常访问[http://localhost:8899](http://localhost:8899)
 
 ## 开发

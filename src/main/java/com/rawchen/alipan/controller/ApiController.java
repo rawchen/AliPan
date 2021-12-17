@@ -244,7 +244,7 @@ public class ApiController {
 
 		String s = FileUtil.textFileToString(
 				new File(System.getProperty("user.dir") +
-				File.separator + "AiPanConfig"));
+				File.separator + "AliPanConfig"));
 		Constants.setRefreshToken(s);
 		JSONObject requestJson = new JSONObject();
 		requestJson.put("grant_type", "refresh_token");
@@ -253,7 +253,7 @@ public class ApiController {
 		String result = HttpClientUtil.doPost(apiUrl + "/account/token", requestJson.toString());
 		JSONObject jsonObject = JSONObject.parseObject(result);
 		if (jsonObject.get("access_token") == null) {
-			return "确认配置文件 AiPanConfig 首行是否为你的 refresh_token！";
+			return "确认配置文件 AliPanConfig 首行是否为你的 refresh_token！";
 		}
 		Constants.setAccessToken((String) jsonObject.get("access_token"));
 		Constants.setDefaultDriveId((String) jsonObject.get("default_drive_id"));
