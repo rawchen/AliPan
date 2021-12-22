@@ -561,8 +561,15 @@
 		document.querySelector('.file-name').innerHTML = name;
 		document.querySelector('.btn.download').addEventListener('click',
 			() => {
-				previewHandler.copyTextContent(null, downloadUrl);
-				location.href = downloadUrl;
+				sendRequest("POST",
+					"/getDownloadUrl/" + fileId,
+					{'Content-type': 'application/x-www-form-urlencoded'},
+					function (data) {
+						let files = JSON.parse(data);
+						previewHandler.copyTextContent(null, files.data.url);
+						location.href = files.data.url;
+					}
+				);
 				const btn = document.querySelector('.btn.download');
 				btn.innerHTML = '已复制';
 				setTimeout(() => btn.innerHTML = '下载', 3000);
@@ -850,9 +857,34 @@
 		document.body.removeChild(target);
 	}
 
-	function js_method_download(type, url) {
+	function js_method_download(type, fileId) {
 		if (type === "file") {
-			location.href = encodeURI(url);
+			sendRequest("POST",
+				"/getDownloadUrl/" + fileId,
+				{'Content-type': 'application/x-www-form-urlencoded'},
+				function (data) {
+					let files = JSON.parse(data);
+					let target = document.createElement('pre');
+					target.style.opacity = '0';
+					target.textContent = files.data.url;
+					document.body.appendChild(target);
+					try {
+						let range = document.createRange();
+						range.selectNode(target);
+						window.getSelection().removeAllRanges();
+						window.getSelection().addRange(range);
+						if (document.execCommand('copy')) {
+							document.execCommand('copy');
+							layer.msg("已复制下载链接");
+						}
+						window.getSelection().removeAllRanges();
+					} catch (e) {
+					}
+					document.body.removeChild(target);
+					location.href = files.data.url;
+				}
+			);
+			// location.href = encodeURI(url);
 		}
 	}
 
@@ -869,7 +901,7 @@
 					} else if (this.id === "share") {
 						this.href = "javascript:js_method_share(\"" + type + "\",\"" + element.getAttribute("fileId") + "\");"
 					} else if (this.id === "download") {
-						this.href = "javascript:js_method_download(\"" + type + "\",\"" + element.getAttribute("fileDownloadUrl") + "\");"
+						this.href = "javascript:js_method_download(\"" + type + "\",\"" + element.getAttribute("fileId") + "\");"
 					}
 				});
 			}

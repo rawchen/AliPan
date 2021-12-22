@@ -136,14 +136,14 @@ public class ApiController {
 	}
 
 	/**
-	 * 获取下载链接，过期15分钟
+	 * 获取下载链接，过期4小时
 	 *
 	 * @param fileId
 	 * @return
 	 */
 	@ResponseBody
-	@RequestMapping(value = "/down/{fileId}")
-	public Map<String, Object> down(@PathVariable("fileId") String fileId, Model model, HttpServletRequest request, HttpServletResponse response) {
+	@RequestMapping(value = "/getDownloadUrl/{fileId}")
+	public Map<String, Object> getDownloadUrl(@PathVariable("fileId") String fileId, Model model, HttpServletRequest request, HttpServletResponse response) {
 
 		JSONObject requestJson = new JSONObject();
 		requestJson.put("drive_id", Constants.DEFAULT_DRIVE_ID);
