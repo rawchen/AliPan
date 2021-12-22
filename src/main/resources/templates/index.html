@@ -852,7 +852,7 @@
 
 	function js_method_download(type, url) {
 		if (type === "file") {
-			location.href = url;
+			location.href = encodeURI(url);
 		}
 	}
 
