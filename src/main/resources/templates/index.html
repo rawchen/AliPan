@@ -275,6 +275,15 @@
 		if (files === null) {
 			location.reload();
 		}
+
+		let folderCount = 0;
+		files.data.items.forEach(function () {
+			folderCount++;
+		});
+		if (folderCount === 0) {
+			layer.msg("找不到东西哦");
+		}
+
 		// document.getElementsByClassName("markdown-body")[0].innerHTML = '';
 		files.data.items.forEach(file => {
 			if (file.type === 'file' && file.name === "README.md") {
@@ -638,7 +647,7 @@
 						fullFileIdArr.push(fileId)
 
 						let folderCount = 0;
-						files.data.items.forEach(file => {
+						files.data.items.forEach(function () {
 							folderCount++;
 						});
 						if (folderCount === 0) {
