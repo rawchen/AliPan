@@ -3,6 +3,7 @@ package com.rawchen.alipan.utils;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 
 /**
  * @author RawChen
@@ -30,5 +31,33 @@ public class FileUtil {
 			e.printStackTrace();
 		}
 		return result;
+	}
+
+	/**
+	 * 写入refresh_token字符串到指定存在的文本文件
+	 *
+	 * @param str
+	 * @param file
+	 * @return
+	 */
+	public static int stringToTextFile(String str, File file) {
+		FileWriter fw = null;
+		try {
+			fw = new FileWriter(file);
+			fw.write(str);
+			fw.close();
+		} catch (Throwable e) {
+			e.printStackTrace();
+			return 0;
+		} finally {
+			if (fw != null) {
+				try {
+					fw.close();
+				} catch (Throwable e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return 1;
 	}
 }

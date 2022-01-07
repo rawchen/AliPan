@@ -78,6 +78,7 @@ public class ApiController {
 		requestJson.put("image_thumbnail_process", "image/resize,w_50");
 		requestJson.put("image_url_process", "image/resize,w_1920/format,jpeg");
 		requestJson.put("limit", 100);
+		requestJson.put("url_expire_sec", 14400);
 		requestJson.put("order_by", "name");
 		requestJson.put("order_direction", "ASC");
 		requestJson.put("parent_file_id", fileId);
@@ -93,6 +94,13 @@ public class ApiController {
 			result = HttpClientUtil.doPost(apiUrl + "/file/list", requestJson.toString(), headerMap);
 			jsonObject = JSONObject.parseObject(result);
 		}
+		if (jsonObject != null && "AccessTokenInvalid".equals(jsonObject.get("code"))) {
+			refresh();
+			headerMap.put("Authorization", "Bearer " + Constants.ACCESS_TOKEN);
+			result = HttpClientUtil.doPost(apiUrl + "/file/list", requestJson.toString(), headerMap);
+			jsonObject = JSONObject.parseObject(result);
+		}
+
 		Map<String, Object> map = new HashMap<>();
 
 		//返回基于根的parent路径
@@ -252,13 +260,25 @@ public class ApiController {
 
 		String result = HttpClientUtil.doPost(apiUrl + "/account/token", requestJson.toString());
 		JSONObject jsonObject = JSONObject.parseObject(result);
-		if (jsonObject.get("access_token") == null) {
+		if (jsonObject.get("code") != null) {
 			return "确认配置文件 AliPanConfig 首行是否为你的 refresh_token！";
 		}
-		Constants.setAccessToken((String) jsonObject.get("access_token"));
-		Constants.setDefaultDriveId((String) jsonObject.get("default_drive_id"));
+
+		if (jsonObject.get("code") == null && jsonObject.get("access_token") != null) {
+			//刷新一次refresh_token到AliPanConfig
+			String refreshToken = (String) jsonObject.get("refresh_token");
+			if (refreshToken != null  && !"".equals(refreshToken)) {
+				FileUtil.stringToTextFile(refreshToken, new File(System.getProperty("user.dir") +
+						File.separator + "AliPanConfig"));
+			}
+			//更新一次access_token到Constants
+			Constants.setAccessToken((String) jsonObject.get("access_token"));
+			Constants.setRefreshToken(refreshToken);
+			Constants.setDefaultDriveId((String) jsonObject.get("default_drive_id"));
 //		Map<String, JSONObject> map = new HashMap<>();
 //		map.put("data", jsonObject);
-		return "刷新配置文件成功，刷新 access_token 成功！";
+			return "刷新配置文件成功，刷新 access_token 成功！";
+		}
+		return "其它问题，联系软件作者。";
 	}
 }
