@@ -14,7 +14,7 @@
 
 ## 开发
 
-* 确保java8及以上环境，下载项目后通过IDEA打开，可配置application.yml中的端口号、parent_file_id(要展示的节点目录)等，Maven打包jar运行。
+* 确保java8及以上环境，下载项目后通过IDEA打开，可配置application.yml中的端口号、parent_file_id(要展示的节点目录)等，通过Maven打包jar运行，没有IDEA也可配置Maven命令执行`mvn clean package`。
 
 **refresh_token获取方法：**
 > https://pan.rawchen.com/token
