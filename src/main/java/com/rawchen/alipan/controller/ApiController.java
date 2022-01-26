@@ -40,7 +40,7 @@ public class ApiController {
 	 * @return
 	 */
 	@ResponseBody
-	@RequestMapping(value = "/getFile/{fileId}")
+	@PostMapping(value = "/getFile/{fileId}")
 	public Map<String, Object> getFile(@PathVariable("fileId") String fileId) {
 
 		JSONObject requestJson = new JSONObject();
@@ -68,7 +68,7 @@ public class ApiController {
 	 * @return
 	 */
 	@ResponseBody
-	@RequestMapping(value = "/getFolder/{fileId}")
+	@PostMapping(value = "/getFolder/{fileId}")
 	public Map<String, Object> getFolder(@PathVariable("fileId") String fileId) {
 		JSONObject requestJson = new JSONObject();
 		requestJson.put("param1", 30);
@@ -150,7 +150,7 @@ public class ApiController {
 	 * @return
 	 */
 	@ResponseBody
-	@RequestMapping(value = "/getDownloadUrl/{fileId}")
+	@PostMapping(value = "/getDownloadUrl/{fileId}")
 	public Map<String, Object> getDownloadUrl(@PathVariable("fileId") String fileId, Model model, HttpServletRequest request, HttpServletResponse response) {
 
 		JSONObject requestJson = new JSONObject();
