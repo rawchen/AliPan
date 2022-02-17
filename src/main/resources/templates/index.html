@@ -89,6 +89,7 @@
 					<div class="file-name"></div>
 					<div class="btn download">下载</div>
 					<div class="btn share">分享</div>
+					<div class="btn potplayer" id="potplayer">PotPlayer</div>
 				</div>
 				<div class="content"></div>
 			</div>
@@ -464,6 +465,11 @@
 		const suffix = name.split('.').pop();
 		let content = document.querySelector('.content');
 		let contentType = previewHandler.fileType(suffix);
+		if (contentType !== 'video') {
+			document.getElementById("potplayer").style.display = "none";
+		} else {
+			document.getElementById("potplayer").style.display = "unset";
+		}
 		switch (contentType) {
 			case 'image':
 				let img = new Image();
@@ -569,6 +575,18 @@
 		}
 		// document.querySelector('.file-name').innerHTML = address + "\t" + name;
 		document.querySelector('.file-name').innerHTML = name;
+		document.querySelector('.btn.potplayer').addEventListener('click',
+			() => {
+				sendRequest("POST",
+					"/getDownloadUrl/" + fileId,
+					{'Content-type': 'application/x-www-form-urlencoded'},
+					function (data) {
+						let files = JSON.parse(data);
+						location.href = "potplayer://" + files.data.url;
+					}
+				);
+			}
+		);
 		document.querySelector('.btn.download').addEventListener('click',
 			() => {
 				sendRequest("POST",
