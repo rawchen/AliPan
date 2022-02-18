@@ -79,6 +79,10 @@ pre * {
 	overflow: hidden;
 }
 
+#potplayer {
+	width: 72px;
+}
+
 .target-blank {
 	line-height: 2em;
 	background: #000;
