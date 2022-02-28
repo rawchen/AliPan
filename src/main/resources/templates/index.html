@@ -467,7 +467,6 @@
 			}
 		}
 
-
 		let address;
 		if (url) {
 			address = document.location.protocol + "//" + window.location.host + "/file/" + fileId;
@@ -477,7 +476,7 @@
 		// document.querySelector('.file-name').innerHTML = address + "\t" + name;
 		document.querySelector('.file-name').innerHTML = name;
 
-		function potplayerBtn() {
+		document.querySelector('.btn.potplayer').onclick = () => {
 			sendRequest("POST",
 				"/getDownloadUrl/" + fileId,
 				{'Content-type': 'application/x-www-form-urlencoded'},
@@ -486,34 +485,28 @@
 					location.href = "potplayer://" + files.data.url;
 				}
 			);
-		};
+		}
 
-		document.querySelector('.btn.potplayer').addEventListener('click', potplayerBtn);
-
-		document.querySelector('.btn.download').addEventListener('click',
-			() => {
-				sendRequest("POST",
-					"/getDownloadUrl/" + fileId,
-					{'Content-type': 'application/x-www-form-urlencoded'},
-					function (data) {
-						let files = JSON.parse(data);
-						previewHandler.copyTextContent(null, files.data.url);
-						location.href = files.data.url;
-					}
-				);
-				const btn = document.querySelector('.btn.download');
-				btn.innerHTML = '已复制';
-				setTimeout(() => btn.innerHTML = '下载', 3000);
-			}
-		);
-		document.querySelector('.btn.share').addEventListener('click',
-			() => {
-				previewHandler.copyTextContent(null, address);
-				const btn = document.querySelector('.btn.share');
-				btn.innerHTML = '已复制';
-				setTimeout(() => btn.innerHTML = '分享', 3000);
-			}
-		);
+		document.querySelector('.btn.download').onclick = () => {
+			sendRequest("POST",
+				"/getDownloadUrl/" + fileId,
+				{'Content-type': 'application/x-www-form-urlencoded'},
+				function (data) {
+					let files = JSON.parse(data);
+					previewHandler.copyTextContent(null, files.data.url);
+					location.href = files.data.url;
+				}
+			);
+			const btn = document.querySelector('.btn.download');
+			btn.innerHTML = '已复制';
+			setTimeout(() => btn.innerHTML = '下载', 3000);
+		}
+		document.querySelector('.btn.share').onclick = () => {
+			previewHandler.copyTextContent(null, address);
+			const btn = document.querySelector('.btn.share');
+			btn.innerHTML = '已复制';
+			setTimeout(() => btn.innerHTML = '分享', 3000);
+		}
 		fullFileIdArr.push(fileId);
 		// window.backFordwardCache.preview = true;
 		document.getElementById('arrow-back').style.color = '#545454';
@@ -549,7 +542,7 @@
 				audio.style.outline = 'none';
 				audio.preload = 'auto';
 				audio.volume = 0.3;
-				audio.controls = 'controls';
+				audio.controls = true;
 				audio.style.width = '100%';
 				audio.src = url;
 				content.innerHTML = '';
@@ -638,8 +631,6 @@
 			}
 		};
 		window.requestAnimationFrame(scrollToBottom);
-		//啥时候需要移除这个多于的监听事件
-		// document.querySelector('.btn.potplayer').removeEventListener("click", potplayerBtn);
 	}
 
 	function switchBackForwardStatus(path) {
