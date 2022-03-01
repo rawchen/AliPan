@@ -499,7 +499,7 @@ body {
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
-	text-align: right;;
+	text-align: left;
 	width: 133px;
 }
 

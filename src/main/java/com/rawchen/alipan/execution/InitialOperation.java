@@ -20,14 +20,14 @@ public class InitialOperation implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		//如果jar同级目录不存在该token文件则生成文件，并要求用户填入
+		//如果jar同级目录不存在该配置文件则重新创建
 		String absAddress = System.getProperty("user.dir");
 		System.out.println(absAddress);
 		File file = new File(absAddress + File.separator + "AliPanConfig");
 		if (!file.exists()) {
 			file.createNewFile();
 		}
-
+		//拿到配置文件里的refresh_token放到全局Constants
 		String s = FileUtil.textFileToString(file);
 		Constants.setRefreshToken(s);
 	}

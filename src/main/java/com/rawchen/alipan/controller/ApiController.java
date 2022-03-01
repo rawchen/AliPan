@@ -6,11 +6,8 @@ import com.rawchen.alipan.utils.FileUtil;
 import com.rawchen.alipan.utils.HttpClientUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
@@ -85,9 +82,11 @@ public class ApiController {
 		String result = HttpClientUtil.doPost(apiUrl + "/file/list", requestJson.toString(), headerMap);
 		JSONObject jsonObject = JSONObject.parseObject(result);
 		if (jsonObject == null) {
+//			System.out.println("{api}/file/list 响应为空: " + DateUtil.date());
 			result = HttpClientUtil.doPost(apiUrl + "/file/list", requestJson.toString(), headerMap);
 			jsonObject = JSONObject.parseObject(result);
 		}
+		//如果请求到json体不是空且不可用就刷新token
 		if (jsonObject != null && "AccessTokenInvalid".equals(jsonObject.get("code"))) {
 			refresh();
 			headerMap.put("Authorization", "Bearer " + Constants.ACCESS_TOKEN);
@@ -135,8 +134,7 @@ public class ApiController {
 	 */
 	@ResponseBody
 	@PostMapping(value = "/getDownloadUrl/{fileId}")
-	public Map<String, Object> getDownloadUrl(@PathVariable("fileId") String fileId, Model model,
-			HttpServletRequest request, HttpServletResponse response) {
+	public Map<String, Object> getDownloadUrl(@PathVariable("fileId") String fileId) {
 
 		JSONObject requestJson = new JSONObject();
 		requestJson.put("drive_id", Constants.DEFAULT_DRIVE_ID);
@@ -156,7 +154,7 @@ public class ApiController {
 	}
 
 	/**
-	 * 手动刷新token
+	 * 刷新token
 	 *
 	 * @return
 	 */
