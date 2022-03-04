@@ -34,6 +34,7 @@
 * - [x] 后退监听
 * - [x] RefreshToken续期
 * - [x] 手机谷歌、夸克浏览器下载
+* - [x] 调用PotPlayer
 
 ## 案例截图
 
