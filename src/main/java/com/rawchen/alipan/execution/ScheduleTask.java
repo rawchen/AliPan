@@ -9,6 +9,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Spring Boot定时任务
  *
@@ -35,5 +38,30 @@ public class ScheduleTask {
 		JSONObject jsonObject = JSONObject.parseObject(result);
 		Constants.setAccessToken((String) jsonObject.get("access_token"));
 		Constants.setDefaultDriveId((String) jsonObject.get("default_drive_id"));
+	}
+
+	/**
+	 * 调用目录接口，第一次延迟1分钟后执行，之后按每1小时调用一次
+	 */
+	@Scheduled(initialDelay=60 * 1000, fixedRate = 3600 * 1000)
+	private void scheduleTaskToGetFolder() {
+		JSONObject requestJson = new JSONObject();
+		requestJson.put("param1", 30);
+		requestJson.put("all", false);
+		requestJson.put("drive_id", Constants.DEFAULT_DRIVE_ID);
+		requestJson.put("fields", "*");
+		requestJson.put("image_thumbnail_process", "image/resize,w_50");
+		requestJson.put("image_url_process", "image/resize,w_1920/format,jpeg");
+		requestJson.put("limit", 100);
+		requestJson.put("url_expire_sec", 14400);
+		requestJson.put("order_by", "name");
+		requestJson.put("order_direction", "ASC");
+		requestJson.put("parent_file_id", "root");
+		requestJson.put("video_thumbnail_process", "video/snapshot,t_0,f_jpg,w_50");
+
+		Map<String, String> headerMap = new HashMap<>();
+		headerMap.put("Content-Type", "application/json");
+		headerMap.put("Authorization", "Bearer " + Constants.ACCESS_TOKEN);
+		HttpClientUtil.doPost(apiUrl + "/file/list", requestJson.toString(), headerMap);
 	}
 }
