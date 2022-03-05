@@ -83,6 +83,16 @@ pre * {
 	width: 72px;
 }
 
+#thunder {
+	display: block;
+}
+
+@media screen and (max-width: 500px) {
+	#thunder {
+		display: none;
+	}
+}
+
 .target-blank {
 	line-height: 2em;
 	background: #000;
