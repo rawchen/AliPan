@@ -249,23 +249,18 @@ ion-icon {
 
 
 .loading-wrapper {
-	display: none;
-	position: fixed;
-	height: 2em;
-	line-height: 2em;
-	margin-top: .5em;
 	width: 100%;
-	z-index: 1;
 }
 
 .loading {
-	color: white;
-	background: rgb(218, 215, 215);
-	height: 100%;
-	width: 8em;
-	margin: 0 auto;
-	text-align: center;
-	border-radius: 1em;
+	display: none;
+}
+
+.loading img {
+	margin-left: 10px;
+	margin-top: 5px;
+	margin-right: 0.3em;
+	width: 13px;
 }
 
 ion-icon {
@@ -379,28 +374,6 @@ body {
 #main-page:hover {
 	background-color: #f3f3f3;
 	border-radius: 5px;
-}
-
-.nav {
-	width: 100%;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-}
-
-.nav-path,
-.nav-arr {
-	font-size: 1em;
-	height: 1.5em;
-	margin-right: .3em;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-	cursor: default;
-}
-
-.nav-path:hover {
-	color: rgb(255 145 93);
 }
 
 .tree-node:hover,

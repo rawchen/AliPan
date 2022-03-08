@@ -42,18 +42,15 @@
 	</div>
 </template>
 
-<div class="loading-wrapper">
-	<div class="loading">Loading...</div>
-</div>
+
 <div class="header-wrapper">
 	<div class="header">
 		<ion-icon id="arrow-back" class="logo" name="arrow-back"></ion-icon>
-<!--		<ion-icon id="arrow-forward" class="logo" name="arrow-forward"></ion-icon>-->
 		<ion-icon id="main-page" class="logo" name="home"></ion-icon>
-		<div class="nav">
-                <span id="path">
-                </span>
+		<div class="loading-wrapper">
+			<div class="loading"><img th:src="@{/static/img/loading.gif}"></div>
 		</div>
+
 		<a class="site" id="nav-site" href="javascript:void(0);" onclick="domain_index()" title="刷新">AliPan</a>
 		<a class="site" id="git-branch-a" target="_black" href="https://rawchen.com/enjoy/alipan.html"
 		   title="你也想要属于自己的云盘？">
@@ -118,30 +115,36 @@
 	let fullFileIdArr = [];
 	let watchFileState = false;
 
+	let loading = document.querySelector('.loading');
+
 	document.addEventListener('DOMContentLoaded', () => {
 		document.getElementById('arrow-back').style.color = '#818181';
 		if ("[[${type}]]" === "folder") {
-			sendRequest("POST",
-				"/getFolder/" + "[[${fileId}]]",
-				{'Content-type': 'application/x-www-form-urlencoded'},
-				function (data) {
-					renderFileList(JSON.parse(data));
+			loading.style.display = 'initial';
+			$.ajax({
+				type: 'POST',
+				url: "/getFolder/" + "[[${fileId}]]",
+				headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+				// complete: function () {loading.style.display = 'none';},
+				success: function (data) {
+					renderFileList(data);
 					fullFileId = '[[${fileId}]]';
-					fullFileIdArr.push('[[${fileId}]]')
-					// console.log(fullFileId);
-					//初始化根节点列表的树
-					renderTreeNode(JSON.parse(data));
+					fullFileIdArr.push('[[${fileId}]]');
+					renderTreeNode(data);
 				}
-			);
+			});
 		} else {
-			sendRequest("POST",
-				"/getFile/" + "[[${fileId}]]",
-				{'Content-type': 'application/x-www-form-urlencoded'},
-				function (data) {
-					let file = JSON.parse(data);
+			loading.style.display = 'initial';
+			$.ajax({
+				type: 'POST',
+				url: "/getFile/" + "[[${fileId}]]",
+				headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+				complete: function () {loading.style.display = 'none';},
+				success: function (data) {
+					let file = data;
 					dealFile("[[${fileId}]]", file.data.url, formatSize(file.data.size), file.data.name, file.data.download_url);
 				}
-			);
+			});
 		}
 
 		addBackForwardListener();
@@ -183,15 +186,18 @@
 		} else {
 			parentFileId = fullFileIdLastSecond;
 		}
+
 		//根据该文件夹或文件的fileId去请求parent再渲染列表
-		sendRequest("POST",
-			"/getFolder/" + parentFileId,
-			{'Content-type': 'application/x-www-form-urlencoded'},
-			function (data) {
-				let files = JSON.parse(data);
-				renderFileList(files);
+		loading.style.display = 'initial';
+		$.ajax({
+			type: 'POST',
+			url: "/getFolder/" + parentFileId,
+			headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+			complete: function () {loading.style.display = 'none';},
+			success: function (data) {
+				renderFileList(data);
 			}
-		);
+		});
 		if (fullFileIdArr.length > 1) {
 			fullFileIdArr.pop();
 		}
@@ -478,37 +484,43 @@
 		document.querySelector('.file-name').innerHTML = name;
 
 		document.querySelector('.btn.potplayer').onclick = () => {
-			sendRequest("POST",
-				"/getDownloadUrl/" + fileId,
-				{'Content-type': 'application/x-www-form-urlencoded'},
-				function (data) {
-					let files = JSON.parse(data);
-					location.href = "potplayer://" + files.data.url;
+			loading.style.display = 'initial';
+			$.ajax({
+				type: 'POST',
+				url: "/getDownloadUrl/" + fileId,
+				headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+				complete: function () {loading.style.display = 'none';},
+				success: function (data) {
+					location.href = "potplayer://" + data.data.url;
 				}
-			);
+			});
 		}
 
 		document.querySelector('.btn.thunder').onclick = () => {
-			sendRequest("POST",
-				"/getDownloadUrl/" + fileId,
-				{'Content-type': 'application/x-www-form-urlencoded'},
-				function (data) {
-					let files = JSON.parse(data);
-					location.href = "thunder://" + window.btoa('AA' + files.data.url + 'ZZ');
+			loading.style.display = 'initial';
+			$.ajax({
+				type: 'POST',
+				url: "/getDownloadUrl/" + fileId,
+				headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+				complete: function () {loading.style.display = 'none';},
+				success: function (data) {
+					location.href = "thunder://" + window.btoa('AA' + data.data.url + 'ZZ');
 				}
-			);
+			});
 		}
 
 		document.querySelector('.btn.download').onclick = () => {
-			sendRequest("POST",
-				"/getDownloadUrl/" + fileId,
-				{'Content-type': 'application/x-www-form-urlencoded'},
-				function (data) {
-					let files = JSON.parse(data);
-					previewHandler.copyTextContent(null, files.data.url);
-					location.href = files.data.url;
+			loading.style.display = 'initial';
+			$.ajax({
+				type: 'POST',
+				url: "/getDownloadUrl/" + fileId,
+				headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+				complete: function () {loading.style.display = 'none';},
+				success: function (data) {
+					previewHandler.copyTextContent(null, data.data.url);
+					location.href = data.data.url;
 				}
-			);
+			});
 			const btn = document.querySelector('.btn.download');
 			btn.innerHTML = '已复制';
 			setTimeout(() => btn.innerHTML = '下载', 3000);
@@ -676,17 +688,19 @@
 	function addTreeNodeListener(elem, fileId) {
 		elem.addEventListener('click', event => {
 			if (fileId !== null) {
-				sendRequest("POST",
-					"/getFolder/" + fileId,
-					{'Content-type': 'application/x-www-form-urlencoded'},
-					function (data) {
-						let files = JSON.parse(data);
-						renderFileList(files);
+				loading.style.display = 'initial';
+				$.ajax({
+					type: 'POST',
+					url: "/getFolder/" + fileId,
+					headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+					complete: function () {loading.style.display = 'none';},
+					success: function (data) {
+						renderFileList(data);
 						fullFileId = fileId;
 						fullFileIdArr.push(fileId)
 
 						let folderCount = 0;
-						files.data.items.forEach(function () {
+						data.data.items.forEach(function () {
 							folderCount++;
 						});
 						if (folderCount === 0) {
@@ -695,7 +709,7 @@
 
 						//判断是否重复添加列表元素(判断新增的文件夹只要存在同名肯定重复，抛异常)
 						try {
-							files.data.items.forEach(file => {
+							data.data.items.forEach(file => {
 								elem.parentElement.querySelectorAll('.tree-node-name').forEach(item => {
 									if (item.textContent === file.name) {
 										throw Error();
@@ -715,7 +729,7 @@
 							// console.log('error : ' + e);
 						}
 					}
-				);
+				});
 			}
 		});
 	}
@@ -733,15 +747,18 @@
 			rightmenu(elem, "file");
 		} else {
 			elem.addEventListener('click', event => {
-				sendRequest("POST",
-					"/getFolder/" + fileId,
-					{'Content-type': 'application/x-www-form-urlencoded'},
-					function (data) {
-						renderFileList(JSON.parse(data));
+				loading.style.display = 'initial';
+				$.ajax({
+					type: 'POST',
+					url: "/getFolder/" + fileId,
+					headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+					complete: function () {loading.style.display = 'none';},
+					success: function (data) {
+						renderFileList(data);
 						fullFileId = fileId;
-						fullFileIdArr.push(fileId)
+						fullFileIdArr.push(fileId);
 					}
-				);
+				});
 			});
 			elem.setAttribute("fileId", fileId);
 			rightmenu(elem, "folder");
@@ -856,25 +873,29 @@
 
 	function js_method_open(type, fileId) {
 		if (type === "folder") {
-			sendRequest("POST",
-				"/getFolder/" + fileId,
-				{'Content-type': 'application/x-www-form-urlencoded'},
-				function (data) {
-					renderFileList(JSON.parse(data));
+			loading.style.display = 'initial';
+			$.ajax({
+				type: 'POST',
+				url: "/getFolder/" + fileId,
+				headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+				complete: function () {loading.style.display = 'none';},
+				success: function (data) {
+					renderFileList(data);
 					fullFileId = fileId;
-					fullFileIdArr.push(fileId)
+					fullFileIdArr.push(fileId);
 				}
-			);
+			});
 		} else {
-			sendRequest("POST",
-				"/getFile/" + fileId,
-				{'Content-type': 'application/x-www-form-urlencoded'},
-				function (data) {
-					let file;
-					file = JSON.parse(data);
-					dealFile("[[${fileId}]]", file.data.url, formatSize(file.data.size), file.data.name, file.data.download_url);
+			loading.style.display = 'initial';
+			$.ajax({
+				type: 'POST',
+				url: "/getFile/" + fileId,
+				headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+				complete: function () {loading.style.display = 'none';},
+				success: function (data) {
+					dealFile("[[${fileId}]]", data.data.url, formatSize(data.data.size), data.data.name, data.data.download_url);
 				}
-			);
+			});
 		}
 	}
 
@@ -907,14 +928,16 @@
 
 	function js_method_download(type, fileId) {
 		if (type === "file") {
-			sendRequest("POST",
-				"/getDownloadUrl/" + fileId,
-				{'Content-type': 'application/x-www-form-urlencoded'},
-				function (data) {
-					let files = JSON.parse(data);
+			loading.style.display = 'initial';
+			$.ajax({
+				type: 'POST',
+				url: "/getDownloadUrl/" + fileId,
+				headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+				complete: function () {loading.style.display = 'none';},
+				success: function (data) {
 					let target = document.createElement('pre');
 					target.style.opacity = '0';
-					target.textContent = files.data.url;
+					target.textContent = data.data.url;
 					document.body.appendChild(target);
 					try {
 						let range = document.createRange();
@@ -929,9 +952,9 @@
 					} catch (e) {
 					}
 					document.body.removeChild(target);
-					location.href = files.data.url;
+					location.href = data.data.url;
 				}
-			);
+			});
 			// location.href = encodeURI(url);
 		}
 	}
@@ -972,46 +995,6 @@
 			context.style.display = "none";
 		};
 	}
-
-	// window.GLOBAL_CONFIG = {
-	// 	SCF_GATEWAY: "https://fodi.rawchen.workers.dev",
-	// 	SITE_NAME: "PAN · RAWCHEN",
-	// 	IS_CF: true
-	// };
-	// if (window.GLOBAL_CONFIG.SCF_GATEWAY.indexOf('workers') === -1) {
-	// 	window.GLOBAL_CONFIG.SCF_GATEWAY += '/fodi/';
-	// 	window.GLOBAL_CONFIG.IS_CF = false;
-	// }
-	//
-	// document.title = window.GLOBAL_CONFIG.SITE_NAME;
-	// document.querySelector('.site').textContent = window.GLOBAL_CONFIG.SITE_NAME;
-	// window.api = {
-	// 	root: '/',
-	// 	url: window.GLOBAL_CONFIG.SCF_GATEWAY,
-	// 	method: 'POST',
-	// 	formatPayload: (path, passwd) => {
-	// 		return '?path=' + encodeURIComponent(path) +
-	// 			'&encrypted=' + window.api.accessToken.encrypted +
-	// 			'&plain=' + window.api.accessToken.plain +
-	// 			'&passwd=' + passwd;
-	// 	},
-	// 	headers: {
-	// 		'Content-type': 'application/x-www-form-urlencoded'
-	// 	}
-	// }
-	// window.backFordwardCache = {
-	// 	root: window.api.root,
-	// 	deepest: window.api.root,
-	// 	current: window.api.root,
-	// 	backable: true,
-	// 	forwardable: false,
-	// 	preview: false
-	// }
-	// window.fileCache = new Map();
-	// window.api.accessToken = {
-	// 	encrypted: '',
-	// 	plain: ''
-	// };
 
 </script>
 </html>
