@@ -125,7 +125,7 @@
 				type: 'POST',
 				url: "/getFolder/" + "[[${fileId}]]",
 				headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-				// complete: function () {loading.style.display = 'none';},
+				complete: function () {loading.style.display = 'none';},
 				success: function (data) {
 					renderFileList(data);
 					fullFileId = '[[${fileId}]]';
