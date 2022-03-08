@@ -249,6 +249,8 @@ ion-icon {
 
 
 .loading-wrapper {
+	margin-left: 10px;
+	margin-top: 4px;
 	width: 100%;
 }
 
@@ -261,6 +263,58 @@ ion-icon {
 	margin-top: 5px;
 	margin-right: 0.3em;
 	width: 16px;
+}
+
+.pswp__preloader__icn {
+	opacity:0.75;
+	width: 14px;
+	height: 14px;
+	-webkit-animation: clockwise 500ms linear infinite;
+	animation: clockwise 500ms linear infinite;
+}
+
+.pswp__preloader__cut {
+	position: relative;
+	width: 6px;
+	height: 12px;
+	overflow: hidden;
+	top: 0;
+	left: 0;
+}
+
+.pswp__preloader__donut {
+	box-sizing: border-box;
+	width: 14px;
+	height: 14px;
+	border: 2px solid #6ca3e5;
+	border-radius: 50%;
+	border-left-color: transparent;
+	border-bottom-color: transparent;
+	top: 0;
+	left: 0;
+	background: none;
+	margin:0;
+	-webkit-animation: donut-rotate 1000ms cubic-bezier(.4,0,.22,1) infinite;
+	animation: donut-rotate 1000ms cubic-bezier(.4,0,.22,1) infinite;
+}
+
+@-webkit-keyframes clockwise {
+	0% { -webkit-transform: rotate(0deg) }
+	100% { -webkit-transform: rotate(360deg) }
+}
+@keyframes clockwise {
+	0% { transform: rotate(0deg) }
+	100% { transform: rotate(360deg) }
+}
+@-webkit-keyframes donut-rotate {
+	0% { -webkit-transform: rotate(0) }
+	50% { -webkit-transform: rotate(-140deg) }
+	100% { -webkit-transform: rotate(0) }
+}
+@keyframes donut-rotate {
+	0% { transform: rotate(0) }
+	50% { transform: rotate(-140deg) }
+	100% { transform: rotate(0) }
 }
 
 ion-icon {

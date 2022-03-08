@@ -48,9 +48,15 @@
 		<ion-icon id="arrow-back" class="logo" name="arrow-back"></ion-icon>
 		<ion-icon id="main-page" class="logo" name="home"></ion-icon>
 		<div class="loading-wrapper">
-			<div class="loading"><img th:src="@{/static/img/loading.gif}"></div>
+			 <div class="loading">
+				<div class="pswp__preloader__icn">
+					<div class="pswp__preloader__cut">
+						<div class="pswp__preloader__donut">
+						</div>
+					</div>
+				</div>
+			 </div>
 		</div>
-
 		<a class="site" id="nav-site" href="javascript:void(0);" onclick="domain_index()" title="刷新">AliPan</a>
 		<a class="site" id="git-branch-a" target="_black" href="https://rawchen.com/enjoy/alipan.html"
 		   title="你也想要属于自己的云盘？">
