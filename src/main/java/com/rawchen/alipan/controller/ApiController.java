@@ -58,7 +58,7 @@ public class ApiController {
 		file.setFileExtension((String) jsonObject.get("file_extension"));
 		file.setParentFileId((String) jsonObject.get("parent_file_id"));
 		file.setSize(((Number) jsonObject.get("size")).longValue());
-		file.setUrl((String) jsonObject.get("download_url"));
+		file.setUrl((String) jsonObject.get("url"));
 		return file;
 	}
 
@@ -116,7 +116,7 @@ public class ApiController {
 			if ("file".equals(items.getJSONObject(i).get("type"))) {
 				file.setFileExtension((String) items.getJSONObject(i).get("file_extension"));
 				file.setSize(((Number) items.getJSONObject(i).get("size")).longValue());
-				file.setUrl((String) items.getJSONObject(i).get("download_url"));
+				file.setUrl((String) items.getJSONObject(i).get("url"));
 			}
 			panFiles.add(file);
 		}
@@ -131,7 +131,7 @@ public class ApiController {
 	 */
 	@ResponseBody
 	@PostMapping(value = "/getDownloadUrl/{fileId}")
-	public Map<String, Object> getDownloadUrl(@PathVariable("fileId") String fileId) {
+	public PanFile getDownloadUrl(@PathVariable("fileId") String fileId) {
 
 		JSONObject requestJson = new JSONObject();
 		requestJson.put("drive_id", Constants.DEFAULT_DRIVE_ID);
@@ -144,10 +144,12 @@ public class ApiController {
 		String result = HttpClientUtil.doPost(apiUrl + "/file/get_download_url",
 				requestJson.toString(), headerMap);
 		JSONObject jsonObject = JSONObject.parseObject(result);
-		Map<String, Object> map = new HashMap<>();
-		map.put("data", jsonObject);
-		map.put("fileId", fileId);
-		return map;
+
+		PanFile file = new PanFile();
+		file.setFileId(fileId);
+		file.setSize(((Number) jsonObject.get("size")).longValue());
+		file.setUrl((String) jsonObject.get("url"));
+		return file;
 	}
 
 	/**

@@ -176,6 +176,11 @@
 	}
 
 	function back() {
+		//如果域名中带有“/file/”则说明是分享的链接进来的，跳转首页
+		if (window.location.href.indexOf("/file/") >= 0) {
+			location.href = document.location.protocol + "//" + window.location.host;
+		}
+
 		if (fullFileIdArr.length === 1) {
 			if (watchFileState === false) {
 				document.getElementById('arrow-back').style.color = '#818181';
@@ -451,8 +456,8 @@
 				url: "/getDownloadUrl/" + fileId,
 				headers: {'Content-Type': 'application/x-www-form-urlencoded'},
 				complete: function () {loading.style.display = 'none';},
-				success: function (data) {
-					location.href = "potplayer://" + data.data.url;
+				success: function (file) {
+					location.href = "potplayer://" + file.url;
 				}
 			});
 		}
@@ -464,8 +469,8 @@
 				url: "/getDownloadUrl/" + fileId,
 				headers: {'Content-Type': 'application/x-www-form-urlencoded'},
 				complete: function () {loading.style.display = 'none';},
-				success: function (data) {
-					location.href = "thunder://" + window.btoa('AA' + data.data.url + 'ZZ');
+				success: function (file) {
+					location.href = "thunder://" + window.btoa('AA' + file.url + 'ZZ');
 				}
 			});
 		}
@@ -477,9 +482,9 @@
 				url: "/getDownloadUrl/" + fileId,
 				headers: {'Content-Type': 'application/x-www-form-urlencoded'},
 				complete: function () {loading.style.display = 'none';},
-				success: function (data) {
-					previewHandler.copyTextContent(null, data.data.url);
-					location.href = data.data.url;
+				success: function (file) {
+					previewHandler.copyTextContent(null, file.url);
+					location.href = file.url;
 				}
 			});
 			const btn = document.querySelector('.btn.download');
@@ -872,10 +877,10 @@
 				url: "/getDownloadUrl/" + fileId,
 				headers: {'Content-Type': 'application/x-www-form-urlencoded'},
 				complete: function () {loading.style.display = 'none';},
-				success: function (data) {
+				success: function (file) {
 					let target = document.createElement('pre');
 					target.style.opacity = '0';
-					target.textContent = data.data.url;
+					target.textContent = file.url;
 					document.body.appendChild(target);
 					try {
 						let range = document.createRange();
@@ -890,7 +895,7 @@
 					} catch (e) {
 					}
 					document.body.removeChild(target);
-					location.href = data.data.url;
+					location.href = file.url;
 				}
 			});
 			// location.href = encodeURI(url);
@@ -902,6 +907,8 @@
 		element.oncontextmenu = function (env) {
 			//env 表示event事件、兼容event事件写法
 			var e = env || window.event;
+			document.querySelector('.file-wrapper-hover')?.classList.remove('file-wrapper-hover');
+			element.classList.add('file-wrapper-hover');
 			let aList = context.getElementsByTagName('a')
 			for (var i = 0; i < aList.length; i++) {
 				aList[i].addEventListener('click', function () {
@@ -931,6 +938,7 @@
 		};
 		document.onclick = function () {
 			context.style.display = "none";
+			document.querySelector('.file-wrapper-hover')?.classList.remove('file-wrapper-hover');
 		};
 	}
 

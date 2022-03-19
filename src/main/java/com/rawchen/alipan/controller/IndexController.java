@@ -31,6 +31,7 @@ public class IndexController {
 	public String toFile(@PathVariable("fileId") String fileId, Model model){
 		model.addAttribute("fileId", fileId);
 		model.addAttribute("type", "file");
+		model.addAttribute("parentFileId", parentFileId);
 		return "index";
 	}
 

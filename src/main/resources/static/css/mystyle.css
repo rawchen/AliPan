@@ -437,6 +437,12 @@ body {
 	cursor: pointer;
 }
 
+.row.file-wrapper-hover {
+	color: rgb(255 255 255);
+	background-color: #0f0f0f;
+	cursor: pointer;
+}
+
 .container {
 	position: fixed;
 	width: 100%;
