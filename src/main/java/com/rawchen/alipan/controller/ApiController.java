@@ -1,7 +1,9 @@
 package com.rawchen.alipan.controller;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.rawchen.alipan.config.Constants;
+import com.rawchen.alipan.entity.PanFile;
 import com.rawchen.alipan.utils.FileUtil;
 import com.rawchen.alipan.utils.HttpClientUtil;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,7 +11,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @CrossOrigin
@@ -26,14 +30,14 @@ public class ApiController {
 	String refererURL;
 
 	/**
-	 * 获取文件
+	 * 文件对象
 	 *
 	 * @param fileId
 	 * @return
 	 */
 	@ResponseBody
 	@PostMapping(value = "/getFile/{fileId}")
-	public Map<String, Object> getFile(@PathVariable("fileId") String fileId) {
+	public PanFile getFile(@PathVariable("fileId") String fileId) {
 
 		JSONObject requestJson = new JSONObject();
 		requestJson.put("drive_id", Constants.DEFAULT_DRIVE_ID);
@@ -46,21 +50,27 @@ public class ApiController {
 		String result = HttpClientUtil.doPost(apiUrl + "/file/get",
 				requestJson.toString(), headerMap);
 		JSONObject jsonObject = JSONObject.parseObject(result);
-
-		Map<String, Object> map = new HashMap<>();
-		map.put("data", jsonObject);
-		return map;
+		PanFile file = new PanFile();
+		file.setFileId((String) jsonObject.get("file_id"));
+		file.setType((String) jsonObject.get("type"));
+		file.setName((String) jsonObject.get("name"));
+		file.setCreatedAt((String) jsonObject.get("created_at"));
+		file.setFileExtension((String) jsonObject.get("file_extension"));
+		file.setParentFileId((String) jsonObject.get("parent_file_id"));
+		file.setSize(((Number) jsonObject.get("size")).longValue());
+		file.setUrl((String) jsonObject.get("download_url"));
+		return file;
 	}
 
 	/**
-	 * 文件夹列表，返回的json带items
+	 * 文件列表
 	 *
 	 * @param fileId
 	 * @return
 	 */
 	@ResponseBody
 	@PostMapping(value = "/getFolder/{fileId}")
-	public Map<String, Object> getFolder(@PathVariable("fileId") String fileId) {
+	public List<PanFile> getFolder(@PathVariable("fileId") String fileId) {
 		JSONObject requestJson = new JSONObject();
 		requestJson.put("param1", 30);
 		requestJson.put("all", false);
@@ -94,36 +104,23 @@ public class ApiController {
 			jsonObject = JSONObject.parseObject(result);
 		}
 
-		Map<String, Object> map = new HashMap<>();
-
-		//返回基于根的parent路径
-//		String t = fileId;
-//		String fullPath = "/";
-//		String fullPathFileId = "/";
-//		JSONObject requestJson2 = new JSONObject();
-//		requestJson2.put("drive_id", Constants.DEFAULT_DRIVE_ID);
-//
-//		Map<String, String> headerMap2 = new HashMap<>();
-//		headerMap2.put("Content-Type", "application/json");
-//		headerMap2.put("Authorization", "Bearer " + Constants.ACCESS_TOKEN);
-
-//		while (!"root".equals(t)) {
-//			requestJson2.put("file_id", t);
-//			String result2 = HttpClientUtil.doPost(apiUrl + "/file/get",
-//					requestJson2.toString(), headerMap2);
-//			JSONObject jsonObject2 = JSONObject.parseObject(result2);
-//			t = (String) jsonObject2.get("parent_file_id");
-//			fullPath ="/" + jsonObject2.get("name") + fullPath;
-//			fullPathFileId ="/" + jsonObject2.get("parent_file_id") + fullPathFileId;
-//
-//		}
-//		System.out.println("fullPath::::::::::::::::" + fullPath);
-
-
-		map.put("data", jsonObject);
-//		map.put("parent", fullPath);
-//		map.put("fullPathFileId", fullPathFileId);
-		return map;
+		ArrayList<PanFile> panFiles = new ArrayList<>();
+		JSONArray items = jsonObject.getJSONArray("items");
+		for (int i = 0; i < items.size(); i++) {
+			PanFile file = new PanFile();
+			file.setFileId((String) items.getJSONObject(i).get("file_id"));
+			file.setType((String) items.getJSONObject(i).get("type"));
+			file.setName((String) items.getJSONObject(i).get("name"));
+			file.setParentFileId((String) items.getJSONObject(i).get("parent_file_id"));
+			file.setCreatedAt((String) items.getJSONObject(i).get("created_at"));
+			if ("file".equals(items.getJSONObject(i).get("type"))) {
+				file.setFileExtension((String) items.getJSONObject(i).get("file_extension"));
+				file.setSize(((Number) items.getJSONObject(i).get("size")).longValue());
+				file.setUrl((String) items.getJSONObject(i).get("download_url"));
+			}
+			panFiles.add(file);
+		}
+		return panFiles;
 	}
 
 	/**

@@ -132,11 +132,11 @@
 				url: "/getFolder/" + "[[${fileId}]]",
 				headers: {'Content-Type': 'application/x-www-form-urlencoded'},
 				complete: function () {loading.style.display = 'none';},
-				success: function (data) {
-					renderFileList(data);
+				success: function (files) {
+					renderFileList(files);
 					fullFileId = '[[${fileId}]]';
 					fullFileIdArr.push('[[${fileId}]]');
-					renderTreeNode(data);
+					renderTreeNode(files);
 				}
 			});
 		} else {
@@ -146,9 +146,8 @@
 				url: "/getFile/" + "[[${fileId}]]",
 				headers: {'Content-Type': 'application/x-www-form-urlencoded'},
 				complete: function () {loading.style.display = 'none';},
-				success: function (data) {
-					let file = data;
-					dealFile("[[${fileId}]]", file.data.url, formatSize(file.data.size), file.data.name, file.data.download_url);
+				success: function (file) {
+					dealFile("[[${fileId}]]", file.url, formatSize(file.size), file.name);
 				}
 			});
 		}
@@ -200,8 +199,8 @@
 			url: "/getFolder/" + parentFileId,
 			headers: {'Content-Type': 'application/x-www-form-urlencoded'},
 			complete: function () {loading.style.display = 'none';},
-			success: function (data) {
-				renderFileList(data);
+			success: function (files) {
+				renderFileList(files);
 			}
 		});
 		if (fullFileIdArr.length > 1) {
@@ -216,53 +215,6 @@
 		location.reload();
 	}
 
-	function createCORSRequest(method, url, timeout) {
-		let xhr = new XMLHttpRequest();
-		if ('withCredentials' in xhr) {
-			xhr.open(method, url, true);
-		} else if (typeof XDomainRequest !== 'undefined') {
-			xhr = new XDomainRequest();
-			xhr.open(method, url);
-		} else {
-			xhr = null;
-		}
-		if (xhr) {
-			xhr.timeout = timeout;
-		}
-		return xhr;
-	}
-
-	function sendRequest(method, url, headers, callback, error, times) {
-		let xhr = createCORSRequest(method, url, 2500);
-		xhr.onreadystatechange = () => {
-			if (xhr.readyState === 4 && xhr.status === 200) {
-				callback(xhr.responseText);
-			}
-		};
-		xhr.timeout = xhr.onerror = () => {
-			if (!times) {
-				times = 0;
-			}
-			console.log({
-				url: url,
-				times: times
-			})
-			if (times < 1) {
-				sendRequest(method, url, headers, callback, error, times + 1);
-			} else if (typeof error === 'function') {
-				error();
-			}
-		}
-		if (headers) {
-			for (key in headers) {
-				if (headers.hasOwnProperty(key)) {
-					xhr.setRequestHeader(key, headers[key]);
-				}
-			}
-		}
-		xhr.send();
-	}
-
 	function renderFileList(files) {
 
 		if (fullFileIdArr.length > 0) {
@@ -272,13 +224,13 @@
 		switchRightDisplay();
 		watchFileState = false;
 
-		const createFileWrapper = (type, name, time, size, fileId, url, downloadUrl) => {
+		const createFileWrapper = (type, name, time, size, fileId, url) => {
 			let fileWrapper = document.getElementById('file-wrapper-templete').content.cloneNode(true);
 			fileWrapper.querySelector('ion-icon').setAttribute('name', type);
 			fileWrapper.querySelector('.name').innerHTML = name;
 			fileWrapper.querySelector('.time').innerHTML = time;
 			fileWrapper.querySelector('.size').innerHTML = size;
-			addFileListLineListener(fileWrapper.querySelector('.row.file-wrapper'), fileId, url, size, name, downloadUrl);
+			addFileListLineListener(fileWrapper.querySelector('.row.file-wrapper'), fileId, size, name, url);
 			return fileWrapper;
 		};
 
@@ -291,7 +243,7 @@
 		}
 
 		let folderCount = 0;
-		files.data.items.forEach(function () {
+		files.forEach(function () {
 			folderCount++;
 		});
 		if (folderCount === 0) {
@@ -299,20 +251,19 @@
 		}
 
 		// document.getElementsByClassName("markdown-body")[0].innerHTML = '';
-		files.data.items.forEach(file => {
-			if (file.type === 'file' && file.name === "README.md") {
+		files.forEach(file => {
+			if (file.type === 'file' && (file.name.toLowerCase() === "readme.md")) {
 				renderMarkdown(file.url, true);
 			}
 			if (file.name !== "README.md") {
 				fileList.appendChild(
 					createFileWrapper(
-						file.url ? "document" : "folder",
+						file.type === "folder" ? "folder" : "document",
 						file.name,
-						formatDate(file.created_at),
+						formatDate(file.createdAt),
 						file.size ? formatSize(file.size) : '未知',
-						file.file_id,
+						file.fileId,
 						file.url,
-						file.download_url
 					)
 				);
 			}
@@ -347,7 +298,13 @@
 				document.querySelector(".content").append(mdDiv);
 			}
 		};
-		sendRequest('GET', url, null, text => render(text));
+		$.ajax({
+			type: 'GET',
+			url: url,
+			success: function (data) {
+				render(data);
+			}
+		});
 	}
 
 	/**
@@ -356,9 +313,8 @@
 	 * @param url
 	 * @param size
 	 * @param name
-	 * @param downloadUrl
 	 */
-	function dealFile(fileId, url, size, name, downloadUrl) {
+	function dealFile(fileId, url, size, name) {
 
 		//创建复制文本对象
 		const previewHandler = {
@@ -417,7 +373,6 @@
 				} else if (['md'].contains(suffix)) {
 					return 'markdown';
 				}
-				;
 			},
 			loadResource: (resource, callback) => {
 				let type;
@@ -538,7 +493,6 @@
 			setTimeout(() => btn.innerHTML = '分享', 3000);
 		}
 		fullFileIdArr.push(fileId);
-		// window.backFordwardCache.preview = true;
 		document.getElementById('arrow-back').style.color = '#545454';
 		switchRightDisplay('preview');
 		watchFileState = true;
@@ -593,9 +547,16 @@
 				content.style['text-align'] = 'initial';
 				content.innerHTML = '';
 				content.append(pre);
-				sendRequest('GET', url, null, data => {
-					code.textContent = data;
-					if (size.indexOf(' B') >= 0 || size.indexOf(' KB') && size.split(' ')[0] < 100) {
+				loading.style.display = 'initial';
+				$.ajax({
+					type: 'GET',
+					url: url,
+					complete: function () {loading.style.display = 'none';},
+					success: function (data) {
+						code.textContent = data;
+						// 限制大小
+						// if (size.indexOf(' B') >= 0 || size.indexOf(' KB') && size.split(' ')[0] < 100) {
+						// 	}
 						$('pre code').each(function (i, block) {
 							hljs.highlightBlock(block);
 							hljs.lineNumbersBlock(block);
@@ -664,33 +625,6 @@
 		window.requestAnimationFrame(scrollToBottom);
 	}
 
-	function switchBackForwardStatus(path) {
-		if (path) {
-			window.backFordwardCache.deepest = path;
-		}
-		if (window.backFordwardCache.root !== window.backFordwardCache.current) {
-			window.backFordwardCache.backable = true;
-			document.getElementById('arrow-back').style.color = '#545454';
-		} else {
-			// window.backFordwardCache.backable = false;
-			// document.getElementById('arrow-back').style.color = 'rgb(218, 215, 215)';
-		}
-		if (window.backFordwardCache.deepest !== window.backFordwardCache.current) {
-			window.backFordwardCache.forwardable = true;
-			document.getElementById('arrow-forward').style.color = '#545454';
-		} else {
-			window.backFordwardCache.forwardable = false;
-			document.getElementById('arrow-forward').style.color = '#545454';
-		}
-	}
-
-	function addPathListener(elem, path) {
-		elem.addEventListener('click', event => {
-			// fetchFileList(path);
-			switchBackForwardStatus(path);
-		});
-	}
-
 	function addTreeNodeListener(elem, fileId) {
 		elem.addEventListener('click', event => {
 			if (fileId !== null) {
@@ -700,13 +634,13 @@
 					url: "/getFolder/" + fileId,
 					headers: {'Content-Type': 'application/x-www-form-urlencoded'},
 					complete: function () {loading.style.display = 'none';},
-					success: function (data) {
-						renderFileList(data);
+					success: function (files) {
+						renderFileList(files);
 						fullFileId = fileId;
 						fullFileIdArr.push(fileId)
 
 						let folderCount = 0;
-						data.data.items.forEach(function () {
+						files.forEach(function () {
 							folderCount++;
 						});
 						if (folderCount === 0) {
@@ -715,19 +649,19 @@
 
 						//判断是否重复添加列表元素(判断新增的文件夹只要存在同名肯定重复，抛异常)
 						try {
-							data.data.items.forEach(file => {
+							files.forEach(file => {
 								elem.parentElement.querySelectorAll('.tree-node-name').forEach(item => {
 									if (item.textContent === file.name) {
 										throw Error();
 									}
 								});
 
-								if (!file.url) {
+								if (file.type === "folder") {
 									elem.parentElement.append(createTreeNodeWrapper(
 										'arrow-dropright',
 										'folder-open',
 										file.name,
-										file.file_id
+										file.fileId
 									));
 								}
 							});
@@ -740,16 +674,14 @@
 		});
 	}
 
-	function addFileListLineListener(elem, fileId, url, size, name, downloadUrl) {
-		//如果url不为空则时文件，为空就是文件夹
+	function addFileListLineListener(elem, fileId, size, name, url) {
 		if (url) {
 			elem.addEventListener('click', event => {
-				dealFile(fileId, url, size, name, downloadUrl);
+				dealFile(fileId, url, size, name);
 			});
 
 			//为elem添加右键点击事件，传数据
 			elem.setAttribute("fileId", fileId);
-			// elem.setAttribute("fileDownloadUrl", downloadUrl);
 			rightmenu(elem, "file");
 		} else {
 			elem.addEventListener('click', event => {
@@ -759,8 +691,8 @@
 					url: "/getFolder/" + fileId,
 					headers: {'Content-Type': 'application/x-www-form-urlencoded'},
 					complete: function () {loading.style.display = 'none';},
-					success: function (data) {
-						renderFileList(data);
+					success: function (files) {
+						renderFileList(files);
 						fullFileId = fileId;
 						fullFileIdArr.push(fileId);
 					}
@@ -866,12 +798,12 @@
 
 		const treeRoot = document.getElementById('tree-root');
 		treeRoot.innerHTML = '';
-		files.data.items.forEach(file => {
+		files.forEach(file => {
 			if (!file.url) {
 				treeRoot.append(createTreeNodeWrapper('arrow-dropright',
 					'folder',
 					file.name,
-					file.file_id
+					file.fileId
 				));
 			}
 		});
@@ -885,8 +817,8 @@
 				url: "/getFolder/" + fileId,
 				headers: {'Content-Type': 'application/x-www-form-urlencoded'},
 				complete: function () {loading.style.display = 'none';},
-				success: function (data) {
-					renderFileList(data);
+				success: function (files) {
+					renderFileList(files);
 					fullFileId = fileId;
 					fullFileIdArr.push(fileId);
 				}
@@ -898,8 +830,8 @@
 				url: "/getFile/" + fileId,
 				headers: {'Content-Type': 'application/x-www-form-urlencoded'},
 				complete: function () {loading.style.display = 'none';},
-				success: function (data) {
-					dealFile("[[${fileId}]]", data.data.url, formatSize(data.data.size), data.data.name, data.data.download_url);
+				success: function (file) {
+					dealFile("[[${fileId}]]", file.url, formatSize(file.size), file.name);
 				}
 			});
 		}

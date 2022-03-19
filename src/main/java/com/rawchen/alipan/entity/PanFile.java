@@ -1,7 +1,6 @@
 package com.rawchen.alipan.entity;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * @author RawChen
@@ -11,21 +10,27 @@ public class PanFile implements Serializable {
 
 	private String fileId;
 
-	private String name;
-
 	private String type;
 
-	private long size;
+	private String name;
 
-	private String contentType;
+	private String parentFileId;
 
-	private Date createdAt;
+	private String createdAt;
+
+	//以上属性为文件夹、文件共有属性
 
 	private String fileExtension;
 
-	private String password;
+	private long size;
 
 	private String url;
+
+	//以上属性为文件共有属性
+
+	private String password;
+
+	//以上属性为自定义属性
 
 	public String getFileId() {
 		return fileId;
@@ -33,14 +38,6 @@ public class PanFile implements Serializable {
 
 	public void setFileId(String fileId) {
 		this.fileId = fileId;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
 	}
 
 	public String getType() {
@@ -51,27 +48,27 @@ public class PanFile implements Serializable {
 		this.type = type;
 	}
 
-	public long getSize() {
-		return size;
+	public String getName() {
+		return name;
 	}
 
-	public void setSize(long size) {
-		this.size = size;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public String getContentType() {
-		return contentType;
+	public String getParentFileId() {
+		return parentFileId;
 	}
 
-	public void setContentType(String contentType) {
-		this.contentType = contentType;
+	public void setParentFileId(String parentFileId) {
+		this.parentFileId = parentFileId;
 	}
 
-	public Date getCreatedAt() {
+	public String getCreatedAt() {
 		return createdAt;
 	}
 
-	public void setCreatedAt(Date createdAt) {
+	public void setCreatedAt(String createdAt) {
 		this.createdAt = createdAt;
 	}
 
@@ -81,6 +78,14 @@ public class PanFile implements Serializable {
 
 	public void setFileExtension(String fileExtension) {
 		this.fileExtension = fileExtension;
+	}
+
+	public long getSize() {
+		return size;
+	}
+
+	public void setSize(long size) {
+		this.size = size;
 	}
 
 	public String getPassword() {
@@ -103,12 +108,12 @@ public class PanFile implements Serializable {
 	public String toString() {
 		return "PanFile{" +
 				"fileId='" + fileId + '\'' +
-				", name='" + name + '\'' +
 				", type='" + type + '\'' +
-				", size=" + size +
-				", contentType='" + contentType + '\'' +
-				", createdAt=" + createdAt +
+				", name='" + name + '\'' +
+				", parentFileId='" + parentFileId + '\'' +
+				", createdAt='" + createdAt + '\'' +
 				", fileExtension='" + fileExtension + '\'' +
+				", size=" + size +
 				", password='" + password + '\'' +
 				", url='" + url + '\'' +
 				'}';
