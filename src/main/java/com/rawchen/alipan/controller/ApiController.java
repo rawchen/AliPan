@@ -30,6 +30,9 @@ public class ApiController {
 	@Value("${alipan.referer_url}")
 	String refererURL;
 
+	@Value("${alipan.password_file_name}")
+	String passwordFileName;
+
 	/**
 	 * 文件对象
 	 *
@@ -128,11 +131,11 @@ public class ApiController {
 
 		for (int i = 0; i < panFiles.size(); i++) {
 			//列表中如果有
-			if ("password".equals(panFiles.get(i).getName())) {
+			if (passwordFileName.equals(panFiles.get(i).getName())) {
 				//找到一个名字为password的文件，如果传参为空就说明没传密码，直接返回一个文件且encrypted为true
 				if (password == null || "".equals(password)) {
 					panFiles.clear();
-					panFiles.add(new PanFile(true));
+					panFiles.add(new PanFile(passwordFileName, true, "file"));
 					break;
 				} else {
 					//找到一个名字为password的文件，但是传了密码参数
@@ -140,7 +143,7 @@ public class ApiController {
 					//如果密码没对上
 					if (!password.equals(folderPasswd)) {
 						panFiles.clear();
-						panFiles.add(new PanFile(true));
+						panFiles.add(new PanFile(passwordFileName, true, "file"));
 						break;
 					} else {
 						//密码对上了，在文件列表中删除这个密码文件(同一文件夹只能一个)

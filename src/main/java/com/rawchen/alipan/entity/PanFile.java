@@ -37,6 +37,17 @@ public class PanFile implements Serializable {
 		this.encrypted = encrypted;
 	}
 
+	public PanFile(String name, boolean encrypted) {
+		this.name = name;
+		this.encrypted = encrypted;
+	}
+
+	public PanFile(String name, boolean encrypted, String type) {
+		this.name = name;
+		this.encrypted = encrypted;
+		this.type = type;
+	}
+
 	//以上属性为自定义属性
 
 	public String getFileId() {

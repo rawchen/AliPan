@@ -133,10 +133,14 @@
 				headers: {'Content-Type': 'application/x-www-form-urlencoded'},
 				complete: function () {loading.style.display = 'none';},
 				success: function (files) {
-					renderFileList(files);
-					fullFileId = '[[${fileId}]]';
-					fullFileIdArr.push('[[${fileId}]]');
-					renderTreeNode(files);
+					if (window.location.href.indexOf("/folder/") >= 0) {
+						dealFiles(files, "[[${fileId}]]", false);
+					} else {
+						renderFileList(files);
+						fullFileId = '[[${fileId}]]';
+						fullFileIdArr.push('[[${fileId}]]');
+						renderTreeNode(files);
+					}
 				}
 			});
 		} else {
@@ -862,7 +866,7 @@
 		const treeRoot = document.getElementById('tree-root');
 		treeRoot.innerHTML = '';
 		files.forEach(file => {
-			if (!file.url) {
+			if (file.type === "folder") {
 				treeRoot.append(createTreeNodeWrapper('arrow-dropright',
 					'folder',
 					file.name,
