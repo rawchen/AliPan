@@ -28,7 +28,14 @@ public class PanFile implements Serializable {
 
 	//以上属性为文件共有属性
 
-	private String password;
+	private boolean encrypted;
+
+	public PanFile() {
+	}
+
+	public PanFile(boolean encrypted) {
+		this.encrypted = encrypted;
+	}
 
 	//以上属性为自定义属性
 
@@ -88,12 +95,12 @@ public class PanFile implements Serializable {
 		this.size = size;
 	}
 
-	public String getPassword() {
-		return password;
+	public boolean isEncrypted() {
+		return encrypted;
 	}
 
-	public void setPassword(String password) {
-		this.password = password;
+	public void setEncrypted(boolean encrypted) {
+		this.encrypted = encrypted;
 	}
 
 	public String getUrl() {
@@ -114,8 +121,8 @@ public class PanFile implements Serializable {
 				", createdAt='" + createdAt + '\'' +
 				", fileExtension='" + fileExtension + '\'' +
 				", size=" + size +
-				", password='" + password + '\'' +
 				", url='" + url + '\'' +
+				", encrypted=" + encrypted +
 				'}';
 	}
 }

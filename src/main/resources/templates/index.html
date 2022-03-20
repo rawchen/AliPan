@@ -205,7 +205,7 @@
 			headers: {'Content-Type': 'application/x-www-form-urlencoded'},
 			complete: function () {loading.style.display = 'none';},
 			success: function (files) {
-				renderFileList(files);
+				dealFiles(files, parentFileId, true);
 			}
 		});
 		if (fullFileIdArr.length > 1) {
@@ -225,8 +225,6 @@
 		if (fullFileIdArr.length > 0) {
 			document.getElementById('arrow-back').style.color = '#545454';
 		}
-
-		switchRightDisplay();
 		watchFileState = false;
 
 		const createFileWrapper = (type, name, time, size, fileId, url) => {
@@ -246,21 +244,14 @@
 		if (files === null) {
 			location.reload();
 		}
-
-		let folderCount = 0;
-		files.forEach(function () {
-			folderCount++;
-		});
-		if (folderCount === 0) {
+		if (files.length === 0) {
 			layer.msg("找不到东西哦");
 		}
-
-		// document.getElementsByClassName("markdown-body")[0].innerHTML = '';
 		files.forEach(file => {
 			if (file.type === 'file' && (file.name.toLowerCase() === "readme.md")) {
 				renderMarkdown(file.url, true);
 			}
-			if (file.name !== "README.md") {
+			if (file.name.toLowerCase() !== "readme.md" && file.name !== "[[${passwordFileName}]]") {
 				fileList.appendChild(
 					createFileWrapper(
 						file.type === "folder" ? "folder" : "document",
@@ -277,22 +268,12 @@
 
 	async function renderMarkdown(url, isReadMeMarkdown) {
 		const render = text => {
-			let markedText;
-			try {
-				markedText = marked(text, {
-					gfm: true,
-					highlight: (code, lang) => {
-						return hljs.highlight(lang, code).value;
-					}
-				});
-			} catch (e) {
-				markedText = marked(text, {
-					gfm: true,
-					highlight: (code) => {
-						return hljs.highlight('bash', code).value;
-					}
-				});
-			}
+			let markedText = marked(text, {
+				gfm: true,
+				highlight: code => {
+					return hljs.highlightAuto(code).value;
+				}
+			});
 			if (isReadMeMarkdown) {
 				document.getElementById('readme').innerHTML = markedText;
 				document.querySelector('.markdown-body').style.display = 'block';
@@ -446,7 +427,6 @@
 		} else {
 			address = document.location.protocol + "//" + window.location.host + "/folder/" + fileId;
 		}
-		// document.querySelector('.file-name').innerHTML = address + "\t" + name;
 		document.querySelector('.file-name').innerHTML = name;
 
 		document.querySelector('.btn.potplayer').onclick = () => {
@@ -497,7 +477,9 @@
 			btn.innerHTML = '已复制';
 			setTimeout(() => btn.innerHTML = '分享', 3000);
 		}
-		fullFileIdArr.push(fileId);
+		if (fullFileIdArr[fullFileIdArr.length - 1] !== fileId) {
+			fullFileIdArr.push(fileId);
+		}
 		document.getElementById('arrow-back').style.color = '#545454';
 		switchRightDisplay('preview');
 		watchFileState = true;
@@ -544,67 +526,88 @@
 				content.append(video);
 				break;
 			case 'text':
-				let pre = document.createElement('pre');
-				let code = document.createElement('code');
-				pre.append(code);
-				pre.style['overflow-x'] = 'scroll';
-				pre.classList.add(suffix);
-				content.style['text-align'] = 'initial';
-				content.innerHTML = '';
-				content.append(pre);
-				loading.style.display = 'initial';
-				$.ajax({
-					type: 'GET',
-					url: url,
-					complete: function () {loading.style.display = 'none';},
-					success: function (data) {
-						code.textContent = data;
-						// 限制大小
-						// if (size.indexOf(' B') >= 0 || size.indexOf(' KB') && size.split(' ')[0] < 100) {
-						// 	}
-						$('pre code').each(function (i, block) {
-							hljs.highlightBlock(block);
-							hljs.lineNumbersBlock(block);
-						});
-					}
-				});
-				break;
+				// 限制大小（有MB单位大于5M，或者有GB单位那都不渲染）
+				if ((size.indexOf(' MB') >= 0 && size.split(' ')[0] > 5) || (size.indexOf(' GB') >= 0)) {
+					content.style['text-align'] = 'center';
+					content.innerHTML = '该文件超过5MB不支持预览';
+					break;
+				} else {
+					let pre = document.createElement('pre');
+					let code = document.createElement('code');
+					pre.append(code);
+					pre.style['overflow-x'] = 'scroll';
+					pre.classList.add(suffix);
+					content.style['text-align'] = 'initial';
+					content.innerHTML = '';
+					content.append(pre);
+					loading.style.display = 'initial';
+					$.ajax({
+						type: 'GET',
+						url: url,
+						dataType:"text",
+						complete: function () {loading.style.display = 'none';},
+						success: function (data) {
+							code.textContent = data;
+							$('pre code').each(function (i, block) {
+								hljs.highlightBlock(block);
+								hljs.lineNumbersBlock(block);
+							});
+						}
+					});
+					break;
+				}
 			case 'office':
-				const officeOnline = 'https://view.officeapps.live.com/op/view.aspx?src=' + encodeURIComponent(url);
-				// const officeOnline = 'https://view.officeapps.live.com/op/embed.aspx?src=' + encodeURIComponent(url);
-				// const officeOnline = 'https://docs.google.com/viewer?url=' + encodeURIComponent(url);
-				let div = document.createElement('div');
-				div.className = 'target-blank';
-				div.innerHTML = '点我新窗口打开';
-				div.addEventListener('click', () => window.open(officeOnline));
-				content.innerHTML = '';
-				content.appendChild(div);
-				if (document.body.clientWidth >= 480) {
-					let iframe = document.createElement('iframe');
-					iframe.width = '100%';
-					iframe.style.height = '46em';
-					iframe.style.border = '0';
-					iframe.src = officeOnline;
-					content.appendChild(iframe);
+				// 限制大小（有MB单位大于20M，或者有GB单位那都不渲染）
+				if ((size.indexOf(' MB') >= 0 && size.split(' ')[0] > 20) || (size.indexOf(' GB') >= 0)) {
+					content.style['text-align'] = 'center';
+					content.innerHTML = '该文件超过20MB不支持预览';
+					break;
+				} else {
+					const officeOnline = 'https://view.officeapps.live.com/op/view.aspx?src=' + encodeURIComponent(url);
+					// const officeOnline = 'https://view.officeapps.live.com/op/embed.aspx?src=' + encodeURIComponent(url);
+					// const officeOnline = 'https://docs.google.com/viewer?url=' + encodeURIComponent(url);
+					let div = document.createElement('div');
+					div.className = 'target-blank';
+					content.style['text-align'] = 'initial';
+					div.innerHTML = '点我新窗口打开';
+					div.addEventListener('click', () => window.open(officeOnline));
+					content.innerHTML = '';
+					content.appendChild(div);
+					if (document.body.clientWidth >= 480) {
+						let iframe = document.createElement('iframe');
+						iframe.width = '100%';
+						iframe.style.height = '46em';
+						iframe.style.border = '0';
+						iframe.src = officeOnline;
+						content.appendChild(iframe);
+					}
+					break;
 				}
-				break;
 			case 'pdf':
-				const pdfOnline = 'https://pdf.rawchen.com/web?file=' + encodeURIComponent(url);
-				let div2 = document.createElement('div');
-				div2.className = 'target-blank';
-				div2.innerHTML = '点我新窗口打开';
-				div2.addEventListener('click', () => window.open(pdfOnline));
-				content.innerHTML = '';
-				content.appendChild(div2);
-				if (document.body.clientWidth >= 300) {
-					let iframe2 = document.createElement('iframe');
-					iframe2.width = '100%';
-					iframe2.style.height = '46em';
-					iframe2.style.border = '0';
-					iframe2.src = pdfOnline;
-					content.appendChild(iframe2);
+				// 限制大小（有MB单位大于50M，或者有GB单位那都不渲染）
+				if ((size.indexOf(' MB') >= 0 && size.split(' ')[0] > 50) || (size.indexOf(' GB') >= 0)) {
+					content.style['text-align'] = 'center';
+					content.innerHTML = '该文件超过50MB不支持预览';
+					break;
+				} else {
+					const pdfOnline = 'https://pdf.rawchen.com/web?file=' + encodeURIComponent(url);
+					let div2 = document.createElement('div');
+					div2.className = 'target-blank';
+					div2.innerHTML = '点我新窗口打开';
+					div2.addEventListener('click', () => window.open(pdfOnline));
+					content.style['text-align'] = 'initial';
+					content.innerHTML = '';
+					content.appendChild(div2);
+					if (document.body.clientWidth >= 300) {
+						let iframe2 = document.createElement('iframe');
+						iframe2.width = '100%';
+						iframe2.style.height = '46em';
+						iframe2.style.border = '0';
+						iframe2.src = pdfOnline;
+						content.appendChild(iframe2);
+					}
+					break;
 				}
-				break;
 			case 'markdown':
 				renderMarkdown(url, false);
 				content.style['text-align'] = 'initial';
@@ -630,6 +633,74 @@
 		window.requestAnimationFrame(scrollToBottom);
 	}
 
+	function dealFiles(files, fileId, isBack) {
+		if (files.length === 0) {
+			layer.msg("找不到东西哦");
+		}
+		if (fullFileIdArr[fullFileIdArr.length - 1] !== fileId) {
+			fullFileIdArr.push(fileId);
+		}
+		if (files.length === 1 && files[0].encrypted) {
+			switchRightDisplay("encrypted");
+			const password = document.querySelector('.password');
+			const input = password.querySelector('input');
+			input.focus();
+			const button = password.querySelector('button');
+			const buttonParent = button.parentElement;
+			const buttonClone = button.cloneNode(true);
+			buttonParent.replaceChild(buttonClone, button);
+			input.placeholder = '请输入密码';
+
+			$('.password').bind("keypress", function() {
+				if (event.keyCode === 13) {
+					buttonClone.click();
+				}
+			});
+
+			buttonClone.addEventListener('click', event => {
+				const passwd = input.value;
+				if (!input.value) {
+					layer.msg("你还没填写密码哦");
+					input.focus();
+					return;
+				}
+				input.value = '';
+				input.placeholder = '正在验证..';
+				loading.style.display = 'initial';
+				$.ajax({
+					type: 'POST',
+					url: "/getFolder/" + fileId,
+					data: {password: passwd},
+					headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+					complete: function () {loading.style.display = 'none';},
+					success: function (files) {
+						//密码错了
+						if (files != null && files.length === 1 && files[0].encrypted) {
+							input.placeholder = '请输入密码';
+							layer.msg("密码错误哦");
+							input.focus();
+						} else {
+							//密码对了
+							switchRightDisplay();
+							renderFileList(files);
+						}
+
+
+					}
+				});
+			});
+		} else {
+			switchRightDisplay();
+			renderFileList(files);
+			fullFileId = fileId;
+			if (!isBack) {
+				if (fullFileIdArr[fullFileIdArr.length - 1] !== fileId) {
+					fullFileIdArr.push(fileId);
+				}
+			}
+		}
+	}
+
 	function addTreeNodeListener(elem, fileId) {
 		elem.addEventListener('click', event => {
 			if (fileId !== null) {
@@ -640,18 +711,7 @@
 					headers: {'Content-Type': 'application/x-www-form-urlencoded'},
 					complete: function () {loading.style.display = 'none';},
 					success: function (files) {
-						renderFileList(files);
-						fullFileId = fileId;
-						fullFileIdArr.push(fileId)
-
-						let folderCount = 0;
-						files.forEach(function () {
-							folderCount++;
-						});
-						if (folderCount === 0) {
-							layer.msg("找不到东西哦");
-						}
-
+						dealFiles(files, fileId, false);
 						//判断是否重复添加列表元素(判断新增的文件夹只要存在同名肯定重复，抛异常)
 						try {
 							files.forEach(file => {
@@ -697,9 +757,7 @@
 					headers: {'Content-Type': 'application/x-www-form-urlencoded'},
 					complete: function () {loading.style.display = 'none';},
 					success: function (files) {
-						renderFileList(files);
-						fullFileId = fileId;
-						fullFileIdArr.push(fileId);
+						dealFiles(files, fileId, false);
 					}
 				});
 			});

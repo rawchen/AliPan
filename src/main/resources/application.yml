@@ -5,6 +5,8 @@ alipan:
   api_url: https://api.aliyundrive.com/v2
   # 阿里云盘请求来源
   referer_url: https://www.aliyundrive.com
+  # 自定义配置存放密码的文件名
+  password_file_name: password
 
 server:
   port: 8899

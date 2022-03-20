@@ -6,6 +6,7 @@ import com.rawchen.alipan.config.Constants;
 import com.rawchen.alipan.entity.PanFile;
 import com.rawchen.alipan.utils.FileUtil;
 import com.rawchen.alipan.utils.HttpClientUtil;
+import com.rawchen.alipan.utils.StringUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -70,7 +71,7 @@ public class ApiController {
 	 */
 	@ResponseBody
 	@PostMapping(value = "/getFolder/{fileId}")
-	public List<PanFile> getFolder(@PathVariable("fileId") String fileId) {
+	public List<PanFile> getFolder(@PathVariable("fileId") String fileId, @RequestParam(required = false) String password) {
 		JSONObject requestJson = new JSONObject();
 		requestJson.put("param1", 30);
 		requestJson.put("all", false);
@@ -113,12 +114,43 @@ public class ApiController {
 			file.setName((String) items.getJSONObject(i).get("name"));
 			file.setParentFileId((String) items.getJSONObject(i).get("parent_file_id"));
 			file.setCreatedAt((String) items.getJSONObject(i).get("created_at"));
+			file.setEncrypted(false);
 			if ("file".equals(items.getJSONObject(i).get("type"))) {
 				file.setFileExtension((String) items.getJSONObject(i).get("file_extension"));
 				file.setSize(((Number) items.getJSONObject(i).get("size")).longValue());
 				file.setUrl((String) items.getJSONObject(i).get("url"));
 			}
 			panFiles.add(file);
+		}
+
+		//文件列表中密码文件的位置
+		int passwordIndex = -1;
+
+		for (int i = 0; i < panFiles.size(); i++) {
+			//列表中如果有
+			if ("password".equals(panFiles.get(i).getName())) {
+				//找到一个名字为password的文件，如果传参为空就说明没传密码，直接返回一个文件且encrypted为true
+				if (password == null || "".equals(password)) {
+					panFiles.clear();
+					panFiles.add(new PanFile(true));
+					break;
+				} else {
+					//找到一个名字为password的文件，但是传了密码参数
+					String folderPasswd = StringUtil.clearStr(HttpClientUtil.doGet(panFiles.get(i).getUrl(), null, new HashMap<>(), null));
+					//如果密码没对上
+					if (!password.equals(folderPasswd)) {
+						panFiles.clear();
+						panFiles.add(new PanFile(true));
+						break;
+					} else {
+						//密码对上了，在文件列表中删除这个密码文件(同一文件夹只能一个)
+						 passwordIndex = i;
+					}
+				}
+			}
+		}
+		if (passwordIndex != -1) {
+			panFiles.remove(passwordIndex);
 		}
 		return panFiles;
 	}

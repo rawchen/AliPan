@@ -12,10 +12,14 @@ public class IndexController {
 	@Value("${alipan.parent_file_id}")
 	String parentFileId;
 
+	@Value("${alipan.password_file_name}")
+	String passwordFileName;
+
 	@RequestMapping("/")
 	public String toIndexHtml(Model model){
 		model.addAttribute("type", "folder");
 		model.addAttribute("fileId", parentFileId);
+		model.addAttribute("passwordFileName", passwordFileName);
 		return "index";
 
 	}
@@ -24,6 +28,7 @@ public class IndexController {
 	public String toFolder(@PathVariable("fileId") String fileId, Model model){
 		model.addAttribute("fileId", fileId);
 		model.addAttribute("type", "folder");
+		model.addAttribute("passwordFileName", passwordFileName);
 		return "index";
 	}
 
@@ -32,6 +37,7 @@ public class IndexController {
 		model.addAttribute("fileId", fileId);
 		model.addAttribute("type", "file");
 		model.addAttribute("parentFileId", parentFileId);
+		model.addAttribute("passwordFileName", passwordFileName);
 		return "index";
 	}
 
