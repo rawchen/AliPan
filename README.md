@@ -39,7 +39,7 @@
 
 ## 高级
 
-在`application.yml`中你可以自定义`parent_file_id`(要展示的节点目录)。
+在`application.yml`中你可以自定义`parent_file_id`(要展示的节点目录id，可对文件夹右键分享查看)。
 需要密码保护文件夹则新建`password`文件放置该文件夹。
 注意该密码文件无任何后缀名，在`application.yml`可自定义加密文件名。
 
