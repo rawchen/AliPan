@@ -969,7 +969,10 @@
 		element.oncontextmenu = function (env) {
 			//env 表示event事件、兼容event事件写法
 			var e = env || window.event;
-			document.querySelector('.file-wrapper-hover')?.classList.remove('file-wrapper-hover');
+			let fileHover = document.querySelector('.file-wrapper-hover');
+			if (fileHover) {
+				fileHover.classList.remove('file-wrapper-hover');
+			}
 			element.classList.add('file-wrapper-hover');
 			let aList = context.getElementsByTagName('a')
 			for (var i = 0; i < aList.length; i++) {
@@ -1000,7 +1003,10 @@
 		};
 		document.onclick = function () {
 			context.style.display = "none";
-			document.querySelector('.file-wrapper-hover')?.classList.remove('file-wrapper-hover');
+			let fileHover = document.querySelector('.file-wrapper-hover')
+			if (fileHover) {
+				fileHover.classList.remove('file-wrapper-hover');
+			}
 		};
 	}
 
