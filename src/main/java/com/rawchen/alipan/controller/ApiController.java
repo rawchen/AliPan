@@ -91,6 +91,7 @@ public class ApiController {
 
 		Map<String, String> headerMap = new HashMap<>();
 		headerMap.put("Content-Type", "application/json");
+		headerMap.put("Referer", refererURL);
 		headerMap.put("Authorization", "Bearer " + Constants.ACCESS_TOKEN);
 
 		String result = HttpClientUtil.doPost(apiUrl + "/file/list", requestJson.toString(), headerMap);
@@ -103,7 +104,6 @@ public class ApiController {
 		//如果请求到json体不是空且不可用就刷新token
 		if (jsonObject != null && "AccessTokenInvalid".equals(jsonObject.get("code"))) {
 			refresh();
-			headerMap.put("Authorization", "Bearer " + Constants.ACCESS_TOKEN);
 			result = HttpClientUtil.doPost(apiUrl + "/file/list", requestJson.toString(), headerMap);
 			jsonObject = JSONObject.parseObject(result);
 		}
@@ -174,6 +174,7 @@ public class ApiController {
 		requestJson.put("expire_sec", 14400);
 		Map<String, String> headerMap = new HashMap<>();
 		headerMap.put("Content-Type", "application/json");
+		headerMap.put("Referer", refererURL);
 		headerMap.put("Authorization", "Bearer " + Constants.ACCESS_TOKEN);
 
 		String result = HttpClientUtil.doPost(apiUrl + "/file/get_download_url",
