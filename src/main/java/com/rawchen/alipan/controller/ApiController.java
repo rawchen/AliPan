@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.rawchen.alipan.config.Constants;
 import com.rawchen.alipan.entity.PanFile;
+import com.rawchen.alipan.entity.Result;
 import com.rawchen.alipan.utils.FileUtil;
 import com.rawchen.alipan.utils.HttpClientUtil;
 import com.rawchen.alipan.utils.StringUtil;
@@ -186,6 +187,38 @@ public class ApiController {
 		file.setSize(((Number) jsonObject.get("size")).longValue());
 		file.setUrl((String) jsonObject.get("url"));
 		return file;
+	}
+
+	/**
+	 * 获取Office文件在线预览url
+	 *
+	 * @param fileId
+	 * @return
+	 */
+	@ResponseBody
+	@PostMapping(value = "/getOfficePreviewUrl/{fileId}")
+	public Result getOfficePreviewUrl(@PathVariable("fileId") String fileId) {
+
+		JSONObject requestJson = new JSONObject();
+		requestJson.put("drive_id", Constants.DEFAULT_DRIVE_ID);
+		requestJson.put("file_id", fileId);
+		Map<String, String> headerMap = new HashMap<>();
+		headerMap.put("Content-Type", "application/json");
+		headerMap.put("Referer", refererURL);
+		headerMap.put("Authorization", "Bearer " + Constants.ACCESS_TOKEN);
+
+		String result = HttpClientUtil.doPost(apiUrl + "/file/get_office_preview_url",
+				requestJson.toString(), headerMap);
+		JSONObject jsonObject = JSONObject.parseObject(result);
+		String text = "";
+		if (jsonObject != null) {
+			text = (String) jsonObject.get("preview_url");
+		}
+		if (!"".equals(text)) {
+			return Result.ok("请求成功", text);
+		} else {
+			return Result.fail("请求失败");
+		}
 	}
 
 	/**
