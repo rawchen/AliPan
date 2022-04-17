@@ -331,7 +331,7 @@ ion-icon {
 #git-branch {
 	padding: 3px;
 	font-size: 1.2em;
-	margin-top: 4px;
+	margin-top: 1px;
 }
 
 #nav-site, #git-branch-a {
@@ -718,9 +718,10 @@ body {
 	}
 
 	#git-branch-a {
-		display: none;
-		width: 1em;
-		height: 1em;
+		/*display: none;*/
+		margin-left: 10px;
+		margin-right: -9px;
+		font-size: 11px;
 	}
 
 
