@@ -81,14 +81,17 @@ public class ApiController {
 		requestJson.put("all", false);
 		requestJson.put("drive_id", Constants.DEFAULT_DRIVE_ID);
 		requestJson.put("fields", "*");
-		requestJson.put("image_thumbnail_process", "image/resize,w_50");
+		requestJson.put("marker", "");
+//		requestJson.put("image_thumbnail_process", "image/resize,w_50");
+		requestJson.put("image_thumbnail_process", "image/resize,w_400/format,jpeg");
 		requestJson.put("image_url_process", "image/resize,w_1920/format,jpeg");
 		requestJson.put("limit", 100);
 		requestJson.put("url_expire_sec", 14400);
 		requestJson.put("order_by", "name");
 		requestJson.put("order_direction", "ASC");
 		requestJson.put("parent_file_id", fileId);
-		requestJson.put("video_thumbnail_process", "video/snapshot,t_0,f_jpg,w_50");
+//		requestJson.put("video_thumbnail_process", "video/snapshot,t_0,f_jpg,w_50");
+		requestJson.put("video_thumbnail_process", "video/snapshot,t_0,f_jpg,w_400");
 
 		Map<String, String> headerMap = new HashMap<>();
 		headerMap.put("Content-Type", "application/json");
@@ -120,6 +123,7 @@ public class ApiController {
 			file.setCreatedAt((String) items.getJSONObject(i).get("created_at"));
 			file.setEncrypted(false);
 			if ("file".equals(items.getJSONObject(i).get("type"))) {
+				file.setPreviewUrl((String) items.getJSONObject(i).get("thumbnail"));
 				file.setFileExtension((String) items.getJSONObject(i).get("file_extension"));
 				file.setSize(((Number) items.getJSONObject(i).get("size")).longValue());
 				file.setUrl((String) items.getJSONObject(i).get("url"));

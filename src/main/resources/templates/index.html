@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh" xmlns:th="http://www.thymeleaf.org">
 <head>
-	<meta name="referrer" content="never">
+	<meta name="referrer" content="no-referrer">
 	<meta charset="UTF-8">
 	<title>PAN · RAWCHEN</title>
 	<link rel="shortcut icon" th:href="@{/static/img/favicon.ico}">
@@ -47,6 +47,7 @@
 	<div class="header">
 		<ion-icon id="arrow-back" class="logo" name="arrow-back"></ion-icon>
 		<ion-icon id="main-page" class="logo" name="home"></ion-icon>
+		<ion-icon id="thumbnail-toggle" class="logo" name="more"></ion-icon>
 		<div class="loading-wrapper">
 			 <div class="loading">
 				<div class="pswp__preloader__icn">
@@ -133,6 +134,13 @@
 				headers: {'Content-Type': 'application/x-www-form-urlencoded'},
 				complete: function () {loading.style.display = 'none';},
 				success: function (files) {
+					if (window.localStorage.getItem("thumbnailState") === "1") {
+						document.querySelector('.list-header').style.display = "none";
+						document.querySelector('#file-list').classList.add("thumbnail");
+					} else if (window.localStorage.getItem("thumbnailState") === "0") {
+						document.querySelector('#file-list').classList.remove("thumbnail");
+					}
+
 					if (window.location.href.indexOf("/folder/") >= 0) {
 						dealFiles(files, "[[${fileId}]]", false);
 					} else {
@@ -176,6 +184,33 @@
 		// document.getElementById('arrow-forward').addEventListener('click', forward);
 		document.querySelector('#main-page').addEventListener('click', () => {
 			location.href = document.location.protocol + "//" + window.location.host;
+		});
+
+		document.querySelector('#thumbnail-toggle').addEventListener('click', () => {
+			var timeClass = document.getElementsByClassName("time");
+			// 切换缩略图
+			if (document.getElementById('file-list').getAttribute("class") !== 'thumbnail') {
+				document.getElementById('thumbnail-toggle').setAttribute("name", "more");
+				document.querySelector('#file-list').classList.add("thumbnail");
+				window.localStorage.setItem("thumbnailState", "1");
+				for (let i = 0; i < timeClass.length; i++) {
+					timeClass[i].style.display = "none";
+				}
+				if (document.getElementById("file-list").style.display !== 'none') {
+					document.querySelector('.list-header').style.display = "none";
+				}
+			} else {
+				// 列表
+				document.getElementById('thumbnail-toggle').setAttribute("name", "apps");
+				document.querySelector('#file-list').classList.remove("thumbnail");
+				window.localStorage.setItem("thumbnailState", "0");
+				for (let i = 0; i < timeClass.length; i++) {
+					timeClass[i].style.display = "block";
+				}
+				if (document.getElementById("file-list").style.display !== 'none') {
+					document.querySelector('.list-header').style.display = "block";
+				}
+			}
 		});
 	}
 
@@ -226,18 +261,29 @@
 
 	function renderFileList(files) {
 
+		if (document.getElementById('file-list').getAttribute("class") === 'thumbnail') {
+			// 缩略图
+			files.forEach(file => {
+				if (file.previewUrl !== null) {
+					let imgt = new Image();
+					imgt.src = file.previewUrl;
+				}
+			});
+		}
+
 		if (fullFileIdArr.length > 0) {
 			document.getElementById('arrow-back').style.color = '#545454';
 		}
 		watchFileState = false;
 
-		const createFileWrapper = (type, name, time, size, fileId, url) => {
+		const createFileWrapper = (type, name, time, size, fileId, url, previewUrl) => {
 			let fileWrapper = document.getElementById('file-wrapper-templete').content.cloneNode(true);
 			fileWrapper.querySelector('ion-icon').setAttribute('name', type);
 			fileWrapper.querySelector('.name').innerHTML = name;
+			fileWrapper.querySelector('.name').title = name;
 			fileWrapper.querySelector('.time').innerHTML = time;
 			fileWrapper.querySelector('.size').innerHTML = size;
-			addFileListLineListener(fileWrapper.querySelector('.row.file-wrapper'), fileId, size, name, url);
+			addFileListLineListener(fileWrapper.querySelector('.row.file-wrapper'), fileId, size, name, url, previewUrl);
 			return fileWrapper;
 		};
 
@@ -264,10 +310,37 @@
 						file.size ? formatSize(file.size) : '未知',
 						file.fileId,
 						file.url,
+						file.previewUrl
+						// 'https://fastly.jsdelivr.net/gh/rawchen/JsDelivr/static/blog/mail.jpg'
 					)
 				);
 			}
 		});
+		if (document.getElementById('file-list').getAttribute("class") === 'thumbnail') {
+			var timeClass = document.getElementsByClassName("time");
+			for (let i = 0; i < timeClass.length; i++) {
+				timeClass[i].style.display = "none";
+			}
+
+			const fileWrapper = document.getElementsByClassName("row file-wrapper");
+			for (let i = 0; i < fileWrapper.length; i++) {
+				// 文件图标
+				if (!fileWrapper[i].style['backgroundImage']) {
+					fileWrapper[i].style['backgroundImage'] = "url('"+ './static/img/file.jpg' +"')";
+					fileWrapper[i].style['backgroundRepeat'] = "no-repeat";
+					fileWrapper[i].style['backgroundSize'] = "cover";
+					fileWrapper[i].style['backgroundPosition'] = "center";
+				}
+				// 文件夹图标
+				if (fileWrapper[i].children[0].children[0].getAttribute("name") === 'folder') {
+					fileWrapper[i].style['backgroundImage'] = "url('"+ './static/img/folder.jpg' +"')";
+					fileWrapper[i].style['backgroundRepeat'] = "no-repeat";
+					fileWrapper[i].style['backgroundSize'] = "cover";
+					fileWrapper[i].style['backgroundPosition'] = "center";
+				}
+
+			}
+		}
 	}
 
 	async function renderMarkdown(url, isReadMeMarkdown) {
@@ -743,13 +816,22 @@
 		});
 	}
 
-	function addFileListLineListener(elem, fileId, size, name, url) {
+	function addFileListLineListener(elem, fileId, size, name, url, previewUrl) {
 		if (url) {
 			elem.addEventListener('click', event => {
 				dealFile(fileId, url, size, name);
 			});
 
 			//为elem添加右键点击事件，传数据
+
+			if (previewUrl) {
+				// console.log(elem)
+				// console.log("url("+ previewUrl +") cover")
+				elem.style['backgroundImage'] = "url('"+ previewUrl +"')";
+				elem.style['backgroundRepeat'] = "no-repeat";
+				elem.style['backgroundSize'] = "cover";
+				elem.style['backgroundPosition'] = "center";
+			}
 			elem.setAttribute("fileId", fileId);
 			rightmenu(elem, "file");
 		} else {
@@ -789,8 +871,7 @@
 				document.querySelector('.preview .content').innerHTML = '';
 			}
 		} else {
-			document.querySelector('.list-header').style.display = 'initial';
-			document.querySelector('#file-list').style.display = 'initial';
+			document.querySelector('#file-list').style.display = 'block';
 			document.querySelector('.markdown-body').style.display = 'none'
 			document.querySelector('.preview').style.display = 'none';
 			document.querySelector('.password').style.display = 'none';

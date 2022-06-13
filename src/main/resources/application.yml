@@ -4,7 +4,7 @@ alipan:
   # 阿里云盘API，默认不改动
   api_url: https://api.aliyundrive.com/v2
   # 阿里云盘请求来源
-  referer_url: https://www.aliyundrive.com
+  referer_url: https://www.aliyundrive.com/
   # 自定义配置存放密码的文件名
   password_file_name: password
 
@@ -34,7 +34,7 @@ spring:
     suffix: .html
     mode: HTML5
     encoding: UTF-8
-    cache: true
+    cache: false
     servlet:
       content-type: text/html
 

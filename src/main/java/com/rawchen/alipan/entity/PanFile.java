@@ -26,6 +26,8 @@ public class PanFile implements Serializable {
 
 	private String url;
 
+	private String previewUrl;
+
 	//以上属性为文件共有属性
 
 	private boolean encrypted;
@@ -122,6 +124,14 @@ public class PanFile implements Serializable {
 		this.url = url;
 	}
 
+	public String getPreviewUrl() {
+		return previewUrl;
+	}
+
+	public void setPreviewUrl(String previewUrl) {
+		this.previewUrl = previewUrl;
+	}
+
 	@Override
 	public String toString() {
 		return "PanFile{" +
@@ -133,6 +143,7 @@ public class PanFile implements Serializable {
 				", fileExtension='" + fileExtension + '\'' +
 				", size=" + size +
 				", url='" + url + '\'' +
+				", previewUrl='" + previewUrl + '\'' +
 				", encrypted=" + encrypted +
 				'}';
 	}

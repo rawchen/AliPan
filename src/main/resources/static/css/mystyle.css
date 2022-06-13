@@ -146,10 +146,15 @@ ion-icon {
 	padding: 0em 0.2em;
 }
 
+#thumbnail-toggle {
+	padding: 0em 0.2em;
+}
+
 #arrow-back:hover,
 #arrow-forward:hover,
 #git-branch:hover,
-#main-page:hover {
+#main-page:hover,
+#thumbnail-toggle:hover {
 	/*color: rgb(218, 215, 215);*/
 	color: #181818;
 	cursor: pointer;
@@ -425,7 +430,8 @@ body {
 #arrow-back:hover,
 #arrow-forward:hover,
 #git-branch:hover,
-#main-page:hover {
+#main-page:hover,
+#thumbnail-toggle:hover {
 	background-color: #f3f3f3;
 	border-radius: 5px;
 }
@@ -509,6 +515,43 @@ body {
 	transition: all 0.2s;
 }
 
+.row .file-wrapper::after {
+	content: "";
+	height: 100%;
+	width: 100%;
+	position: absolute;
+	left: 0;
+	top: 0;
+	background: url(../img/favicon.ico) no-repeat center;
+}
+
+.thumbnail {
+	padding-top: 8px;
+}
+
+.thumbnail .row.file-wrapper .file {
+	color: white;
+	background: linear-gradient(90deg, #0000008f, #ffffff00);
+}
+
+.thumbnail .row.file-wrapper {
+	display: flex;
+	float: left;
+	width: 16%;
+	height: 8em;
+	margin: 4px;
+	padding: unset;
+	border-radius: 5px;
+}
+
+.thumbnail .row {
+	align-items: end;
+}
+
+.thumbnail .row.file-wrapper .file .size {
+	padding-right: 5px;
+}
+
 .file {
 	width: 100%;
 	display: flex;
@@ -530,6 +573,8 @@ body {
 }
 
 #file-list {
+	display: block;
+	overflow: hidden;
 	font-family: serif;
 }
 
@@ -570,7 +615,6 @@ body {
 }
 
 .size {
-	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	margin-left: auto;

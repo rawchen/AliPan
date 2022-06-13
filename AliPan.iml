@@ -75,5 +75,6 @@
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpcore:4.4.14" level="project" />
     <orderEntry type="library" name="Maven: commons-codec:commons-codec:1.15" level="project" />
     <orderEntry type="library" name="Maven: cn.hutool:hutool-all:5.3.5" level="project" />
+    <orderEntry type="library" name="highlightjs-line-numbers" level="application" />
   </component>
 </module>
