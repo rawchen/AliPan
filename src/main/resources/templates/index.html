@@ -326,14 +326,14 @@
 			for (let i = 0; i < fileWrapper.length; i++) {
 				// 文件图标
 				if (!fileWrapper[i].style['backgroundImage']) {
-					fileWrapper[i].style['backgroundImage'] = "url('"+ './static/img/file.jpg' +"')";
+					fileWrapper[i].style['backgroundImage'] = "url('" + document.location.protocol + "//" + window.location.host + '/static/img/file.jpg' +"')";
 					fileWrapper[i].style['backgroundRepeat'] = "no-repeat";
 					fileWrapper[i].style['backgroundSize'] = "cover";
 					fileWrapper[i].style['backgroundPosition'] = "center";
 				}
 				// 文件夹图标
 				if (fileWrapper[i].children[0].children[0].getAttribute("name") === 'folder') {
-					fileWrapper[i].style['backgroundImage'] = "url('"+ './static/img/folder.jpg' +"')";
+					fileWrapper[i].style['backgroundImage'] = "url('" + document.location.protocol + "//" + window.location.host + '/static/img/folder.jpg' +"')";
 					fileWrapper[i].style['backgroundRepeat'] = "no-repeat";
 					fileWrapper[i].style['backgroundSize'] = "cover";
 					fileWrapper[i].style['backgroundPosition'] = "center";
