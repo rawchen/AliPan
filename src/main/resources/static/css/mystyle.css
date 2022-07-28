@@ -544,6 +544,10 @@ body {
 	border-radius: 5px;
 }
 
+.thumbnail .row.file-wrapper:hover {
+	transform: scale(1.03);
+}
+
 .thumbnail .row {
 	align-items: end;
 }
