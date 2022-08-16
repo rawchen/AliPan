@@ -125,6 +125,12 @@
 
 	let loading = document.querySelector('.loading');
 
+	document.onkeydown = function() {
+		if (event.keyCode === 8) {
+			back();
+		}
+	}
+
 	document.addEventListener('DOMContentLoaded', () => {
 		document.getElementById('arrow-back').style.color = '#818181';
 		if ("[[${type}]]" === "folder") {
