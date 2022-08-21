@@ -102,7 +102,7 @@
 			<div class="password-wrapper">
 				<div class="password">
 					<input type="password">
-					<button>提交</button>
+					<button id="submit-password">提交</button>
 				</div>
 			</div>
 		</div>
@@ -302,7 +302,8 @@
 			location.reload();
 		}
 		if (files.length === 0) {
-			layer.msg("找不到东西哦");
+			layer.msg('文件夹空的哦', {icon: 3, closeBtn: 2});
+
 		}
 		files.forEach(file => {
 			if (file.type === 'file' && (file.name.toLowerCase() === "readme.md")) {
@@ -590,7 +591,7 @@
 				fancy.append(img);
 				content.innerHTML = '';
 				content.append(fancy);
-				layer.msg("低分辨率预览中，请自行下载原图");
+				layer.msg('低分辨率预览中, 请自行下载原图', {icon: 3, closeBtn: 2});
 				break;
 			case 'audio':
 				let audio = new Audio();
@@ -718,9 +719,6 @@
 	}
 
 	function dealFiles(files, fileId, isBack) {
-		if (files.length === 0) {
-			layer.msg("找不到东西哦");
-		}
 		if (fullFileIdArr[fullFileIdArr.length - 1] !== fileId) {
 			fullFileIdArr.push(fileId);
 		}
@@ -737,14 +735,14 @@
 
 			$('.password').bind("keypress", function() {
 				if (event.keyCode === 13) {
-					buttonClone.click();
+					$('#submit-password').click();
 				}
 			});
 
 			buttonClone.addEventListener('click', event => {
 				const passwd = input.value;
 				if (!input.value) {
-					layer.msg("你还没填写密码哦");
+					layer.msg('你还没填写密码哦', {icon: 3, closeBtn: 2});
 					input.focus();
 					return;
 				}
@@ -761,7 +759,7 @@
 						//密码错了
 						if (files != null && files.length === 1 && files[0].encrypted) {
 							input.placeholder = '请输入密码';
-							layer.msg("密码错误哦");
+							layer.msg('密码错误哦', {icon: 2, closeBtn: 2});
 							input.focus();
 						} else {
 							//密码对了
@@ -1011,7 +1009,7 @@
 			window.getSelection().addRange(range);
 			if (document.execCommand('copy')) {
 				document.execCommand('copy');
-				layer.msg("已复制");
+				layer.msg('已复制分享链接', {icon: 1, closeBtn: 2});
 			}
 			window.getSelection().removeAllRanges();
 		} catch (e) {
@@ -1039,7 +1037,7 @@
 						window.getSelection().addRange(range);
 						if (document.execCommand('copy')) {
 							document.execCommand('copy');
-							layer.msg("已复制下载链接");
+							layer.msg('已复制下载链接', {icon: 1, closeBtn: 2});
 						}
 						window.getSelection().removeAllRanges();
 					} catch (e) {
