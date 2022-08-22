@@ -131,6 +131,12 @@
 		}
 	}
 
+	if (window.localStorage.getItem("thumbnailState") === "1") {
+		document.getElementById('thumbnail-toggle').setAttribute("name", "more");
+	} else if (window.localStorage.getItem("thumbnailState") === "0") {
+		document.getElementById('thumbnail-toggle').setAttribute("name", "apps");
+	}
+
 	document.addEventListener('DOMContentLoaded', () => {
 		document.getElementById('arrow-back').style.color = '#818181';
 		if ("[[${type}]]" === "folder") {
