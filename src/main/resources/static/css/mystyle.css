@@ -741,9 +741,9 @@ body {
 		width: 75%;
 	}
 
-	/*.time {*/
-	/*	display: none;*/
-	/*}*/
+	.time {
+		display: none;
+	}
 
 	.header {
 		padding: 0 1em;

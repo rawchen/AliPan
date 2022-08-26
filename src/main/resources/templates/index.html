@@ -13,7 +13,7 @@
 	<link href="https://s0.pstatp.com/cdn/expire-1-M/highlight.js/9.15.6/styles/monokai-sublime.min.css" rel="stylesheet"/>
 	<link href="https://s0.pstatp.com/cdn/expire-1-M/github-markdown-css/3.0.1/github-markdown.min.css" rel="stylesheet"/>
 	<script src="https://s0.pstatp.com/cdn/expire-1-M/jquery/3.4.0/jquery.min.js"></script>
-<!--	<script async defer data-website-id="da900d64-d5d3-4b0f-a9b0-f57f3867c324" src="https://umami.rawchen.com/umami.js"></script>-->
+	<script async defer data-website-id="da900d64-d5d3-4b0f-a9b0-f57f3867c324" src="https://umami.rawchen.com/umami.js"></script>
 <!--	<script src="https://s0.pstatp.com/cdn/expire-1-M/fancybox/3.5.7/jquery.fancybox.min.js"></script>-->
 <!--	<link href="https://s0.pstatp.com/cdn/expire-1-M/fancybox/3.5.7/jquery.fancybox.min.css" rel="stylesheet"/>-->
 
@@ -236,18 +236,10 @@
 		window.history.forward();
 
 		document.querySelector('#file-list').classList.add("thumbnail");
-
 		const fileWrapper = document.getElementsByClassName("row file-wrapper");
-		const timeClass = document.getElementsByClassName("time");
 
 		//如果没有状态或者是缩略状
 		if (window.localStorage.getItem("thumbnailState") === null || window.localStorage.getItem("thumbnailState") === "1") {
-			setTimeout( function(){
-				for (let i = 0; i < timeClass.length; i++) {
-					timeClass[i].style.display = "none";
-				}
-			}, 500);
-
 			if (document.getElementById("file-list").style.display !== 'none') {
 				document.querySelector('.list-header').style.display = "none";
 			}
@@ -258,19 +250,6 @@
 			//列表
 			for (let i = 0; i < fileWrapper.length; i++) {
 				fileWrapper[i].style['backgroundSize'] = "contain";
-			}
-			if (document.body.clientWidth < 600) {
-				setTimeout(function () {
-					for (let i = 0; i < timeClass.length; i++) {
-						timeClass[i].style.display = "none";
-					}
-				}, 700);
-			} else {
-				setTimeout( function(){
-					for (let i = 0; i < timeClass.length; i++) {
-						timeClass[i].style.display = "block";
-					}
-				}, 500);
 			}
 		}
 		
@@ -372,10 +351,17 @@
 		// 缩略图
 		files.forEach(file => {
 			if (file.previewUrl !== null) {
-				let imgt = new Image();
-				imgt.src = file.previewUrl;
+				let imgTemp = new Image();
+				imgTemp.src = file.previewUrl;
 			}
 		});
+
+		const timeClass = document.getElementsByClassName("time");
+		if (window.localStorage.getItem("thumbnailState") === null || window.localStorage.getItem("thumbnailState") === "1") {
+			for (let i = 0; i < timeClass.length; i++) {
+				timeClass[i].style.display = "none";
+			}
+		}
 
 		const fileWrapper = document.getElementsByClassName("row file-wrapper");
 		for (let i = 0; i < fileWrapper.length; i++) {
