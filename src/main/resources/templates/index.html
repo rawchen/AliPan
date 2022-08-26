@@ -231,24 +231,27 @@
 
 		const timeClass = document.getElementsByClassName("time");
 		document.querySelector('#file-list').classList.add("thumbnail");
-		window.localStorage.setItem("thumbnailState", "1");
-		for (let i = 0; i < timeClass.length; i++) {
-			timeClass[i].style.display = "none";
-		}
-		if (document.getElementById("file-list").style.display !== 'none') {
-			document.querySelector('.list-header').style.display = "none";
-		}
-
 		const fileWrapper = document.getElementsByClassName("row file-wrapper");
-		if (document.getElementById('file-list').getAttribute("class") !== 'thumbnail') {
+
+		//如果没有状态或者是缩略状
+		if (window.localStorage.getItem("thumbnailState") === null || window.localStorage.getItem("thumbnailState") === "1") {
+
+			for (let i = 0; i < timeClass.length; i++) {
+				timeClass[i].style.display = "none";
+			}
+			if (document.getElementById("file-list").style.display !== 'none') {
+				document.querySelector('.list-header').style.display = "none";
+			}
 			for (let i = 0; i < fileWrapper.length; i++) {
 				fileWrapper[i].style['backgroundSize'] = "cover";
 			}
 		} else {
+			//列表
 			for (let i = 0; i < fileWrapper.length; i++) {
 				fileWrapper[i].style['backgroundSize'] = "contain";
 			}
 		}
+
 	});
 
 	function back() {
