@@ -205,8 +205,14 @@
 				document.getElementById('thumbnail-toggle').setAttribute("name", "apps");
 				document.querySelector('#file-list').classList.remove("thumbnail");
 				window.localStorage.setItem("thumbnailState", "0");
-				for (let i = 0; i < timeClass.length; i++) {
-					timeClass[i].style.display = "block";
+				if (document.body.clientWidth < 600) {
+					for (let i = 0; i < timeClass.length; i++) {
+						timeClass[i].style.display = "none";
+					}
+				} else {
+					for (let i = 0; i < timeClass.length; i++) {
+						timeClass[i].style.display = "block";
+					}
 				}
 				if (document.getElementById("file-list").style.display !== 'none') {
 					document.querySelector('.list-header').style.display = "block";
@@ -229,16 +235,19 @@
 		window.history.pushState('forward', null, '');
 		window.history.forward();
 
-		const timeClass = document.getElementsByClassName("time");
 		document.querySelector('#file-list').classList.add("thumbnail");
+
 		const fileWrapper = document.getElementsByClassName("row file-wrapper");
+		const timeClass = document.getElementsByClassName("time");
 
 		//如果没有状态或者是缩略状
 		if (window.localStorage.getItem("thumbnailState") === null || window.localStorage.getItem("thumbnailState") === "1") {
+			setTimeout( function(){
+				for (let i = 0; i < timeClass.length; i++) {
+					timeClass[i].style.display = "none";
+				}
+			}, 500);
 
-			for (let i = 0; i < timeClass.length; i++) {
-				timeClass[i].style.display = "none";
-			}
 			if (document.getElementById("file-list").style.display !== 'none') {
 				document.querySelector('.list-header').style.display = "none";
 			}
@@ -250,8 +259,21 @@
 			for (let i = 0; i < fileWrapper.length; i++) {
 				fileWrapper[i].style['backgroundSize'] = "contain";
 			}
+			if (document.body.clientWidth < 600) {
+				setTimeout(function () {
+					for (let i = 0; i < timeClass.length; i++) {
+						timeClass[i].style.display = "none";
+					}
+				}, 700);
+			} else {
+				setTimeout( function(){
+					for (let i = 0; i < timeClass.length; i++) {
+						timeClass[i].style.display = "block";
+					}
+				}, 500);
+			}
 		}
-
+		
 	});
 
 	function back() {
@@ -300,7 +322,6 @@
 	}
 
 	function renderFileList(files) {
-
 		if (fullFileIdArr.length > 0) {
 			document.getElementById('arrow-back').style.color = '#545454';
 		}
@@ -355,11 +376,6 @@
 				imgt.src = file.previewUrl;
 			}
 		});
-
-		const timeClass = document.getElementsByClassName("time");
-		for (let i = 0; i < timeClass.length; i++) {
-			timeClass[i].style.display = "none";
-		}
 
 		const fileWrapper = document.getElementsByClassName("row file-wrapper");
 		for (let i = 0; i < fileWrapper.length; i++) {

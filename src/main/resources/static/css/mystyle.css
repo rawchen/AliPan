@@ -556,6 +556,24 @@ body {
 	padding-right: 5px;
 }
 
+@media screen and (max-width: 1250px) {
+	.thumbnail .row.file-wrapper{
+		width: 19%;
+	}
+}
+
+@media screen and (max-width: 800px) {
+	.thumbnail .row.file-wrapper{
+		width: 23%;
+	}
+}
+
+@media screen and (max-width: 500px) {
+	.thumbnail .row.file-wrapper{
+		width: 30%;
+	}
+}
+
 .file {
 	width: 100%;
 	display: flex;
@@ -723,9 +741,9 @@ body {
 		width: 75%;
 	}
 
-	.time {
-		display: none;
-	}
+	/*.time {*/
+	/*	display: none;*/
+	/*}*/
 
 	.header {
 		padding: 0 1em;
