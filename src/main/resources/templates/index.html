@@ -682,32 +682,78 @@
 					break;
 				}
 			case 'office':
+				//fileId参数 调用本地/getOfficePreviewUrl/{fileId}接口
+				//获得预览地址和token
+				//使用方式为访问该预览地址并添加请求头Cookie: wwo_token xxxx
+				//在Iframe中打开，并添加请求头
+				let officePreviewUrl = "";
+				let wwoToken = "";
+				$.ajax({
+					type: 'POST',
+					url: "/getOfficePreviewUrl/" + fileId,
+					success: function (data) {
+						officePreviewUrl = data.preview_url
+						wwoToken = data.access_token
+						// console.log(officePreviewUrl, wwoToken);
+						// document.cookie = "wwo_token=" + wwoToken;
+						// document.cookie = "wwo_token=" + wwoToken +";path=/; domain=.aliyuncs.com; Secure";
+
+						// window.open(officePreviewUrl)
+
+						let div = document.createElement('div');
+						div.className = 'target-blank';
+						content.style['text-align'] = 'initial';
+						div.innerHTML = '点我新窗口打开';
+						div.addEventListener('click', () => window.open(officePreviewUrl));
+						content.innerHTML = '';
+						content.appendChild(div);
+						if (document.body.clientWidth >= 480) {
+							let iframe = document.createElement('iframe');
+							iframe.width = '100%';
+							iframe.style.height = '46em';
+							iframe.style.border = '0';
+							iframe.src = officePreviewUrl;
+							content.appendChild(iframe);
+							console.log(wwoToken)
+							iframe.contentDocument.cookie = "wwo_token=" + wwoToken + ";domain=.office-cn-beijing.imm.aliyuncs.com";
+						}
+
+					}
+				});
+
+
+
+
+				break;
+
+
+
 				// 限制大小（有MB单位大于20M，或者有GB单位那都不渲染）
-				if ((size.indexOf(' MB') >= 0 && size.split(' ')[0] > 20) || (size.indexOf(' GB') >= 0)) {
-					content.style['text-align'] = 'center';
-					content.innerHTML = '该文件超过20MB不支持预览';
-					break;
-				} else {
-					const officeOnline = 'https://view.officeapps.live.com/op/view.aspx?src=' + encodeURIComponent(url);
+				// if ((size.indexOf(' MB') >= 0 && size.split(' ')[0] > 20) || (size.indexOf(' GB') >= 0)) {
+				// 	content.style['text-align'] = 'center';
+				// 	content.innerHTML = '该文件超过20MB不支持预览';
+				// 	break;
+				// } else {
+				// 	const officeOnline = 'https://view.officeapps.live.com/op/view.aspx?src=' + encodeURIComponent(url);
 					// const officeOnline = 'https://view.officeapps.live.com/op/embed.aspx?src=' + encodeURIComponent(url);
 					// const officeOnline = 'https://docs.google.com/viewer?url=' + encodeURIComponent(url);
-					let div = document.createElement('div');
-					div.className = 'target-blank';
-					content.style['text-align'] = 'initial';
-					div.innerHTML = '点我新窗口打开';
-					div.addEventListener('click', () => window.open(officeOnline));
-					content.innerHTML = '';
-					content.appendChild(div);
-					if (document.body.clientWidth >= 480) {
-						let iframe = document.createElement('iframe');
-						iframe.width = '100%';
-						iframe.style.height = '46em';
-						iframe.style.border = '0';
-						iframe.src = officeOnline;
-						content.appendChild(iframe);
-					}
-					break;
-				}
+					// let div = document.createElement('div');
+					// div.className = 'target-blank';
+					// content.style['text-align'] = 'initial';
+					// div.innerHTML = '点我新窗口打开';
+					// div.addEventListener('click', () => window.open(officeOnline));
+					// content.innerHTML = '';
+					// content.appendChild(div);
+					// if (document.body.clientWidth >= 480) {
+					// 	let iframe = document.createElement('iframe');
+					// 	iframe.width = '100%';
+					// 	iframe.style.height = '46em';
+					// 	iframe.style.border = '0';
+					// 	iframe.src = officeOnline;
+					// 	content.appendChild(iframe);
+					// }
+					// break;
+
 			case 'pdf':
 				// 限制大小（有MB单位大于50M，或者有GB单位那都不渲染）
 				if ((size.indexOf(' MB') >= 0 && size.split(' ')[0] > 50) || (size.indexOf(' GB') >= 0)) {
@@ -1134,6 +1180,10 @@
 				fileHover.classList.remove('file-wrapper-hover');
 			}
 		};
+	}
+
+	function getOfficePreviewUrl(fileId) {
+
 	}
 
 </script>

@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.rawchen.alipan.config.Constants;
 import com.rawchen.alipan.entity.PanFile;
-import com.rawchen.alipan.entity.Result;
 import com.rawchen.alipan.utils.FileUtil;
 import com.rawchen.alipan.utils.HttpClientUtil;
 import com.rawchen.alipan.utils.StringUtil;
@@ -12,6 +11,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -201,7 +203,7 @@ public class ApiController {
 	 */
 	@ResponseBody
 	@PostMapping(value = "/getOfficePreviewUrl/{fileId}")
-	public Result getOfficePreviewUrl(@PathVariable("fileId") String fileId) {
+	public Map<String, String> getOfficePreviewUrl(@PathVariable("fileId") String fileId, HttpServletRequest request, HttpServletResponse response) {
 
 		JSONObject requestJson = new JSONObject();
 		requestJson.put("drive_id", Constants.DEFAULT_DRIVE_ID);
@@ -214,15 +216,24 @@ public class ApiController {
 		String result = HttpClientUtil.doPost(apiUrl + "/file/get_office_preview_url",
 				requestJson.toString(), headerMap);
 		JSONObject jsonObject = JSONObject.parseObject(result);
-		String text = "";
+		String previewUrl = "";
+		String accessToken = "";
 		if (jsonObject != null) {
-			text = (String) jsonObject.get("preview_url");
+			previewUrl = (String) jsonObject.get("preview_url");
+			accessToken = (String) jsonObject.get("access_token");
 		}
-		if (!"".equals(text)) {
-			return Result.ok("请求成功", text);
-		} else {
-			return Result.fail("请求失败");
-		}
+		Map<String, String> map = new HashMap();
+		map.put("preview_url", previewUrl);
+		map.put("access_token", accessToken);
+
+		Cookie cookie = new Cookie("wwo_token", accessToken);
+
+		//将cookie对象加入response响应
+		response.addCookie(cookie);
+
+		System.out.println(previewUrl);
+		System.out.println(accessToken);
+		return map;
 	}
 
 	/**

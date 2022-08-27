@@ -531,7 +531,10 @@ body {
 
 .thumbnail .row.file-wrapper .file {
 	color: white;
-	background: linear-gradient(90deg, #0000008f, #ffffff00);
+	background: linear-gradient(90deg, #0000008f, #00000047);
+	border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    margin-top: 84px;
 }
 
 .thumbnail .row.file-wrapper {
@@ -542,14 +545,16 @@ body {
 	margin: 4px;
 	padding: unset;
 	border-radius: 5px;
+	box-shadow: 0px 0px 7px #dfdfdf;
 }
 
 .thumbnail .row.file-wrapper:hover {
+	background-color: #fff;
 	transform: scale(1.03);
 }
 
 .thumbnail .row {
-	align-items: end;
+	/*align-items: end;*/
 }
 
 .thumbnail .row.file-wrapper .file .size {
