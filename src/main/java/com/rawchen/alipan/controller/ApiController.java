@@ -11,9 +11,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -196,14 +193,15 @@ public class ApiController {
 	}
 
 	/**
-	 * 获取Office文件在线预览url
+	 * 获取Office文件在线预览url和token
+	 * @see <a href="https://help.aliyun.com/document_detail/396287.html">阿里云智能媒体管理</a>
 	 *
 	 * @param fileId
 	 * @return
 	 */
 	@ResponseBody
 	@PostMapping(value = "/getOfficePreviewUrl/{fileId}")
-	public Map<String, String> getOfficePreviewUrl(@PathVariable("fileId") String fileId, HttpServletRequest request, HttpServletResponse response) {
+	public Map<String, String> getOfficePreviewUrl(@PathVariable("fileId") String fileId) {
 
 		JSONObject requestJson = new JSONObject();
 		requestJson.put("drive_id", Constants.DEFAULT_DRIVE_ID);
@@ -225,14 +223,6 @@ public class ApiController {
 		Map<String, String> map = new HashMap();
 		map.put("preview_url", previewUrl);
 		map.put("access_token", accessToken);
-
-		Cookie cookie = new Cookie("wwo_token", accessToken);
-
-		//将cookie对象加入response响应
-		response.addCookie(cookie);
-
-		System.out.println(previewUrl);
-		System.out.println(accessToken);
 		return map;
 	}
 

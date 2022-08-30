@@ -13,7 +13,8 @@
 	<link href="https://s0.pstatp.com/cdn/expire-1-M/highlight.js/9.15.6/styles/monokai-sublime.min.css" rel="stylesheet"/>
 	<link href="https://s0.pstatp.com/cdn/expire-1-M/github-markdown-css/3.0.1/github-markdown.min.css" rel="stylesheet"/>
 	<script src="https://s0.pstatp.com/cdn/expire-1-M/jquery/3.4.0/jquery.min.js"></script>
-	<script async defer data-website-id="da900d64-d5d3-4b0f-a9b0-f57f3867c324" src="https://umami.rawchen.com/umami.js"></script>
+	<script src="https://g.alicdn.com/IMM/office-js/1.1.5/aliyun-web-office-sdk.min.js"></script>
+<!--	<script async defer data-website-id="da900d64-d5d3-4b0f-a9b0-f57f3867c324" src="https://umami.rawchen.com/umami.js"></script>-->
 <!--	<script src="https://s0.pstatp.com/cdn/expire-1-M/fancybox/3.5.7/jquery.fancybox.min.js"></script>-->
 <!--	<link href="https://s0.pstatp.com/cdn/expire-1-M/fancybox/3.5.7/jquery.fancybox.min.css" rel="stylesheet"/>-->
 
@@ -476,11 +477,9 @@
 				) {
 					return 'text';
 				} else if (
-					['doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'mpp', 'rtf', 'vsd', 'vsdx', 'csv'].contains(suffix)
+					['pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'mpp', 'rtf', 'vsd', 'vsdx', 'csv'].contains(suffix)
 				) {
 					return 'office';
-				} else if (['pdf'].contains(suffix)) {
-					return 'pdf';
 				} else if (['md'].contains(suffix)) {
 					return 'markdown';
 				}
@@ -682,103 +681,33 @@
 					break;
 				}
 			case 'office':
-				//fileId参数 调用本地/getOfficePreviewUrl/{fileId}接口
-				//获得预览地址和token
-				//使用方式为访问该预览地址并添加请求头Cookie: wwo_token xxxx
-				//在Iframe中打开，并添加请求头
-				let officePreviewUrl = "";
-				let wwoToken = "";
 				$.ajax({
 					type: 'POST',
 					url: "/getOfficePreviewUrl/" + fileId,
 					success: function (data) {
-						officePreviewUrl = data.preview_url
-						wwoToken = data.access_token
-						// console.log(officePreviewUrl, wwoToken);
-						// document.cookie = "wwo_token=" + wwoToken;
-						// document.cookie = "wwo_token=" + wwoToken +";path=/; domain=.aliyuncs.com; Secure";
-
-						// window.open(officePreviewUrl)
-
 						let div = document.createElement('div');
 						div.className = 'target-blank';
 						content.style['text-align'] = 'initial';
 						div.innerHTML = '点我新窗口打开';
-						div.addEventListener('click', () => window.open(officePreviewUrl));
+						div.addEventListener('click', () => window.open(data.preview_url));
 						content.innerHTML = '';
 						content.appendChild(div);
-						if (document.body.clientWidth >= 480) {
-							let iframe = document.createElement('iframe');
-							iframe.width = '100%';
-							iframe.style.height = '46em';
-							iframe.style.border = '0';
-							iframe.src = officePreviewUrl;
-							content.appendChild(iframe);
-							console.log(wwoToken)
-							iframe.contentDocument.cookie = "wwo_token=" + wwoToken + ";domain=.office-cn-beijing.imm.aliyuncs.com";
-						}
 
+						let container = document.createElement('div');
+						container.id = 'weboffice-container';
+						container.style['height'] = '80vh';
+						container.style['backgroundColor'] = '#fff';
+						container.style['boxShadow'] = '0 10px 15px -3px rgba(0, 0, 0, 0.1),0 4px 6px -2px rgba(0, 0, 0, 0.05)';
+						content.appendChild(container);
+
+						let instance = aliyun.config({
+							mount: document.querySelector('#weboffice-container'),
+							url: data.preview_url
+						})
+						instance.setToken({token: data.access_token})
 					}
 				});
-
-
-
-
 				break;
-
-
-
-				// 限制大小（有MB单位大于20M，或者有GB单位那都不渲染）
-				// if ((size.indexOf(' MB') >= 0 && size.split(' ')[0] > 20) || (size.indexOf(' GB') >= 0)) {
-				// 	content.style['text-align'] = 'center';
-				// 	content.innerHTML = '该文件超过20MB不支持预览';
-				// 	break;
-				// } else {
-				// 	const officeOnline = 'https://view.officeapps.live.com/op/view.aspx?src=' + encodeURIComponent(url);
-					// const officeOnline = 'https://view.officeapps.live.com/op/embed.aspx?src=' + encodeURIComponent(url);
-					// const officeOnline = 'https://docs.google.com/viewer?url=' + encodeURIComponent(url);
-					// let div = document.createElement('div');
-					// div.className = 'target-blank';
-					// content.style['text-align'] = 'initial';
-					// div.innerHTML = '点我新窗口打开';
-					// div.addEventListener('click', () => window.open(officeOnline));
-					// content.innerHTML = '';
-					// content.appendChild(div);
-					// if (document.body.clientWidth >= 480) {
-					// 	let iframe = document.createElement('iframe');
-					// 	iframe.width = '100%';
-					// 	iframe.style.height = '46em';
-					// 	iframe.style.border = '0';
-					// 	iframe.src = officeOnline;
-					// 	content.appendChild(iframe);
-					// }
-					// break;
-
-			case 'pdf':
-				// 限制大小（有MB单位大于50M，或者有GB单位那都不渲染）
-				if ((size.indexOf(' MB') >= 0 && size.split(' ')[0] > 50) || (size.indexOf(' GB') >= 0)) {
-					content.style['text-align'] = 'center';
-					content.innerHTML = '该文件超过50MB不支持预览';
-					break;
-				} else {
-					const pdfOnline = 'https://pdf.rawchen.com/web?file=' + encodeURIComponent(url);
-					let div2 = document.createElement('div');
-					div2.className = 'target-blank';
-					div2.innerHTML = '点我新窗口打开';
-					div2.addEventListener('click', () => window.open(pdfOnline));
-					content.style['text-align'] = 'initial';
-					content.innerHTML = '';
-					content.appendChild(div2);
-					if (document.body.clientWidth >= 300) {
-						let iframe2 = document.createElement('iframe');
-						iframe2.width = '100%';
-						iframe2.style.height = '46em';
-						iframe2.style.border = '0';
-						iframe2.src = pdfOnline;
-						content.appendChild(iframe2);
-					}
-					break;
-				}
 			case 'markdown':
 				renderMarkdown(url, false);
 				content.style['text-align'] = 'initial';
@@ -1071,7 +1000,7 @@
 				headers: {'Content-Type': 'application/x-www-form-urlencoded'},
 				complete: function () {loading.style.display = 'none';},
 				success: function (file) {
-					dealFile("[[${fileId}]]", file.url, formatSize(file.size), file.name);
+					dealFile(fileId, file.url, formatSize(file.size), file.name);
 				}
 			});
 		}
@@ -1181,10 +1110,5 @@
 			}
 		};
 	}
-
-	function getOfficePreviewUrl(fileId) {
-
-	}
-
 </script>
 </html>
