@@ -663,15 +663,6 @@ body {
 	padding-left: 5px;
 }
 
-/* for block of code */
-.hljs-ln-code {
-	padding-left: 1em;
-}
-
-.hljs-ln td {
-	padding: 0 0.7em;
-}
-
 .contextmenu ul {
 	margin: 0;
 	padding: 0;
