@@ -515,22 +515,27 @@ body {
 	transition: all 0.2s;
 }
 
-.row .file-wrapper::after {
-	content: "";
-	height: 100%;
-	width: 100%;
-	position: absolute;
-	left: 0;
-	top: 0;
-	background: url(../img/favicon.ico) no-repeat center;
-}
+/*.row .file-wrapper::after {*/
+/*	content: "";*/
+/*	height: 100%;*/
+/*	width: 100%;*/
+/*	position: absolute;*/
+/*	left: 0;*/
+/*	top: 0;*/
+/*	background: url(../img/favicon.ico) no-repeat center;*/
+/*}*/
 
 .thumbnail {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
 	padding-top: 8px;
+	padding-left: 5px;
+	padding-right: 5px;
 }
 
 .thumbnail .row.file-wrapper .file {
 	color: white;
+	text-align: center;
 	background: linear-gradient(90deg, #0000008f, #00000047);
 	border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
@@ -538,14 +543,12 @@ body {
 }
 
 .thumbnail .row.file-wrapper {
-	display: flex;
-	float: left;
-	width: 16%;
 	height: 8em;
 	margin: 4px;
 	padding: unset;
 	border-radius: 5px;
 	box-shadow: 0px 0px 7px #dfdfdf;
+	background: url(../img/file.jpg) no-repeat center;
 }
 
 .thumbnail .row.file-wrapper:hover {
@@ -557,30 +560,42 @@ body {
 	/*align-items: end;*/
 }
 
-.thumbnail .row.file-wrapper .file .size {
+.thumbnail .name {
+	width: 100%;
+	padding-left: 0.3em;
+	padding-right: 0.3em;
+}
+
+.thumbnail .size {
 	padding-right: 5px;
+	display: none;
 }
 
-@media screen and (max-width: 1250px) {
-	.thumbnail .row.file-wrapper{
-		width: 19%;
-	}
+.thumbnail ion-icon {
+	display: none;
 }
 
-@media screen and (max-width: 800px) {
-	.thumbnail .row.file-wrapper{
-		width: 23%;
-	}
-}
+/*@media screen and (max-width: 1250px) {*/
+/*	.thumbnail .row.file-wrapper{*/
+/*		width: 19%;*/
+/*	}*/
+/*}*/
 
-@media screen and (max-width: 500px) {
-	.thumbnail .row.file-wrapper{
-		width: 30%;
-	}
-}
+/*@media screen and (max-width: 800px) {*/
+/*	.thumbnail .row.file-wrapper{*/
+/*		width: 23%;*/
+/*	}*/
+/*}*/
+
+/*@media screen and (max-width: 500px) {*/
+/*	.thumbnail .row.file-wrapper{*/
+/*		width: 30%;*/
+/*	}*/
+/*}*/
 
 .file {
 	width: 100%;
+	height: 18px;
 	display: flex;
 	align-items: center;
 }
@@ -600,7 +615,7 @@ body {
 }
 
 #file-list {
-	display: block;
+	/*display: block;*/
 	overflow: hidden;
 	font-family: serif;
 }
@@ -671,7 +686,8 @@ body {
 
 .contextmenu {
 	width: 160px;
-	border: 1px solid #999;
+	border-radius: 6px;
+	padding: 6px 0;
 	box-shadow: 2px 2px 4px #0000002b;
 	background-color: #fff;
 	position: absolute;
@@ -691,16 +707,57 @@ body {
 }
 
 .contextmenu li a {
+	font-size: 15px;
 	text-decoration: none;
-	color: #333;
-	display: block;
-	padding: 0 30px;
+	color: #666666FF;
+	display: flex;
+	padding: 0 14px;
 }
 
 .contextmenu li a:hover {
-	color: #fff;
-	background-color: #000000;
-	font-weight: bold;
+	color: #4393E6FF;
+	background-color: #E0EEFDFF;
+}
+
+#contextmenu-ul ion-icon {
+	margin: 11px 1px;
+	font-size: 19px;
+	padding: 0 7px;
+}
+
+.tooltip {
+}
+
+.tooltip:hover::before {
+	word-break: keep-all;
+	white-space: nowrap;
+	content: attr(title);
+	user-select: text;
+	position: absolute;
+	padding: 2px 6px;
+	display: block;
+	color: #EFEFF1FF;
+	border-radius: 2px;
+	font-size: 14px;
+	line-height: 20px;
+	top: 14.2px;
+	left: -9%;
+	background-color: rgba(0, 0, 0, 0.80);
+	/*backdrop-filter: blur(2px);*/
+	z-index: 999;
+}
+
+.tooltip:hover::after {
+	content: "﹀";
+	border-style: solid dashed dashed dashed;
+	border-color: rgba(0, 0, 0, 0.80) transparent transparent transparent;
+	position: absolute;
+	top: 38px;
+	left: 30%;
+	overflow: hidden;
+	width: 0px;
+	height: 0px;
+	border-width: 4px;
 }
 
 @media screen and (max-width: 1000px) {

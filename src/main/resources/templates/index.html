@@ -17,6 +17,9 @@
 	<link th:href="@{/static/css/monokai-sublime.min.css}" rel="stylesheet"/>
 	<link th:href="@{/static/css/github-markdown.min.css}" rel="stylesheet"/>
 	<link th:href="@{/static/css/mystyle.css}" rel="stylesheet"/>
+<!--	<script async defer data-website-id="da900d64-d5d3-4b0f-a9b0-f57f3867c324" src="https://umami.rawchen.com/umami.js"></script>-->
+<!--	<script src="https://s0.pstatp.com/cdn/expire-1-M/fancybox/3.5.7/jquery.fancybox.min.js"></script>-->
+<!--	<link href="https://s0.pstatp.com/cdn/expire-1-M/fancybox/3.5.7/jquery.fancybox.min.css" rel="stylesheet"/>-->
 </head>
 <body>
 
@@ -108,9 +111,25 @@
 
 <div class="contextmenu" id="context">
 	<ul id="contextmenu-ul">
-		<li><a id="open" href="javascript:;">打开</a></li>
-		<li><a id="share" href="javascript:;">分享</a></li>
-		<li><a id="download" href="javascript:;">下载</a></li>
+		<li>
+			<a id="open" href="javascript:;">
+				<ion-icon name="share-alt" style="color: #f96f6f;"></ion-icon>
+				打开
+
+			</a>
+		</li>
+		<li>
+			<a id="share" href="javascript:;">
+				<ion-icon name="share" style="color: #458fff;"></ion-icon>
+				分享
+			</a>
+		</li>
+		<li>
+			<a id="download" href="javascript:;">
+				<ion-icon name="download" style="color: #ff9445;"></ion-icon>
+				下载
+			</a>
+		</li>
 	</ul>
 </div>
 </body>
@@ -307,7 +326,7 @@
 			let fileWrapper = document.getElementById('file-wrapper-templete').content.cloneNode(true);
 			fileWrapper.querySelector('ion-icon').setAttribute('name', type);
 			fileWrapper.querySelector('.name').innerHTML = name;
-			fileWrapper.querySelector('.name').title = name;
+			// fileWrapper.querySelector('.name').title = name;
 			fileWrapper.querySelector('.time').innerHTML = time;
 			fileWrapper.querySelector('.size').innerHTML = size;
 			addFileListLineListener(fileWrapper.querySelector('.row.file-wrapper'), fileId, size, name, url, previewUrl);
@@ -362,6 +381,9 @@
 
 		const fileWrapper = document.getElementsByClassName("row file-wrapper");
 		for (let i = 0; i < fileWrapper.length; i++) {
+			//名称提示
+			fileWrapper[i].title = fileWrapper[i].getElementsByClassName("name")[0].innerHTML;
+			fileWrapper[i].className += " tooltip";
 			// 文件图标
 			if (!fileWrapper[i].style['backgroundImage']) {
 				fileWrapper[i].style['backgroundImage'] = "url('" + document.location.protocol + "//" + window.location.host + '/static/img/file.jpg' +"')";
@@ -888,7 +910,7 @@
 				document.querySelector('.preview .content').innerHTML = '';
 			}
 		} else {
-			document.querySelector('#file-list').style.display = 'block';
+			// document.querySelector('#file-list').style.display = 'block';
 			document.querySelector('.markdown-body').style.display = 'none'
 			document.querySelector('.preview').style.display = 'none';
 			document.querySelector('.password').style.display = 'none';
