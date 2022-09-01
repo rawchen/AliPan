@@ -617,7 +617,7 @@ body {
 #file-list {
 	/*display: block;*/
 	overflow: hidden;
-	font-family: serif;
+	/*font-family: serif;*/
 }
 
 .list-header .name {

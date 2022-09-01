@@ -19,7 +19,7 @@
 	<link th:href="@{/static/css/github-markdown.min.css}" rel="stylesheet"/>
 	<link th:href="@{/static/css/uikit.min.css}" rel="stylesheet"/>
 	<link th:href="@{/static/css/mystyle.css}" rel="stylesheet"/>
-	<script async defer data-website-id="da900d64-d5d3-4b0f-a9b0-f57f3867c324" src="https://umami.rawchen.com/umami.js"></script>
+<!--	<script async defer data-website-id="da900d64-d5d3-4b0f-a9b0-f57f3867c324" src="https://umami.rawchen.com/umami.js"></script>-->
 <!--	<script src="https://s0.pstatp.com/cdn/expire-1-M/fancybox/3.5.7/jquery.fancybox.min.js"></script>-->
 <!--	<link href="https://s0.pstatp.com/cdn/expire-1-M/fancybox/3.5.7/jquery.fancybox.min.css" rel="stylesheet"/>-->
 </head>
@@ -385,8 +385,7 @@
 		for (let i = 0; i < fileWrapper.length; i++) {
 			//名称提示
 			fileWrapper[i].title = fileWrapper[i].getElementsByClassName("name")[0].innerHTML;
-			// fileWrapper[i].className += " uk-tooltip";
-			fileWrapper[i].setAttribute("uk-tooltip", "pos: right; offset:2;");
+			fileWrapper[i].setAttribute("uk-tooltip", "pos:right;offset:-20");
 			// 文件图标
 			if (!fileWrapper[i].style['backgroundImage']) {
 				fileWrapper[i].style['backgroundImage'] = "url('" + document.location.protocol + "//" + window.location.host + '/static/img/file.jpg' +"')";
@@ -913,7 +912,7 @@
 				document.querySelector('.preview .content').innerHTML = '';
 			}
 		} else {
-			// document.querySelector('#file-list').style.display = 'block';
+			document.querySelector('#file-list').style.display = 'grid';
 			document.querySelector('.markdown-body').style.display = 'none'
 			document.querySelector('.preview').style.display = 'none';
 			document.querySelector('.password').style.display = 'none';
