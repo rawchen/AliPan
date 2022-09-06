@@ -1,21 +1,28 @@
-$(document).ready(function($){
-	$(window).scroll(function(){
-		if ($(this).scrollTop() > 300) {
-			$('#cd-top').addClass('cd-is-visible');
-		} else {
-			$('#cd-top').removeClass('cd-is-visible cd-fade-out');
-		}s
-		if( $(this).scrollTop() > 1200 ) {
-			$('#cd-top').addClass('cd-fade-out');
+$(document).ready(function ($) {
+	// browser window scroll (in pixels) after which the "back to top" link is shown
+	const offset = 300,
+	//browser window scroll (in pixels) after which the "back to top" link opacity is reduced
+	offset_opacity = 1200,
+	//duration of the top scrolling animation (in ms)
+	scroll_top_duration = 700,
+	//grab the "back to top" link
+	$back_to_top = $('.cd-top'),
+	$right = $('.right');
+
+	//hide or show the "back to top" link
+	$right.scroll(function () {
+		($right.scrollTop() > offset) ? $back_to_top.addClass('cd-is-visible') : $back_to_top.removeClass('cd-is-visible cd-fade-out');
+		if ($right.scrollTop() > offset_opacity) {
+			$back_to_top.addClass('cd-fade-out');
 		}
 	});
-	//www.sucaijiayuan.com
+
 	//smooth scroll to top
-	$('#cd-top').on('click', function(event){
+	$back_to_top.on('click', function (event) {
 		event.preventDefault();
-		$('body,html').animate({
-				scrollTop: 0 ,
-			}, 700
+		$right.animate({
+				scrollTop: 0,
+			}, scroll_top_duration
 		);
 	});
 });

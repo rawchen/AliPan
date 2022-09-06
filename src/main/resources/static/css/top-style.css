@@ -1,5 +1,5 @@
 @charset "utf-8";
-#cd-top {
+.cd-top {
   z-index: 999999;
   display: inline-block;
   height: 40px;
@@ -20,34 +20,34 @@
   transition: all 0.3s;
 }
 
-#cd-top.cd-fade-out:hover {
+.cd-top.cd-fade-out:hover {
   opacity: 1;
 }
 
-#cd-top.cd-is-visible {
+.cd-top.cd-is-visible {
   /* the button becomes visible */
   visibility: visible;
   opacity: 1;
 }
-#cd-top.cd-fade-out {
+.cd-top.cd-fade-out {
   /* 如果用户继续向下滚动,这个按钮的透明度会变得更低 */
   opacity: .5;
 }
-.no-touch #cd-top:hover {
+.no-touch .cd-top:hover {
   background-color: #e86256;
   opacity: 1;
 }
 @media only screen and (min-width: 768px) {
-  #cd-top {
-    right: 20px;
+  .cd-top {
+    right: 26px;
     bottom: 20px;
   }
 }
 @media only screen and (min-width: 1024px) {
-  #cd-top {
+  .cd-top {
     height: 60px;
     width: 60px;
-    right: 30px;
+    right: 26px;
     bottom: 30px;
   }
 }
