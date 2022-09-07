@@ -386,15 +386,20 @@
 
 		const fileWrapper = document.getElementsByClassName("row file-wrapper");
 		for (let i = 0; i < fileWrapper.length; i++) {
+			const fileName = fileWrapper[i].getElementsByClassName("name")[0].innerHTML;
 			//名称提示
-			fileWrapper[i].title = fileWrapper[i].getElementsByClassName("name")[0].innerHTML;
+			fileWrapper[i].title = fileName;
 			fileWrapper[i].setAttribute("uk-tooltip", "pos:right;offset:-20");
 			// 文件图标
 			if (!fileWrapper[i].style['backgroundImage']) {
-				fileWrapper[i].style['backgroundImage'] = "url('" + document.location.protocol + "//" + window.location.host + '/static/img/file.jpg' +"')";
+				fileWrapper[i].style['backgroundImage']
+					= "url('" + document.location.protocol
+					+ "//" + window.location.host
+					+ '/static/img/type/' + getExtensionFileType(fileName) + '.png' +"')";
 				fileWrapper[i].style['backgroundRepeat'] = "no-repeat";
+				fileWrapper[i].style['backgroundColor'] = "#5b6870";
 				if (document.getElementById('file-list').getAttribute("class") === 'thumbnail') {
-					fileWrapper[i].style['backgroundSize'] = "cover";
+					// fileWrapper[i].style['backgroundSize'] = "contain";
 				} else {
 					fileWrapper[i].style['backgroundSize'] = "contain";
 				}
@@ -1000,6 +1005,53 @@
 			}
 		});
 	}
+
+	function getExtensionFileType(fileFullName) {
+		const fileName = fileFullName.substring(fileFullName.lastIndexOf(".") + 1).toLowerCase();
+		if (fileName === fileFullName.toLowerCase()) {
+			return 'other';
+		}
+		if (['bmp', 'jpg', 'jpeg', 'png', 'svg', 'webp', 'gif', 'tiff', 'ai', 'ico'].includes(fileName)) {
+			return 'image';
+		} else if (['mp3', 'flac', 'wav', 'ogg'].includes(fileName)) {
+			return 'music';
+		} else if (['mp4', 'webm', 'avi', 'mkv', 'flv', 'm3u8', 'mov', 'rmvb', '3gp'].includes(fileName)) {
+			return 'video';
+		} else if (
+			[
+				'txt', 'js', 'json', 'css', 'htm', 'html', 'java', 'c', 'cpp',
+				'vue', 'py', 'h', 'hpp', 'gitignore', 'php', 'conf', 'ini',
+				'cmd', 'ps1', 'bat', 'sh', 'py', 'go', 'asp', 'reg', 'sql',
+				'properties', 'yml', 'xml', 'iml', 'groovy'
+			].includes(fileName)
+		) {
+			return 'code';
+		} else if (
+			[
+				'pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx',
+				'mpp', 'rtf', 'vsd', 'vsdx', 'csv'
+			].includes(fileName)
+		) {
+			return 'office';
+		} else if (['md'].includes(fileName)) {
+			return 'markdown';
+		} else if (['exe', 'com', 'bak', 'dll', 'bin', 'db'].includes(fileName)) {
+			return 'system';
+		} else if (['iso', 'img'].includes(fileName)) {
+			return 'iso';
+		} else if (['psd'].includes(fileName)) {
+			return 'psd';
+		} else if (['apk'].includes(fileName)) {
+			return 'apk';
+		} else if (['ipa', 'pkg', 'dmg'].includes(fileName)) {
+			return 'mac';
+		} else if (['zip', '7z', 'rar', '7-zip'].includes(fileName)) {
+			return 'compress';
+		} else {
+			return 'other';
+		}
+	}
+
 
 	function js_method_open(type, fileId) {
 		if (type === "folder") {
