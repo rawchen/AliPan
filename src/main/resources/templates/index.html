@@ -219,7 +219,13 @@
 					document.querySelector('.list-header').style.display = "none";
 				}
 				for (let i = 0; i < fileWrapper.length; i++) {
-					fileWrapper[i].style['backgroundSize'] = "cover";
+					if (fileWrapper[i].style['backgroundImage'].indexOf("/img/type/") > -1) {
+						fileWrapper[i].style['backgroundSize'] = "";
+						fileWrapper[i].style['backgroundColor'] = "#5b6870";
+					} else {
+						fileWrapper[i].style['backgroundSize'] = "cover";
+						fileWrapper[i].style['backgroundColor'] = "";
+					}
 				}
 			} else {
 				// 列表
@@ -240,6 +246,7 @@
 				}
 				for (let i = 0; i < fileWrapper.length; i++) {
 					fileWrapper[i].style['backgroundSize'] = "contain";
+					fileWrapper[i].style['backgroundColor'] = "";
 				}
 			}
 		});
@@ -397,7 +404,9 @@
 					+ "//" + window.location.host
 					+ '/static/img/type/' + getExtensionFileType(fileName) + '.png' +"')";
 				fileWrapper[i].style['backgroundRepeat'] = "no-repeat";
-				fileWrapper[i].style['backgroundColor'] = "#5b6870";
+				if (document.getElementById('file-list').getAttribute("class") === 'thumbnail') {
+					fileWrapper[i].style['backgroundColor'] = "#5b6870";
+				}
 				if (document.getElementById('file-list').getAttribute("class") === 'thumbnail') {
 					// fileWrapper[i].style['backgroundSize'] = "contain";
 				} else {
@@ -489,7 +498,7 @@
 					}
 					return false;
 				};
-				if (['bmp', 'jpg', 'jpeg', 'png', 'svg', 'webp', 'gif'].contains(suffix)) {
+				if (['bmp', 'jpg', 'jpeg', 'png', 'svg', 'webp', 'gif', 'ico', 'tif'].contains(suffix)) {
 					return 'image';
 				} else if (['mp3', 'flac', 'wav', 'ogg'].contains(suffix)) {
 					return 'audio';
@@ -1032,9 +1041,9 @@
 				'mpp', 'rtf', 'vsd', 'vsdx', 'csv'
 			].includes(fileName)
 		) {
-			return 'office';
+			return 'pdf';
 		} else if (['md'].includes(fileName)) {
-			return 'markdown';
+			return 'doc';
 		} else if (['exe', 'com', 'bak', 'dll', 'bin', 'db'].includes(fileName)) {
 			return 'system';
 		} else if (['iso', 'img'].includes(fileName)) {
@@ -1186,22 +1195,4 @@
 		};
 	}
 </script>
-<!--<script type="application/javascript">-->
-<!--	$(function() {-->
-<!--		$(".right").scroll(function() {-->
-<!--			alert(123)-->
-<!--			if($(".right").scrollTop()>300){-->
-<!--				$("#back-to-top").fadeIn('slow');-->
-<!--				$("#back-to-top").addClass('cd-is-visible');-->
-<!--			}else {-->
-<!--				$("#back-to-top").fadeOut('slow');-->
-<!--				$("#back-to-top").removeClass('cd-is-visible cd-fade-out');-->
-<!--			}-->
-<!--			if($(this).scrollTop() > 1200) {-->
-<!--				$("#back-to-top").addClass('cd-fade-out');-->
-<!--			}-->
-<!--		});-->
-<!--		$("#back-to-top").smoothscroll();-->
-<!--	});-->
-<!--</script>-->
 </html>
