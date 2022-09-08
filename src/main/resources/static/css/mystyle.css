@@ -575,6 +575,10 @@ body {
 	display: none;
 }
 
+.thumbnail .file-wrapper-hover {
+	transform: scale(1.03);
+}
+
 /*@media screen and (max-width: 1250px) {*/
 /*	.thumbnail .row.file-wrapper{*/
 /*		width: 19%;*/
