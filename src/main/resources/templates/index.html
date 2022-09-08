@@ -221,6 +221,7 @@
 					document.querySelector('.list-header').style.display = "none";
 				}
 				for (let i = 0; i < fileWrapper.length; i++) {
+					fileWrapper[i].setAttribute("uk-tooltip", "pos:right;offset:-20");
 					if (fileWrapper[i].style['backgroundImage'].indexOf("/img/type/") > -1) {
 						fileWrapper[i].style['backgroundSize'] = "";
 						fileWrapper[i].style['backgroundColor'] = "#5b6870";
@@ -249,6 +250,10 @@
 				for (let i = 0; i < fileWrapper.length; i++) {
 					fileWrapper[i].style['backgroundSize'] = "contain";
 					fileWrapper[i].style['backgroundColor'] = "";
+					//名称提示
+					// fileWrapper[i].title = fileWrapper[i].getElementsByClassName("name")[0].innerHTML;
+					// fileWrapper[i].setAttribute("uk-tooltip", "pos:right;offset:-20");
+					fileWrapper[i].removeAttribute("uk-tooltip");
 				}
 			}
 		});
@@ -398,7 +403,9 @@
 			const fileName = fileWrapper[i].getElementsByClassName("name")[0].innerHTML;
 			//名称提示
 			fileWrapper[i].title = fileName;
-			fileWrapper[i].setAttribute("uk-tooltip", "pos:right;offset:-20");
+			if (document.getElementById('file-list').getAttribute("class") === 'thumbnail') {
+				fileWrapper[i].setAttribute("uk-tooltip", "pos:right;offset:-20");
+			}
 			// 文件图标
 			if (!fileWrapper[i].style['backgroundImage']) {
 				fileWrapper[i].style['backgroundImage']
@@ -931,7 +938,7 @@
 				document.querySelector('.preview .content').innerHTML = '';
 			}
 		} else {
-			document.querySelector('#file-list').style.display = 'grid';
+			document.querySelector('#file-list').style.display = '';
 			document.querySelector('.markdown-body').style.display = 'none'
 			document.querySelector('.preview').style.display = 'none';
 			document.querySelector('.password').style.display = 'none';
