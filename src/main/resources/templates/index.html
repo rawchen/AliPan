@@ -21,7 +21,7 @@
 	<link th:href="@{/static/css/uikit.min.css}" rel="stylesheet"/>
 	<link th:href="@{/static/css/top-style.css}" rel="stylesheet"/>
 	<link th:href="@{/static/css/mystyle.css}" rel="stylesheet"/>
-<!--	<script async defer data-website-id="da900d64-d5d3-4b0f-a9b0-f57f3867c324" src="https://umami.rawchen.com/umami.js"></script>-->
+	<script async defer data-website-id="da900d64-d5d3-4b0f-a9b0-f57f3867c324" src="https://umami.rawchen.com/umami.js"></script>
 <!--	<script src="https://s0.pstatp.com/cdn/expire-1-M/fancybox/3.5.7/jquery.fancybox.min.js"></script>-->
 <!--	<link href="https://s0.pstatp.com/cdn/expire-1-M/fancybox/3.5.7/jquery.fancybox.min.css" rel="stylesheet"/>-->
 </head>
@@ -601,15 +601,17 @@
 
 		document.querySelector('.btn.potplayer').onclick = () => {
 			loading.style.display = 'initial';
-			$.ajax({
-				type: 'POST',
-				url: "/getDownloadUrl/" + fileId,
-				headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-				complete: function () {loading.style.display = 'none';},
-				success: function (file) {
-					location.href = "potplayer://" + file.url;
-				}
-			});
+			// $.ajax({
+			// 	type: 'POST',
+			// 	url: "/getDownloadUrl/" + fileId,
+			// 	headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+			// 	complete: function () {loading.style.display = 'none';},
+			// 	success: function (file) {
+			// 		location.href = "potplayer://" + file.url;
+			// 	}
+			// });
+			location.href = "potplayer://" + document.location.protocol + "//" + window.location.host +  "/d/" + fileId;
+			loading.style.display = 'none';
 		}
 
 		document.querySelector('.btn.thunder').onclick = () => {

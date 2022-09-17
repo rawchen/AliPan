@@ -193,6 +193,30 @@ public class ApiController {
 	}
 
 	/**
+	 * 获取下载链接，过期4小时
+	 *
+	 * @param fileId
+	 * @return
+	 */
+	@GetMapping(value = "/d/{fileId}")
+	public String redirectUrl(@PathVariable("fileId") String fileId) {
+
+		JSONObject requestJson = new JSONObject();
+		requestJson.put("drive_id", Constants.DEFAULT_DRIVE_ID);
+		requestJson.put("file_id", fileId);
+		requestJson.put("expire_sec", 14400);
+		Map<String, String> headerMap = new HashMap<>();
+		headerMap.put("Content-Type", "application/json");
+		headerMap.put("Referer", refererURL);
+		headerMap.put("Authorization", "Bearer " + Constants.ACCESS_TOKEN);
+
+		String result = HttpClientUtil.doPost(apiUrl + "/file/get_download_url",
+				requestJson.toString(), headerMap);
+		JSONObject jsonObject = JSONObject.parseObject(result);
+		return "redirect:" + jsonObject.get("url");
+	}
+
+	/**
 	 * 获取Office文件在线预览url和token
 	 * @see <a href="https://help.aliyun.com/document_detail/396287.html">阿里云智能媒体管理</a>
 	 *
