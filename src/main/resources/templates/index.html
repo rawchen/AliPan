@@ -21,7 +21,7 @@
 	<link th:href="@{/static/css/uikit.min.css}" rel="stylesheet"/>
 	<link th:href="@{/static/css/top-style.css}" rel="stylesheet"/>
 	<link th:href="@{/static/css/mystyle.css}" rel="stylesheet"/>
-	<script async defer data-website-id="da900d64-d5d3-4b0f-a9b0-f57f3867c324" src="https://umami.rawchen.com/umami.js"></script>
+<!--	<script async defer data-website-id="da900d64-d5d3-4b0f-a9b0-f57f3867c324" src="https://umami.rawchen.com/umami.js"></script>-->
 <!--	<script src="https://s0.pstatp.com/cdn/expire-1-M/fancybox/3.5.7/jquery.fancybox.min.js"></script>-->
 <!--	<link href="https://s0.pstatp.com/cdn/expire-1-M/fancybox/3.5.7/jquery.fancybox.min.css" rel="stylesheet"/>-->
 </head>
@@ -148,11 +148,12 @@
 
 	$right = $('.right');
 
-	document.onkeydown = function() {
+	document.addEventListener("keydown", function(e) {
+		if (e.target !== document.getElementsByTagName('body')[0]) return;
 		if (event.keyCode === 8) {
 			back();
 		}
-	}
+	});
 
 	if (window.localStorage.getItem("thumbnailState") === "1") {
 		document.getElementById('thumbnail-toggle').setAttribute("name", "more");
@@ -678,7 +679,7 @@
 				fancy.append(img);
 				content.innerHTML = '';
 				content.append(fancy);
-				layer.msg('低分辨率预览中, 请自行下载原图', {icon: 3, closeBtn: 2});
+				// layer.msg('低分辨率预览中, 请自行下载原图', {icon: 3, closeBtn: 2});
 				break;
 			case 'audio':
 				let audio = new Audio();
@@ -798,7 +799,7 @@
 
 			$('.password').bind("keypress", function() {
 				if (event.keyCode === 13) {
-					$('#submit-password').click();
+					buttonClone.click();
 				}
 			});
 
@@ -1027,6 +1028,9 @@
 	}
 
 	function getExtensionFileType(fileFullName) {
+		if (fileFullName.endsWith(".tar.gz")) {
+			return "compress";
+		}
 		const fileName = fileFullName.substring(fileFullName.lastIndexOf(".") + 1).toLowerCase();
 		if (fileName === fileFullName.toLowerCase()) {
 			return 'other';
@@ -1065,7 +1069,7 @@
 			return 'apk';
 		} else if (['ipa', 'pkg', 'dmg'].includes(fileName)) {
 			return 'mac';
-		} else if (['zip', '7z', 'rar', '7-zip'].includes(fileName)) {
+		} else if (['zip', '7z', 'rar', '7-zip', 'tar.gz'].includes(fileName)) {
 			return 'compress';
 		} else {
 			return 'other';
