@@ -89,8 +89,7 @@ public class ApiController {
 		requestJson.put("order_by", "name");
 		requestJson.put("order_direction", "ASC");
 		requestJson.put("parent_file_id", fileId);
-//		requestJson.put("video_thumbnail_process", "video/snapshot,t_0,f_jpg,w_50");
-		requestJson.put("video_thumbnail_process", "video/snapshot,t_0,f_jpg,w_400");
+		requestJson.put("video_thumbnail_process", "video/snapshot,t_300000,f_jpg,w_400");
 
 		Map<String, String> headerMap = new HashMap<>();
 		headerMap.put("Content-Type", "application/json");
