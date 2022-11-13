@@ -51,16 +51,13 @@ public class HttpClientUtil {
 	 * @return
 	 * @throws Exception
 	 */
-	public static String doGet(String url, String path,
-			Map<String, String> headers, Map<String, String> querys) {
+	public static String doGet(String url, String path, Map<String, String> headers, Map<String, String> querys) {
 		try {
 			HttpClient httpClient = wrapClient(url);
-
 			HttpGet request = new HttpGet(buildUrl(url, path, querys));
 			for (Map.Entry<String, String> e : headers.entrySet()) {
 				request.addHeader(e.getKey(), e.getValue());
 			}
-
 			HttpResponse response = httpClient.execute(request);
 			HttpEntity entity = response.getEntity();
 			return EntityUtils.toString(entity);
@@ -79,13 +76,11 @@ public class HttpClientUtil {
 	 * @return
 	 */
 	public static String doPost(String url, String paramMap, Map<String, String> headerMap) {
-
 		CloseableHttpClient httpClient = null;
 		CloseableHttpResponse httpResponse = null;
 		String result = "";
 		// 创建httpClient实例
 		httpClient = HttpClients.createDefault();
-
 		// 创建httpPost远程连接实例
 		HttpPost httpPost = new HttpPost(url);
 		RequestConfig requestConfig = null;
@@ -94,7 +89,6 @@ public class HttpClientUtil {
 				.setConnectionRequestTimeout(Constants.CONNECTION_REQUEST_TIMEOUT)// 设置连接请求超时时间
 				.setSocketTimeout(Constants.SOCKET_TIMEOUT)// 设置读取数据连接超时时间
 				.build();
-
 		// 为httpPost实例设置配置
 		httpPost.setConfig(requestConfig);
 		// 设置请求头
@@ -109,7 +103,6 @@ public class HttpClientUtil {
 				httpPost.addHeader(key, headerMap.get(key));
 			}
 		}
-
 		// 封装post请求参数
 		if (null != paramMap) {
 			// 为httpPost设置封装好的请求参数
@@ -158,6 +151,15 @@ public class HttpClientUtil {
 		return doPost(url, paramMap, null);
 	}
 
+	/**
+	 * 构建GET参数
+	 *
+	 * @param host
+	 * @param path
+	 * @param querys
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 */
 	private static String buildUrl(String host, String path, Map<String, String> querys) throws UnsupportedEncodingException {
 		StringBuilder sbUrl = new StringBuilder();
 		sbUrl.append(host);
@@ -185,10 +187,15 @@ public class HttpClientUtil {
 				sbUrl.append("?").append(sbQuery);
 			}
 		}
-
 		return sbUrl.toString();
 	}
 
+	/**
+	 * SSL包装
+	 *
+	 * @param host
+	 * @return
+	 */
 	private static HttpClient wrapClient(String host) {
 		HttpClient httpClient = new DefaultHttpClient();
 		if (host.startsWith("https://")) {
@@ -198,21 +205,18 @@ public class HttpClientUtil {
 		return httpClient;
 	}
 
+	/**
+	 * SSL客户端
+	 *
+	 * @param httpClient
+	 */
 	private static void sslClient(HttpClient httpClient) {
 		try {
 			SSLContext ctx = SSLContext.getInstance("TLS");
 			X509TrustManager tm = new X509TrustManager() {
-				public X509Certificate[] getAcceptedIssuers() {
-					return null;
-				}
-
-				public void checkClientTrusted(X509Certificate[] xcs, String str) {
-
-				}
-
-				public void checkServerTrusted(X509Certificate[] xcs, String str) {
-
-				}
+				public X509Certificate[] getAcceptedIssuers() {return null;}
+				public void checkClientTrusted(X509Certificate[] xcs, String str) {}
+				public void checkServerTrusted(X509Certificate[] xcs, String str) {}
 			};
 			ctx.init(null, new TrustManager[]{tm}, null);
 			SSLSocketFactory ssf = new SSLSocketFactory(ctx);
@@ -220,9 +224,7 @@ public class HttpClientUtil {
 			ClientConnectionManager ccm = httpClient.getConnectionManager();
 			SchemeRegistry registry = ccm.getSchemeRegistry();
 			registry.register(new Scheme("https", 443, ssf));
-		} catch (KeyManagementException ex) {
-			throw new RuntimeException(ex);
-		} catch (NoSuchAlgorithmException ex) {
+		} catch (KeyManagementException | NoSuchAlgorithmException ex) {
 			throw new RuntimeException(ex);
 		}
 	}
@@ -232,7 +234,7 @@ public class HttpClientUtil {
 	 * @param url   源地址
 	 * @return      目标网页的绝对地址
 	 */
-	public static String getAbsUrl(String url){
+	public static String getAbsUrl(String url) {
 		CloseableHttpClient httpclient = HttpClients.createDefault();
 		HttpClientContext context = HttpClientContext.create();
 		HttpGet httpget = new HttpGet(url);

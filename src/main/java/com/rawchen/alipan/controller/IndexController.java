@@ -16,7 +16,7 @@ public class IndexController {
 	String passwordFileName;
 
 	@RequestMapping("/")
-	public String toIndexHtml(Model model){
+	public String toIndexHtml(Model model) {
 		model.addAttribute("type", "folder");
 		model.addAttribute("fileId", parentFileId);
 		model.addAttribute("passwordFileName", passwordFileName);
@@ -25,7 +25,7 @@ public class IndexController {
 	}
 
 	@RequestMapping("/folder/{fileId}")
-	public String toFolder(@PathVariable("fileId") String fileId, Model model){
+	public String toFolder(@PathVariable("fileId") String fileId, Model model) {
 		model.addAttribute("fileId", fileId);
 		model.addAttribute("type", "folder");
 		model.addAttribute("passwordFileName", passwordFileName);
@@ -33,7 +33,7 @@ public class IndexController {
 	}
 
 	@RequestMapping("/file/{fileId}")
-	public String toFile(@PathVariable("fileId") String fileId, Model model){
+	public String toFile(@PathVariable("fileId") String fileId, Model model) {
 		model.addAttribute("fileId", fileId);
 		model.addAttribute("type", "file");
 		model.addAttribute("parentFileId", parentFileId);
@@ -42,7 +42,7 @@ public class IndexController {
 	}
 
 	@RequestMapping("/token")
-	public String token(){
+	public String token() {
 		return "token";
 	}
 }
