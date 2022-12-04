@@ -30,7 +30,7 @@ public class ScheduleTask {
 	 */
 	@Scheduled(fixedRate = 7200 * 1000)
 	private void scheduleTask() {
-		System.err.println("2h定时任务执行: " + DateUtil.date());
+		System.out.println("刷新access_token: " + DateUtil.date());
 		JSONObject paramJson = new JSONObject();
 		paramJson.put("grant_type", "refresh_token");
 		paramJson.put("refresh_token", Constants.getRefreshToken());

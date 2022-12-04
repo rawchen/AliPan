@@ -617,29 +617,36 @@
 
 		document.querySelector('.btn.thunder').onclick = () => {
 			loading.style.display = 'initial';
-			$.ajax({
-				type: 'POST',
-				url: "/getDownloadUrl/" + fileId,
-				headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-				complete: function () {loading.style.display = 'none';},
-				success: function (file) {
-					location.href = "thunder://" + window.btoa('AA' + file.url + 'ZZ');
-				}
-			});
+			// $.ajax({
+			// 	type: 'POST',
+			// 	url: "/getDownloadUrl/" + fileId,
+			// 	headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+			// 	complete: function () {loading.style.display = 'none';},
+			// 	success: function (file) {
+			//
+			// 	}
+			// });
+			let downloadUrl = document.location.protocol + "//" + window.location.host +  "/d/" + fileId;
+			location.href = "thunder://" + window.btoa('AA' + downloadUrl + 'ZZ');
+			loading.style.display = 'none';
 		}
 
 		document.querySelector('.btn.download').onclick = () => {
 			loading.style.display = 'initial';
-			$.ajax({
-				type: 'POST',
-				url: "/getDownloadUrl/" + fileId,
-				headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-				complete: function () {loading.style.display = 'none';},
-				success: function (file) {
-					previewHandler.copyTextContent(null, file.url);
-					location.href = file.url;
-				}
-			});
+			// $.ajax({
+			// 	type: 'POST',
+			// 	url: "/getDownloadUrl/" + fileId,
+			// 	headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+			// 	complete: function () {loading.style.display = 'none';},
+			// 	success: function (file) {
+			// 		previewHandler.copyTextContent(null, file.url);
+			// 		location.href = file.url;
+			// 	}
+			// });
+			let downloadUrl = document.location.protocol + "//" + window.location.host +  "/d/" + fileId;
+			previewHandler.copyTextContent(null, downloadUrl);
+			location.href = downloadUrl;
+			loading.style.display = 'none';
 			const btn = document.querySelector('.btn.download');
 			btn.innerHTML = '已复制';
 			setTimeout(() => btn.innerHTML = '下载', 3000);
@@ -1135,32 +1142,35 @@
 	function js_method_download(type, fileId) {
 		if (type === "file") {
 			loading.style.display = 'initial';
-			$.ajax({
-				type: 'POST',
-				url: "/getDownloadUrl/" + fileId,
-				headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-				complete: function () {loading.style.display = 'none';},
-				success: function (file) {
-					let target = document.createElement('pre');
-					target.style.opacity = '0';
-					target.textContent = file.url;
-					document.body.appendChild(target);
-					try {
-						let range = document.createRange();
-						range.selectNode(target);
-						window.getSelection().removeAllRanges();
-						window.getSelection().addRange(range);
-						if (document.execCommand('copy')) {
-							document.execCommand('copy');
-							layer.msg('已复制下载链接', {icon: 1, closeBtn: 2});
-						}
-						window.getSelection().removeAllRanges();
-					} catch (e) {
-					}
-					document.body.removeChild(target);
-					location.href = file.url;
+			// $.ajax({
+			// 	type: 'POST',
+			// 	url: "/getDownloadUrl/" + fileId,
+			// 	headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+			// 	complete: function () {loading.style.display = 'none';},
+			// 	success: function (file) {
+			//
+			// 	}
+			// });
+			let downloadUrl = document.location.protocol + "//" + window.location.host +  "/d/" + fileId;
+			let target = document.createElement('pre');
+			target.style.opacity = '0';
+			target.textContent = downloadUrl;
+			document.body.appendChild(target);
+			try {
+				let range = document.createRange();
+				range.selectNode(target);
+				window.getSelection().removeAllRanges();
+				window.getSelection().addRange(range);
+				if (document.execCommand('copy')) {
+					document.execCommand('copy');
+					layer.msg('已复制下载链接', {icon: 1, closeBtn: 2});
 				}
-			});
+				window.getSelection().removeAllRanges();
+			} catch (e) {
+			}
+			document.body.removeChild(target);
+			location.href = downloadUrl;
+			loading.style.display = 'none';
 		}
 	}
 
