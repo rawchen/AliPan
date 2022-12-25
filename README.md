@@ -10,13 +10,14 @@
 
 * 确保java8及以上环境，在[releases](https://github.com/rawchen/AliPan/releases)页面下载jar运行文件。
 * 通过`java -jar AliPan.jar`运行该程序，默认访问地址：[http://localhost:8899](http://localhost:8899)。
-* 通过以下 [refresh_token获取方法](https://pan.rawchen.com/token)拿到后，粘贴到jar包同路径下生成的配置文件`AliPanConfig`中（可记事本编辑）。
+* 通过以下 [refresh_token获取方法](https://api.qqil.cn/alipan)拿到后，粘贴到jar包同路径下生成的配置文件`AliPanConfig`中（可记事本编辑）。
 
 ## 开发
 
 * 确保java8及以上环境，下载项目后通过IDEA打开，可配置application.yml中的端口号等，通过Maven打包jar运行，没有IDEA也可配置Maven命令执行`mvn clean package`。
 
 **refresh_token获取方法：**
+> https://api.qqil.cn/alipan  
 > https://pan.rawchen.com/token
 
 
