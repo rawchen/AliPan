@@ -27,6 +27,9 @@ public class ApiController {
 	@Value("${alipan.api_url}")
 	String apiUrl;
 
+	@Value("${alipan.api_url_v3}")
+	String apiUrlV3;
+
 	@Value("${alipan.referer_url}")
 	String refererURL;
 
@@ -80,23 +83,24 @@ public class ApiController {
 		requestJson.put("all", false);
 		requestJson.put("drive_id", Constants.DEFAULT_DRIVE_ID);
 		requestJson.put("fields", "*");
-		requestJson.put("marker", "");
+//		requestJson.put("marker", "");
 //		requestJson.put("image_thumbnail_process", "image/resize,w_50");
-		requestJson.put("image_thumbnail_process", "image/resize,w_400/format,jpeg");
+		requestJson.put("image_thumbnail_process", "image/resize,w_256/format,jpeg");
 		requestJson.put("image_url_process", "image/resize,w_1920/format,jpeg");
 		requestJson.put("limit", 100);
 		requestJson.put("url_expire_sec", 14400);
 		requestJson.put("order_by", "name");
 		requestJson.put("order_direction", "ASC");
 		requestJson.put("parent_file_id", fileId);
-		requestJson.put("video_thumbnail_process", "video/snapshot,t_300000,f_jpg,w_400");
+		requestJson.put("video_thumbnail_process", "video/snapshot,t_1000,f_jpg,ar_auto,w_256");
 
 		Map<String, String> headerMap = new HashMap<>();
 		headerMap.put("Content-Type", "application/json");
 		headerMap.put("Referer", refererURL);
 		headerMap.put("Authorization", "Bearer " + Constants.ACCESS_TOKEN);
 
-		String result = HttpClientUtil.doPost(apiUrl + "/file/list", requestJson.toString(), headerMap);
+		String result = HttpClientUtil.doPost(apiUrlV3 + "/file/list", requestJson.toString(), headerMap);
+//		System.out.println(result);
 		JSONObject jsonObject = JSONObject.parseObject(result);
 		if (jsonObject == null) {
 //			System.out.println("{api}/file/list 响应为空: " + DateUtil.date());
