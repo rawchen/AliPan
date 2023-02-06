@@ -222,7 +222,7 @@
 					document.querySelector('.list-header').style.display = "none";
 				}
 				for (let i = 0; i < fileWrapper.length; i++) {
-					fileWrapper[i].setAttribute("uk-tooltip", "pos:right;offset:-20");
+					fileWrapper[i].setAttribute("uk-tooltip", "pos:right;offset:-0;animation:uk-animation-scale-up;delay:100");
 					if (fileWrapper[i].style['backgroundImage'].indexOf("/img/type/") > -1) {
 						fileWrapper[i].style['backgroundSize'] = "";
 						fileWrapper[i].style['backgroundColor'] = "#5b6870";
@@ -405,7 +405,7 @@
 			//名称提示
 			fileWrapper[i].title = fileName;
 			if (document.getElementById('file-list').getAttribute("class") === 'thumbnail') {
-				fileWrapper[i].setAttribute("uk-tooltip", "pos:right;offset:-20");
+				fileWrapper[i].setAttribute("uk-tooltip", "pos:right;offset:-0;animation:uk-animation-scale-up;delay:100");
 			}
 			// 文件图标
 			if (!fileWrapper[i].style['backgroundImage']) {

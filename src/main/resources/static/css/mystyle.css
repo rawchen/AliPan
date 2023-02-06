@@ -558,7 +558,7 @@ body {
 }
 
 .thumbnail .row.file-wrapper:hover {
-	background-color: #fff;
+	background-color: #7e98a8 !important;
 	transform: scale(1.03);
 }
 
@@ -583,6 +583,7 @@ body {
 
 .thumbnail .file-wrapper-hover {
 	transform: scale(1.03);
+	background-color: #7e98a8 !important;
 }
 
 /*@media screen and (max-width: 1250px) {*/
