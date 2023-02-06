@@ -104,13 +104,13 @@ public class ApiController {
 		JSONObject jsonObject = JSONObject.parseObject(result);
 		if (jsonObject == null) {
 //			System.out.println("{api}/file/list 响应为空: " + DateUtil.date());
-			result = HttpClientUtil.doPost(apiUrl + "/file/list", requestJson.toString(), headerMap);
+			result = HttpClientUtil.doPost(apiUrlV3 + "/file/list", requestJson.toString(), headerMap);
 			jsonObject = JSONObject.parseObject(result);
 		}
 		//如果请求到json体不是空且不可用就刷新token
 		if (jsonObject != null && "AccessTokenInvalid".equals(jsonObject.get("code"))) {
 			refresh();
-			result = HttpClientUtil.doPost(apiUrl + "/file/list", requestJson.toString(), headerMap);
+			result = HttpClientUtil.doPost(apiUrlV3 + "/file/list", requestJson.toString(), headerMap);
 			jsonObject = JSONObject.parseObject(result);
 		}
 

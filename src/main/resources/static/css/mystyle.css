@@ -474,6 +474,10 @@ body {
 	overflow: scroll;
 }
 
+#tree-root {
+	user-select: none;
+}
+
 #tree-root > .tree-node-wrapper {
 	margin-left: 0px;
 }
@@ -623,6 +627,7 @@ body {
 #file-list {
 	/*display: block;*/
 	overflow: hidden;
+	user-select: none;
 	/*font-family: serif;*/
 }
 
