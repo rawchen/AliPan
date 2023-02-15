@@ -21,7 +21,7 @@
 	<link th:href="@{/static/css/uikit.min.css}" rel="stylesheet"/>
 	<link th:href="@{/static/css/top-style.css}" rel="stylesheet"/>
 	<link th:href="@{/static/css/mystyle.css}" rel="stylesheet"/>
-<!--	<script async defer data-website-id="da900d64-d5d3-4b0f-a9b0-f57f3867c324" src="https://umami.rawchen.com/umami.js"></script>-->
+	<script async defer data-website-id="da900d64-d5d3-4b0f-a9b0-f57f3867c324" src="https://umami.rawchen.com/umami.js"></script>
 <!--	<script src="https://s0.pstatp.com/cdn/expire-1-M/fancybox/3.5.7/jquery.fancybox.min.js"></script>-->
 <!--	<link href="https://s0.pstatp.com/cdn/expire-1-M/fancybox/3.5.7/jquery.fancybox.min.css" rel="stylesheet"/>-->
 </head>
@@ -456,6 +456,13 @@
 				mdDiv.innerHTML = markedText;
 				document.querySelector(".content").append(mdDiv);
 			}
+			//添加README.md文件的a标签新窗口跳转事件_black
+			$(".markdown-body a").each(function () {
+				var hrefs = $(this).prop("href");
+				if (hrefs != "#" && hrefs != "javascript:;" && hrefs != "javascript:void(0);") {
+					$(this).prop("target", "_blank");
+				}
+			});
 		};
 		$.ajax({
 			type: 'GET',
