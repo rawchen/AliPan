@@ -1,5 +1,6 @@
 package com.rawchen.alipan.controller;
 
+import cn.hutool.http.HttpRequest;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.rawchen.alipan.config.Constants;
@@ -47,6 +48,9 @@ public class ApiController {
 	@PostMapping(value = "/getFile/{fileId}")
 	public PanFile getFile(@PathVariable("fileId") String fileId) {
 
+		List<String> sign = SignUtil.sign(Constants.APP_ID, Constants.DEVICE_ID, Constants.USER_ID, "0");
+		createSession(sign.get(0), sign.get(2));
+
 		JSONObject requestJson = new JSONObject();
 		requestJson.put("drive_id", Constants.DEFAULT_DRIVE_ID);
 		requestJson.put("file_id", fileId);
@@ -54,9 +58,13 @@ public class ApiController {
 		headerMap.put("Content-Type", "application/json");
 		headerMap.put("Referer", refererURL);
 		headerMap.put("Authorization", "Bearer " + Constants.ACCESS_TOKEN);
+		headerMap.put("x-canary", "client=web,app=adrive,version=v3.17.0");
+		headerMap.put("x-device-id", Constants.DEVICE_ID);
+		headerMap.put("x-signature", sign.get(2));
 
 		String result = HttpClientUtil.doPost(apiUrl + "/file/get",
 				requestJson.toString(), headerMap);
+//		System.out.println("getFile:" + result);
 		JSONObject jsonObject = JSONObject.parseObject(result);
 		PanFile file = new PanFile();
 		file.setFileId((String) jsonObject.get("file_id"));
@@ -206,7 +214,7 @@ public class ApiController {
 	public String redirectUrl(@PathVariable("fileId") String fileId) {
 
 		List<String> sign = SignUtil.sign(Constants.APP_ID, Constants.DEVICE_ID, Constants.USER_ID, "0");
-		createSession();
+		createSession(sign.get(0), sign.get(2));
 
 		JSONObject requestJson = new JSONObject();
 		requestJson.put("drive_id", Constants.DEFAULT_DRIVE_ID);
@@ -227,8 +235,27 @@ public class ApiController {
 		return "redirect:" + jsonObject.get("url");
 	}
 
-	private void createSession() {
+	private void createSession(String publicKey, String signature) {
+		Map<String, String> headers = new HashMap<>();
+		headers.put("Authorization", "Bearer " + Constants.ACCESS_TOKEN);
+		headers.put("Content-Type", "application/json");
+		headers.put("Referer", "https://www.aliyundrive.com");
+		headers.put("x-canary", "client=web,app=adrive,version=v3.17.0");
+		headers.put("x-device-id", Constants.DEVICE_ID);
+		headers.put("x-signature", signature);
 
+		JSONObject param01 = new JSONObject();
+		param01.put("deviceName", "测试设备名");
+		param01.put("modelName", "测试型号");
+		param01.put("nonce", "0");
+		param01.put("pubKey", publicKey);
+
+		String createSessionResult = HttpRequest.post("https://api.aliyundrive.com/users/v1/users/device/create_session")
+				.addHeaders(headers)
+				.body(param01.toJSONString())
+				.execute()
+				.body();
+//		System.out.println("create_session: " + createSessionResult);
 	}
 
 	/**
