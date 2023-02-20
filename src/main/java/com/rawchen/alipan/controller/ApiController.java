@@ -245,8 +245,8 @@ public class ApiController {
 		headers.put("x-signature", signature);
 
 		JSONObject param01 = new JSONObject();
-		param01.put("deviceName", "测试设备名");
-		param01.put("modelName", "测试型号");
+		param01.put("deviceName", "Redmi");
+		param01.put("modelName", "M2012K11AC");
 		param01.put("nonce", "0");
 		param01.put("pubKey", publicKey);
 
