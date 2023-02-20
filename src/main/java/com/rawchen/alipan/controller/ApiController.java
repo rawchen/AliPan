@@ -6,6 +6,7 @@ import com.rawchen.alipan.config.Constants;
 import com.rawchen.alipan.entity.PanFile;
 import com.rawchen.alipan.utils.FileUtil;
 import com.rawchen.alipan.utils.HttpClientUtil;
+import com.rawchen.alipan.utils.SignUtil;
 import com.rawchen.alipan.utils.StringUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -204,6 +205,9 @@ public class ApiController {
 	@GetMapping(value = "/d/{fileId}")
 	public String redirectUrl(@PathVariable("fileId") String fileId) {
 
+		List<String> sign = SignUtil.sign(Constants.APP_ID, Constants.DEVICE_ID, Constants.USER_ID, "0");
+		createSession();
+
 		JSONObject requestJson = new JSONObject();
 		requestJson.put("drive_id", Constants.DEFAULT_DRIVE_ID);
 		requestJson.put("file_id", fileId);
@@ -213,10 +217,18 @@ public class ApiController {
 		headerMap.put("Referer", refererURL);
 		headerMap.put("Authorization", "Bearer " + Constants.ACCESS_TOKEN);
 
+		headerMap.put("x-canary", "client=web,app=adrive,version=v3.17.0");
+		headerMap.put("x-device-id", Constants.DEVICE_ID);
+		headerMap.put("x-signature", sign.get(2));
+
 		String result = HttpClientUtil.doPost(apiUrl + "/file/get_download_url",
 				requestJson.toString(), headerMap);
 		JSONObject jsonObject = JSONObject.parseObject(result);
 		return "redirect:" + jsonObject.get("url");
+	}
+
+	private void createSession() {
+
 	}
 
 	/**

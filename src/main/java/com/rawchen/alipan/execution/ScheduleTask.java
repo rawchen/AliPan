@@ -38,6 +38,9 @@ public class ScheduleTask {
 		JSONObject jsonObject = JSONObject.parseObject(result);
 		Constants.setAccessToken((String) jsonObject.get("access_token"));
 		Constants.setDefaultDriveId((String) jsonObject.get("default_drive_id"));
+		Constants.setUserId((String) jsonObject.get("user_id"));
+		Constants.setDeviceId((String) jsonObject.get("device_id"));
+//		Constants.setPrivateKey();
 //		System.out.println(jsonObject.get("access_token"));
 	}
 

@@ -51,6 +51,11 @@
 			<artifactId>hutool-all</artifactId>
 			<version>5.3.5</version>
 		</dependency>
+		<dependency>
+			<groupId>org.web3j</groupId>
+			<artifactId>crypto</artifactId>
+			<version>5.0.0</version>
+		</dependency>
 
 	</dependencies>
 
