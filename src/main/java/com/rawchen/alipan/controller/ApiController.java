@@ -1,5 +1,6 @@
 package com.rawchen.alipan.controller;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.http.HttpRequest;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -300,6 +301,7 @@ public class ApiController {
 	@ResponseBody
 	@GetMapping(value = "/refresh")
 	public String refresh() {
+		System.out.println("刷新refresh_token: " + DateUtil.date());
 		String s = FileUtil.textFileToString(new File(System.getProperty("user.dir") +
 				File.separator + "AliPanConfig"));
 		Constants.setRefreshToken(s);

@@ -3,14 +3,13 @@ package com.rawchen.alipan.execution;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.rawchen.alipan.config.Constants;
+import com.rawchen.alipan.controller.ApiController;
 import com.rawchen.alipan.utils.HttpClientUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Spring Boot定时任务
@@ -25,8 +24,11 @@ public class ScheduleTask {
 	@Value("${alipan.api_url}")
 	String apiUrl;
 
+	@Autowired
+	ApiController apiController;
+
 	/**
-	 * 启动执行一次 && 每7200秒执行一次刷新access_token
+	 * 启动执行一次 && 每2小时执行一次刷新access_token
 	 */
 	@Scheduled(fixedRate = 7200 * 1000)
 	private void scheduleTask() {
@@ -49,23 +51,24 @@ public class ScheduleTask {
 	 */
 	@Scheduled(initialDelay = 60 * 1000, fixedRate = 3600 * 1000)
 	private void scheduleTaskToGetFolder() {
-		JSONObject requestJson = new JSONObject();
-		requestJson.put("param1", 30);
-		requestJson.put("all", false);
-		requestJson.put("drive_id", Constants.DEFAULT_DRIVE_ID);
-		requestJson.put("fields", "*");
-		requestJson.put("image_thumbnail_process", "image/resize,w_50");
-		requestJson.put("image_url_process", "image/resize,w_1920/format,jpeg");
-		requestJson.put("limit", 100);
-		requestJson.put("url_expire_sec", 14400);
-		requestJson.put("order_by", "name");
-		requestJson.put("order_direction", "ASC");
-		requestJson.put("parent_file_id", "root");
-		requestJson.put("video_thumbnail_process", "video/snapshot,t_0,f_jpg,w_50");
-
-		Map<String, String> headerMap = new HashMap<>();
-		headerMap.put("Content-Type", "application/json");
-		headerMap.put("Authorization", "Bearer " + Constants.ACCESS_TOKEN);
-		HttpClientUtil.doPost(apiUrl + "/file/list", requestJson.toString(), headerMap);
+		apiController.getFolder("root", null);
+//		JSONObject requestJson = new JSONObject();
+//		requestJson.put("param1", 30);
+//		requestJson.put("all", false);
+//		requestJson.put("drive_id", Constants.DEFAULT_DRIVE_ID);
+//		requestJson.put("fields", "*");
+//		requestJson.put("image_thumbnail_process", "image/resize,w_50");
+//		requestJson.put("image_url_process", "image/resize,w_1920/format,jpeg");
+//		requestJson.put("limit", 100);
+//		requestJson.put("url_expire_sec", 14400);
+//		requestJson.put("order_by", "name");
+//		requestJson.put("order_direction", "ASC");
+//		requestJson.put("parent_file_id", "root");
+//		requestJson.put("video_thumbnail_process", "video/snapshot,t_0,f_jpg,w_50");
+//
+//		Map<String, String> headerMap = new HashMap<>();
+//		headerMap.put("Content-Type", "application/json");
+//		headerMap.put("Authorization", "Bearer " + Constants.ACCESS_TOKEN);
+//		HttpClientUtil.doPost(apiUrl + "/file/list", requestJson.toString(), headerMap);
 	}
 }
