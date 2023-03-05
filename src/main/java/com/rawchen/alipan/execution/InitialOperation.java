@@ -30,5 +30,12 @@ public class InitialOperation implements CommandLineRunner {
 		//拿到配置文件里的refresh_token放到全局Constants
 		String s = FileUtil.textFileToString(file);
 		Constants.setRefreshToken(s);
+
+		File fileOpen = new File(absAddress + File.separator + "AliPanConfigOpen");
+		if (!fileOpen.exists()) {
+			fileOpen.createNewFile();
+		}
+		String sOpen = FileUtil.textFileToString(fileOpen);
+		Constants.setRefreshTokenOpen(sOpen);
 	}
 }

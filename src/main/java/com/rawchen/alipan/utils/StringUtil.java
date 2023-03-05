@@ -62,4 +62,13 @@ public class StringUtil {
 		return stringBuffer.toString();
 	}
 
+	/**
+	 * 是否为空
+	 *
+	 * @param s
+	 * @return
+	 */
+	public static boolean isEmpty(String s) {
+		return s == null || "".equals(s);
+	}
 }

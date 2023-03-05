@@ -24,6 +24,9 @@ public class ScheduleTask {
 	@Value("${alipan.api_url}")
 	String apiUrl;
 
+	@Value("${alipan.oauth_token_url}")
+	String oauthTokenUrl;
+
 	@Autowired
 	ApiController apiController;
 
@@ -42,8 +45,18 @@ public class ScheduleTask {
 		Constants.setDefaultDriveId((String) jsonObject.get("default_drive_id"));
 		Constants.setUserId((String) jsonObject.get("user_id"));
 		Constants.setDeviceId((String) jsonObject.get("device_id"));
-//		Constants.setPrivateKey();
 //		System.out.println(jsonObject.get("access_token"));
+
+		System.out.println("刷新access_token_open: " + DateUtil.date());
+		JSONObject paramJsonOpen = new JSONObject();
+		paramJsonOpen.put("client_id", "");
+		paramJsonOpen.put("client_secret", "");
+		paramJsonOpen.put("grant_type", "refresh_token");
+		paramJsonOpen.put("refresh_token", Constants.getRefreshTokenOpen());
+		String resultOpen = HttpClientUtil.doPost(oauthTokenUrl, paramJsonOpen.toString());
+		JSONObject jsonObjectOpen = JSONObject.parseObject(resultOpen);
+		Constants.setAccessToken(jsonObjectOpen.getString("access_token"));
+		Constants.setDefaultDriveId(jsonObjectOpen.getString("default_drive_id"));
 	}
 
 	/**

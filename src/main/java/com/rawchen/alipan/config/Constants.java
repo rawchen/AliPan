@@ -11,14 +11,16 @@ public class Constants {
 	public static String ACCESS_TOKEN = "";
 	// 刷新令牌
 	public static String REFRESH_TOKEN = "";
+	// 访问令牌OPEN
+	public static String ACCESS_TOKEN_OPEN = "";
+	// 刷新令牌OPEN
+	public static String REFRESH_TOKEN_OPEN = "";
 	// 默认驱动器ID
 	public static String DEFAULT_DRIVE_ID = "";
 	// 签名私钥
 	public static String PRIVATE_KEY = "";
 	// 签名公钥
 	public static String PUBLIC_KEY = "";
-	// 应用ID
-	public static final String APP_ID = "5dde4e1bdf9e4966b387ba58f4b3fdc3";
 	// 用户ID
 	public static String USER_ID = "";
 	// 设备ID
@@ -86,5 +88,21 @@ public class Constants {
 
 	public static void setPublicKey(String publicKey) {
 		PUBLIC_KEY = publicKey;
+	}
+
+	public static String getAccessTokenOpen() {
+		return ACCESS_TOKEN_OPEN;
+	}
+
+	public static void setAccessTokenOpen(String accessTokenOpen) {
+		ACCESS_TOKEN_OPEN = accessTokenOpen;
+	}
+
+	public static String getRefreshTokenOpen() {
+		return REFRESH_TOKEN_OPEN;
+	}
+
+	public static void setRefreshTokenOpen(String refreshTokenOpen) {
+		REFRESH_TOKEN_OPEN = refreshTokenOpen;
 	}
 }
