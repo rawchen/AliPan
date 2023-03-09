@@ -117,7 +117,12 @@ public class ApiController {
 		String result = HttpClientUtil.doPost(openApiUrl + "/adrive/v1.0/openFile/list", requestJson.toString(), headerMap);
 		JSONObject jsonObject = JSONObject.parseObject(result);
 		//如果请求到json体不是空且不可用就刷新token
-		if (jsonObject != null && jsonObject.get("code") != null && "AccessTokenInvalid".equals(jsonObject.get("code"))) {
+		if (jsonObject.getJSONArray("items") == null) {
+			System.out.println(result + " " + DateUtil.date());
+		}
+
+		if (jsonObject.get("code") != null
+				&& ("AccessTokenInvalid".equals(jsonObject.get("code"))) || ("ForbiddenDriveNotValid".equals(jsonObject.get("code")))) {
 			refresh();
 			oauthRefreshToken();
 			headerMap.put("Authorization", "Bearer " + Constants.ACCESS_TOKEN_OPEN);
@@ -127,22 +132,25 @@ public class ApiController {
 		}
 
 		ArrayList<PanFile> panFiles = new ArrayList<>();
-		JSONArray items = jsonObject.getJSONArray("items");
-		for (int i = 0; i < items.size(); i++) {
-			PanFile file = new PanFile();
-			file.setFileId((String) items.getJSONObject(i).get("file_id"));
-			file.setType((String) items.getJSONObject(i).get("type"));
-			file.setName((String) items.getJSONObject(i).get("name"));
-			file.setParentFileId((String) items.getJSONObject(i).get("parent_file_id"));
-			file.setCreatedAt((String) items.getJSONObject(i).get("created_at"));
-			file.setEncrypted(false);
-			if ("file".equals(items.getJSONObject(i).get("type"))) {
-				file.setPreviewUrl((String) items.getJSONObject(i).get("thumbnail"));
-				file.setFileExtension((String) items.getJSONObject(i).get("file_extension"));
-				file.setSize(((Number) items.getJSONObject(i).get("size")).longValue());
-				file.setUrl((String) items.getJSONObject(i).get("url"));
+		// 成功返回了文件列表
+		if (jsonObject.getJSONArray("items") != null) {
+			JSONArray items = jsonObject.getJSONArray("items");
+			for (int i = 0; i < items.size(); i++) {
+				PanFile file = new PanFile();
+				file.setFileId((String) items.getJSONObject(i).get("file_id"));
+				file.setType((String) items.getJSONObject(i).get("type"));
+				file.setName((String) items.getJSONObject(i).get("name"));
+				file.setParentFileId((String) items.getJSONObject(i).get("parent_file_id"));
+				file.setCreatedAt((String) items.getJSONObject(i).get("created_at"));
+				file.setEncrypted(false);
+				if ("file".equals(items.getJSONObject(i).get("type"))) {
+					file.setPreviewUrl((String) items.getJSONObject(i).get("thumbnail"));
+					file.setFileExtension((String) items.getJSONObject(i).get("file_extension"));
+					file.setSize(((Number) items.getJSONObject(i).get("size")).longValue());
+					file.setUrl((String) items.getJSONObject(i).get("url"));
+				}
+				panFiles.add(file);
 			}
-			panFiles.add(file);
 		}
 
 		//文件列表中密码文件的位置
