@@ -21,7 +21,11 @@ public class IndexController {
 		model.addAttribute("fileId", parentFileId);
 		model.addAttribute("passwordFileName", passwordFileName);
 		return "index";
+	}
 
+	@RequestMapping("/toomany")
+	public String toomany(Model model) {
+		return "toomany";
 	}
 
 	@RequestMapping("/folder/{fileId}")

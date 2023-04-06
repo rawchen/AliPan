@@ -260,8 +260,20 @@ public class ApiController {
 
 		String result = HttpClientUtil.doPost(openApiUrl + "/adrive/v1.0/openFile/getDownloadUrl",
 				requestJson.toString(), headerMap);
+		System.out.println("下载结果：" + result);
 		JSONObject jsonObject = JSONObject.parseObject(result);
-		return "redirect:" + jsonObject.get("url");
+
+		if (jsonObject != null) {
+			String code = jsonObject.getString("code");
+			if ("TooManyRequests".equals(code)) {
+				return "redirect:" + "/toomany";
+			} else {
+				if (jsonObject.getString("url") != null) {
+					return "redirect:" + jsonObject.getString("url");
+				}
+			}
+		}
+		return "redirect:" + "/toomany";
 	}
 
 	private void createSession(String publicKey, String signature) {
