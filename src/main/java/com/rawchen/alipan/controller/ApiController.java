@@ -124,7 +124,7 @@ public class ApiController {
 		if (jsonObject.get("code") != null
 				&& ("AccessTokenInvalid".equals(jsonObject.get("code"))) || ("ForbiddenDriveNotValid".equals(jsonObject.get("code")))) {
 			refresh();
-			oauthRefreshToken();
+			System.out.println(oauthRefreshToken());
 			headerMap.put("Authorization", "Bearer " + Constants.ACCESS_TOKEN_OPEN);
 			requestJson.put("drive_id", Constants.DEFAULT_DRIVE_ID);
 			result = HttpClientUtil.doPost(openApiUrl + "/adrive/v1.0/openFile/list", requestJson.toString(), headerMap);
@@ -260,7 +260,7 @@ public class ApiController {
 
 		String result = HttpClientUtil.doPost(openApiUrl + "/adrive/v1.0/openFile/getDownloadUrl",
 				requestJson.toString(), headerMap);
-		System.out.println("下载结果：" + result);
+//		System.out.println("下载结果：" + result);
 		JSONObject jsonObject = JSONObject.parseObject(result);
 
 		if (jsonObject != null) {
@@ -397,6 +397,9 @@ public class ApiController {
 			return "获取refresh_token失败，检查接口：" + oauthTokenUrl;
 		}
 		JSONObject jsonObject = JSONObject.parseObject(result);
+		if (!StringUtil.isEmpty(jsonObject.getString("code")) && "Too Many Requests".equals(jsonObject.getString("code"))) {
+			return "请求刷新Token接口频率过快 Too Many Requests";
+		}
 		if (!StringUtil.isEmpty(jsonObject.getString("access_token"))) {
 			//刷新一次refresh_token到AliPanConfig
 			String refreshToken = jsonObject.getString("refresh_token");

@@ -1,10 +1,48 @@
 <!DOCTYPE html>
-<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
 <head>
 	<meta charset="UTF-8">
-	<title>Title</title>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+	<meta name="renderer" content="webkit">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<meta http-equiv="Cache-Control" content="no-transform"/>
+	<link rel="shortcut icon" th:href="@{/static/img/favicon.ico}">
+	<link rel="apple-touch-icon" th:href="@{/static/img/favicon.ico}">
+	<link rel="stylesheet" th:href="@{/static/css/error.css}">
+	<title>PAN · RAWCHEN</title>
 </head>
 <body>
-下载请求速度过快
+<div class="body404">
+	<div class="info404">
+		<header id="header404" class="clearfix">
+			<div class="site-name404">下载频率过快</div>
+		</header>
+		<section>
+			<div class="title404">
+				<p>Too Many Requests.</p>
+<!--				<p><span id="tip-text">5</span>s 后返回原网页 <a href="/" id="tip-text-a" style="border-bottom: 1px solid gray;"></a></p>-->
+<!--				<p><span id="tip-text">5</span>s 后返回原网页</p>-->
+			</div>
+			 <a id="go-back" href="javascript:history.back()" class="index404">Go back (5)</a>
+		</section>
+	</div>
+</div>
 </body>
+<script type="text/javascript">
+	window.onload = function(){
+		// document.getElementById('tip-text-a').innerText = window.location.host;
+		var i = 4;
+		var intervalid;
+		intervalid = setInterval(fun, 1000);
+		function fun() {
+			if (i === 0) {
+				window.history.back();
+				// location.href = document.location.protocol + "//" + window.location.host;
+				clearInterval(intervalid);
+			}
+			document.getElementById('go-back').innerText = "Go back (" + i + ")";
+			i--;
+		}
+	}
+</script>
 </html>
