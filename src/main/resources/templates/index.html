@@ -1057,13 +1057,19 @@
 			return 'video';
 		} else if (
 			[
-				'txt', 'js', 'json', 'css', 'htm', 'html', 'java', 'c', 'cpp',
+				'js', 'json', 'css', 'htm', 'html', 'java', 'c', 'cpp',
 				'vue', 'py', 'h', 'hpp', 'gitignore', 'php', 'conf', 'ini',
 				'cmd', 'ps1', 'bat', 'sh', 'py', 'go', 'asp', 'reg', 'sql',
 				'properties', 'yml', 'xml', 'iml', 'groovy'
 			].includes(fileName)
 		) {
 			return 'code';
+		} else if (
+				[
+					'txt'
+				].includes(fileName)
+		) {
+			return 'txt';
 		} else if (
 			[
 				'pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx',
