@@ -54,9 +54,14 @@ public class ScheduleTask {
 		paramJsonOpen.put("grant_type", "refresh_token");
 		paramJsonOpen.put("refresh_token", Constants.getRefreshTokenOpen());
 		String resultOpen = HttpClientUtil.doPost(oauthTokenUrl, paramJsonOpen.toString());
-		JSONObject jsonObjectOpen = JSONObject.parseObject(resultOpen);
-		Constants.setAccessToken(jsonObjectOpen.getString("access_token"));
-		Constants.setDefaultDriveId(jsonObjectOpen.getString("default_drive_id"));
+		if (!resultOpen.toLowerCase().contains("502 bad gateway")) {
+			JSONObject jsonObjectOpen = JSONObject.parseObject(resultOpen);
+			Constants.setAccessToken(jsonObjectOpen.getString("access_token"));
+			Constants.setDefaultDriveId(jsonObjectOpen.getString("default_drive_id"));
+		} else {
+			// 将导致token过期
+			System.out.println("定时获取access_token_open: 502 bad gateway. " + DateUtil.date());
+		}
 	}
 
 	/**
