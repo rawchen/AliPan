@@ -122,7 +122,9 @@ public class ApiController {
 		}
 
 		if (jsonObject.get("code") != null
-				&& ("AccessTokenInvalid".equals(jsonObject.get("code"))) || ("ForbiddenDriveNotValid".equals(jsonObject.get("code")))) {
+				&& (("AccessTokenInvalid".equals(jsonObject.get("code")))
+				|| ("AccessTokenExpired".equals(jsonObject.get("code")))
+				|| ("ForbiddenDriveNotValid".equals(jsonObject.get("code"))))) {
 			refresh();
 			System.out.println(oauthRefreshToken());
 			headerMap.put("Authorization", "Bearer " + Constants.ACCESS_TOKEN_OPEN);
