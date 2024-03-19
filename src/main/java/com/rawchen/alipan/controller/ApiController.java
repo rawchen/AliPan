@@ -147,7 +147,9 @@ public class ApiController {
 					file.setPreviewUrl((String) items.getJSONObject(i).get("thumbnail"));
 					file.setFileExtension((String) items.getJSONObject(i).get("file_extension"));
 					file.setSize(((Number) items.getJSONObject(i).get("size")).longValue());
-					file.setUrl((String) items.getJSONObject(i).get("url"));
+					String url = items.getJSONObject(i).getString("url");
+					url = (url == null) ? "https://" : url;
+					file.setUrl(url);
 				}
 				panFiles.add(file);
 			}
