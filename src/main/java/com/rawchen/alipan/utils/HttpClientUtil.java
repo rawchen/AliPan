@@ -2,6 +2,7 @@ package com.rawchen.alipan.utils;
 
 import cn.hutool.core.util.StrUtil;
 import com.rawchen.alipan.config.Constants;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
@@ -39,6 +40,7 @@ import java.util.Map;
 /**
  * HttpClient网络请求工具
  */
+@Slf4j
 public class HttpClientUtil {
 
 	/**
@@ -247,7 +249,7 @@ public class HttpClientUtil {
 			HttpHost target = context.getTargetHost();
 			List<URI> redirectLocations = context.getRedirectLocations();
 			URI location = URIUtils.resolve(httpget.getURI(), target, redirectLocations);
-			System.out.println("Final HTTP location: " + location.toASCIIString());
+			log.info("Final HTTP location: " + location.toASCIIString());
 			absUrl = location.toASCIIString();
 		}catch(IOException e){
 			e.printStackTrace();

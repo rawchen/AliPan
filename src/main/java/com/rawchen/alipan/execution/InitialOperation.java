@@ -2,6 +2,7 @@ package com.rawchen.alipan.execution;
 
 import com.rawchen.alipan.config.Constants;
 import com.rawchen.alipan.utils.FileUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -16,13 +17,14 @@ import java.io.File;
  */
 @Component
 @Order(1)
+@Slf4j
 public class InitialOperation implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
 		//如果jar同级目录不存在该配置文件则重新创建
 		String absAddress = System.getProperty("user.dir");
-		System.out.println("JAR同级目录：" + absAddress);
+		log.info("JAR同级目录：" + absAddress);
 		File file = new File(absAddress + File.separator + "AliPanConfig");
 		if (!file.exists()) {
 			file.createNewFile();

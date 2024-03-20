@@ -10,6 +10,7 @@ import com.rawchen.alipan.utils.FileUtil;
 import com.rawchen.alipan.utils.HttpClientUtil;
 import com.rawchen.alipan.utils.SignUtil;
 import com.rawchen.alipan.utils.StringUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +23,7 @@ import java.util.Map;
 
 @CrossOrigin
 @Controller
+@Slf4j
 public class ApiController {
 
 	@Value("${alipan.parent_file_id}")
@@ -94,31 +96,38 @@ public class ApiController {
 	 * @return
 	 */
 	@ResponseBody
-	@PostMapping(value = "/getFolder/{fileId}")
-	public List<PanFile> getFolder(@PathVariable("fileId") String fileId, @RequestParam(required = false) String password) {
+	@PostMapping(value = "/getFolderV1/{fileId}")
+	public List<PanFile> getFolderV1(@PathVariable("fileId") String fileId, @RequestParam(required = false) String password) {
+
+		List<String> sign = SignUtil.sign(appId, Constants.DEVICE_ID, Constants.USER_ID, "0");
+		createSession(sign.get(0), sign.get(2));
+
 		JSONObject requestJson = new JSONObject();
-		requestJson.put("param1", 30);
 		requestJson.put("all", false);
 		requestJson.put("drive_id", Constants.DEFAULT_DRIVE_ID);
 		requestJson.put("fields", "*");
-		requestJson.put("image_thumbnail_process", "image/resize,w_256/format,jpeg");
-		requestJson.put("image_url_process", "image/resize,w_1920/format,jpeg");
+		requestJson.put("image_thumbnail_process", "image/resize,w_256/format,avif");
+		requestJson.put("image_url_process", "image/resize,w_1920/format,avif");
 		requestJson.put("limit", 100);
+		requestJson.put("marker", "");
 		requestJson.put("url_expire_sec", 14400);
 		requestJson.put("order_by", "name");
 		requestJson.put("order_direction", "ASC");
 		requestJson.put("parent_file_id", fileId);
-		requestJson.put("video_thumbnail_process", "video/snapshot,t_1000,f_jpg,ar_auto,w_256");
+		requestJson.put("video_thumbnail_process", "video/snapshot,t_120000,f_jpg,m_lfit,w_256,ar_auto,m_fast");
 
 		Map<String, String> headerMap = new HashMap<>();
 		headerMap.put("Content-Type", "application/json");
-		headerMap.put("Authorization", "Bearer " + Constants.ACCESS_TOKEN_OPEN);
+		headerMap.put("Authorization", "Bearer " + Constants.ACCESS_TOKEN);
+		headerMap.put("x-canary", "client=web,app=adrive,version=v3.17.0");
+		headerMap.put("x-device-id", Constants.DEVICE_ID);
+		headerMap.put("x-signature", sign.get(2));
 
-		String result = HttpClientUtil.doPost(openApiUrl + "/adrive/v1.0/openFile/list", requestJson.toString(), headerMap);
+		String result = HttpClientUtil.doPost(apiUrlV3 + "/file/list", requestJson.toString(), headerMap);
 		JSONObject jsonObject = JSONObject.parseObject(result);
 		//如果请求到json体不是空且不可用就刷新token
 		if (jsonObject.getJSONArray("items") == null) {
-			System.out.println(result + " " + DateUtil.date());
+			log.error("获取文件夹列表错误: " + result + " " + DateUtil.date());
 		}
 
 		if (jsonObject.get("code") != null
@@ -126,10 +135,12 @@ public class ApiController {
 				|| ("AccessTokenExpired".equals(jsonObject.get("code")))
 				|| ("ForbiddenDriveNotValid".equals(jsonObject.get("code"))))) {
 			refresh();
-			System.out.println(oauthRefreshToken());
+			log.info(oauthRefreshToken());
 			headerMap.put("Authorization", "Bearer " + Constants.ACCESS_TOKEN_OPEN);
 			requestJson.put("drive_id", Constants.DEFAULT_DRIVE_ID);
-			result = HttpClientUtil.doPost(openApiUrl + "/adrive/v1.0/openFile/list", requestJson.toString(), headerMap);
+			List<String> signRetry = SignUtil.sign(appId, Constants.DEVICE_ID, Constants.USER_ID, "0");
+			createSession(signRetry.get(0), signRetry.get(2));
+			result = HttpClientUtil.doPost(apiUrlV3 + "/file/list", requestJson.toString(), headerMap);
 			jsonObject = JSONObject.parseObject(result);
 		}
 
@@ -179,6 +190,118 @@ public class ApiController {
 					} else {
 						//密码对上了，在文件列表中删除这个密码文件(同一文件夹只能一个)
 						 passwordIndex = i;
+					}
+				}
+			}
+		}
+		if (passwordIndex != -1) {
+			panFiles.remove(passwordIndex);
+		}
+		return panFiles;
+	}
+
+	/**
+	 * 文件列表(Open)
+	 *
+	 * @param fileId
+	 * @return
+	 */
+	@ResponseBody
+	@PostMapping(value = "/getFolder/{fileId}")
+	public List<PanFile> getFolder(@PathVariable("fileId") String fileId, @RequestParam(required = false) String password) {
+
+		List<String> sign = SignUtil.sign(appId, Constants.DEVICE_ID, Constants.USER_ID, "0");
+		createSession(sign.get(0), sign.get(2));
+
+		JSONObject requestJson = new JSONObject();
+		requestJson.put("all", false);
+		requestJson.put("drive_id", Constants.DEFAULT_DRIVE_ID);
+		requestJson.put("fields", "*");
+		requestJson.put("image_thumbnail_process", "image/resize,w_256/format,avif");
+		requestJson.put("image_url_process", "image/resize,w_1920/format,avif");
+		requestJson.put("limit", 100);
+		requestJson.put("marker", "");
+		requestJson.put("url_expire_sec", 14400);
+		requestJson.put("order_by", "name");
+		requestJson.put("order_direction", "ASC");
+		requestJson.put("parent_file_id", fileId);
+		requestJson.put("video_thumbnail_process", "video/snapshot,t_120000,f_jpg,m_lfit,w_256,ar_auto,m_fast");
+
+		Map<String, String> headerMap = new HashMap<>();
+		headerMap.put("Content-Type", "application/json");
+		headerMap.put("Authorization", "Bearer " + Constants.ACCESS_TOKEN_OPEN);
+		headerMap.put("x-canary", "client=web,app=adrive,version=v3.17.0");
+		headerMap.put("x-device-id", Constants.DEVICE_ID);
+		headerMap.put("x-signature", sign.get(2));
+
+		String result = HttpClientUtil.doPost(openApiUrl + "/adrive/v1.0/openFile/list", requestJson.toString(), headerMap);
+		JSONObject jsonObject = JSONObject.parseObject(result);
+		//如果请求到json体不是空且不可用就刷新token
+		if (jsonObject.getJSONArray("items") == null) {
+			log.error("获取文件夹列表错误: " + result + " " + DateUtil.date());
+		}
+
+		if (jsonObject.get("code") != null
+				&& (("AccessTokenInvalid".equals(jsonObject.get("code")))
+				|| ("AccessTokenExpired".equals(jsonObject.get("code")))
+				|| ("UserNotAllowedAccessDrive".equals(jsonObject.get("code")))
+				|| ("ForbiddenDriveNotValid".equals(jsonObject.get("code"))))) {
+			refresh();
+			log.info(oauthRefreshToken());
+			headerMap.put("Authorization", "Bearer " + Constants.ACCESS_TOKEN_OPEN);
+			requestJson.put("drive_id", Constants.DEFAULT_DRIVE_ID);
+			List<String> signRetry = SignUtil.sign(appId, Constants.DEVICE_ID, Constants.USER_ID, "0");
+			createSession(signRetry.get(0), signRetry.get(2));
+			result = HttpClientUtil.doPost(openApiUrl + "/adrive/v1.0/openFile/list", requestJson.toString(), headerMap);
+			jsonObject = JSONObject.parseObject(result);
+		}
+
+		ArrayList<PanFile> panFiles = new ArrayList<>();
+		// 成功返回了文件列表
+		if (jsonObject.getJSONArray("items") != null) {
+			JSONArray items = jsonObject.getJSONArray("items");
+			for (int i = 0; i < items.size(); i++) {
+				PanFile file = new PanFile();
+				file.setFileId((String) items.getJSONObject(i).get("file_id"));
+				file.setType((String) items.getJSONObject(i).get("type"));
+				file.setName((String) items.getJSONObject(i).get("name"));
+				file.setParentFileId((String) items.getJSONObject(i).get("parent_file_id"));
+				file.setCreatedAt((String) items.getJSONObject(i).get("created_at"));
+				file.setEncrypted(false);
+				if ("file".equals(items.getJSONObject(i).get("type"))) {
+					file.setPreviewUrl((String) items.getJSONObject(i).get("thumbnail"));
+					file.setFileExtension((String) items.getJSONObject(i).get("file_extension"));
+					file.setSize(((Number) items.getJSONObject(i).get("size")).longValue());
+					String url = items.getJSONObject(i).getString("url");
+					url = (url == null) ? "https://" : url;
+					file.setUrl(url);
+				}
+				panFiles.add(file);
+			}
+		}
+
+		//文件列表中密码文件的位置
+		int passwordIndex = -1;
+
+		for (int i = 0; i < panFiles.size(); i++) {
+			//列表中如果有
+			if (passwordFileName.equals(panFiles.get(i).getName())) {
+				//找到一个名字为password的文件，如果传参为空就说明没传密码，直接返回一个文件且encrypted为true
+				if (password == null || "".equals(password)) {
+					panFiles.clear();
+					panFiles.add(new PanFile(passwordFileName, true, "file"));
+					break;
+				} else {
+					//找到一个名字为password的文件，但是传了密码参数
+					String folderPasswd = StringUtil.clearStr(HttpClientUtil.doGet(panFiles.get(i).getUrl(), null, new HashMap<>(), null));
+					//如果密码没对上
+					if (!password.equals(folderPasswd)) {
+						panFiles.clear();
+						panFiles.add(new PanFile(passwordFileName, true, "file"));
+						break;
+					} else {
+						//密码对上了，在文件列表中删除这个密码文件(同一文件夹只能一个)
+						passwordIndex = i;
 					}
 				}
 			}
@@ -264,7 +387,7 @@ public class ApiController {
 
 		String result = HttpClientUtil.doPost(openApiUrl + "/adrive/v1.0/openFile/getDownloadUrl",
 				requestJson.toString(), headerMap);
-//		System.out.println("下载结果：" + result);
+//		log.info("下载结果：" + result);
 		JSONObject jsonObject = JSONObject.parseObject(result);
 
 		if (jsonObject != null) {
@@ -300,7 +423,7 @@ public class ApiController {
 				.body(param01.toJSONString())
 				.execute()
 				.body();
-//		System.out.println("create_session: " + createSessionResult);
+		log.info("create_session: " + createSessionResult);
 	}
 
 	/**
@@ -345,7 +468,7 @@ public class ApiController {
 	@ResponseBody
 	@GetMapping(value = "/refresh")
 	public String refresh() {
-		System.out.println("刷新refresh_token: " + DateUtil.date());
+		log.info("执行刷新refresh_token");
 		String s = FileUtil.textFileToString(new File(System.getProperty("user.dir") +
 				File.separator + "AliPanConfig"));
 		Constants.setRefreshToken(s);
@@ -419,7 +542,7 @@ public class ApiController {
 			String driveResult = HttpClientUtil.doPost(openApiUrl + "/adrive/v1.0/user/getDriveInfo", null, headers);
 			JSONObject jsonDriveObject = JSONObject.parseObject(driveResult);
 			Constants.setDefaultDriveId(jsonDriveObject.getString("default_drive_id"));
-			return "刷新配置文件成功，刷新 access_token 成功！";
+			return "刷新配置文件成功，刷新 access_token(Open) 成功！";
 		}
 		return "其它问题，联系软件作者。";
 	}

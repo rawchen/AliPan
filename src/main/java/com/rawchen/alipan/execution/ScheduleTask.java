@@ -1,10 +1,12 @@
 package com.rawchen.alipan.execution;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.rawchen.alipan.config.Constants;
 import com.rawchen.alipan.controller.ApiController;
 import com.rawchen.alipan.utils.HttpClientUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @EnableScheduling
+@Slf4j
 public class ScheduleTask {
 
 	@Value("${alipan.api_url}")
@@ -35,7 +38,7 @@ public class ScheduleTask {
 	 */
 	@Scheduled(fixedRate = 7200 * 1000)
 	private void scheduleTask() {
-		System.out.println("刷新access_token: " + DateUtil.date());
+		log.info("刷新access_token: " + DateUtil.date());
 		JSONObject paramJson = new JSONObject();
 		paramJson.put("grant_type", "refresh_token");
 		paramJson.put("refresh_token", Constants.getRefreshToken());
@@ -45,9 +48,7 @@ public class ScheduleTask {
 		Constants.setDefaultDriveId((String) jsonObject.get("default_drive_id"));
 		Constants.setUserId((String) jsonObject.get("user_id"));
 		Constants.setDeviceId((String) jsonObject.get("device_id"));
-//		System.out.println(jsonObject.get("access_token"));
-
-		System.out.println("刷新access_token_open: " + DateUtil.date());
+		log.info("刷新access_token_open: " + DateUtil.date());
 		JSONObject paramJsonOpen = new JSONObject();
 		paramJsonOpen.put("client_id", "");
 		paramJsonOpen.put("client_secret", "");
@@ -56,11 +57,17 @@ public class ScheduleTask {
 		String resultOpen = HttpClientUtil.doPost(oauthTokenUrl, paramJsonOpen.toString());
 		if (!resultOpen.toLowerCase().contains("502 bad gateway")) {
 			JSONObject jsonObjectOpen = JSONObject.parseObject(resultOpen);
-			Constants.setAccessToken(jsonObjectOpen.getString("access_token"));
-			Constants.setDefaultDriveId(jsonObjectOpen.getString("default_drive_id"));
+			if ("Too Many Requests".equals(jsonObjectOpen.getString("code"))) {
+				log.error("定时获取access_token_open: Too Many Requests. " + DateUtil.date());
+			} else if (!StrUtil.isEmpty(jsonObjectOpen.getString("access_token"))) {
+				Constants.setAccessTokenOpen(jsonObjectOpen.getString("access_token"));
+				Constants.setDefaultDriveId(jsonObjectOpen.getString("default_drive_id"));
+			} else {
+				log.info("定时获取access_token_open: " + resultOpen);
+			}
 		} else {
 			// 将导致token过期
-			System.out.println("定时获取access_token_open: 502 bad gateway. " + DateUtil.date());
+			log.error("定时获取access_token_open: 502 bad gateway. ");
 		}
 	}
 
@@ -70,23 +77,5 @@ public class ScheduleTask {
 	@Scheduled(initialDelay = 60 * 1000, fixedRate = 3600 * 1000)
 	private void scheduleTaskToGetFolder() {
 		apiController.getFolder("root", null);
-//		JSONObject requestJson = new JSONObject();
-//		requestJson.put("param1", 30);
-//		requestJson.put("all", false);
-//		requestJson.put("drive_id", Constants.DEFAULT_DRIVE_ID);
-//		requestJson.put("fields", "*");
-//		requestJson.put("image_thumbnail_process", "image/resize,w_50");
-//		requestJson.put("image_url_process", "image/resize,w_1920/format,jpeg");
-//		requestJson.put("limit", 100);
-//		requestJson.put("url_expire_sec", 14400);
-//		requestJson.put("order_by", "name");
-//		requestJson.put("order_direction", "ASC");
-//		requestJson.put("parent_file_id", "root");
-//		requestJson.put("video_thumbnail_process", "video/snapshot,t_0,f_jpg,w_50");
-//
-//		Map<String, String> headerMap = new HashMap<>();
-//		headerMap.put("Content-Type", "application/json");
-//		headerMap.put("Authorization", "Bearer " + Constants.ACCESS_TOKEN);
-//		HttpClientUtil.doPost(apiUrl + "/file/list", requestJson.toString(), headerMap);
 	}
 }
