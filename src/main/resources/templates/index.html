@@ -640,16 +640,6 @@
 
 		document.querySelector('.btn.download').onclick = () => {
 			loading.style.display = 'initial';
-			// $.ajax({
-			// 	type: 'POST',
-			// 	url: "/getDownloadUrl/" + fileId,
-			// 	headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-			// 	complete: function () {loading.style.display = 'none';},
-			// 	success: function (file) {
-			// 		previewHandler.copyTextContent(null, file.url);
-			// 		location.href = file.url;
-			// 	}
-			// });
 			let downloadUrl = document.location.protocol + "//" + window.location.host +  "/d/" + fileId;
 			previewHandler.copyTextContent(null, downloadUrl);
 			location.href = downloadUrl;
@@ -679,13 +669,27 @@
 		} else {
 			document.getElementById("potplayer").style.display = "unset";
 		}
+		let urlTemp = url;
+		if (url === 'https://') {
+			loading.style.display = 'initial';
+			$.ajax({
+				async: false,
+				type: 'POST',
+				url: "/getFile/" + fileId,
+				headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+				complete: function () {loading.style.display = 'none';},
+				success: function (file) {
+					urlTemp = file.url;
+				}
+			});
+		}
 		switch (contentType) {
 			case 'image':
 				let img = new Image();
 				img.style.maxWidth = '100%';
 				img.style.border = '4px dotted #94b4d1';
 				img.style.padding = '6px';
-				img.src = url;
+				img.src = urlTemp;
 				let fancy = document.createElement('a');
 				// fancy.setAttribute('data-fancybox', 'image');
 				fancy.href = img.src;
@@ -702,13 +706,13 @@
 				audio.volume = 0.3;
 				audio.controls = true;
 				audio.style.width = '100%';
-				audio.src = url;
+				audio.src = urlTemp;
 				content.innerHTML = '';
 				content.append(audio);
 				break;
 			case 'video':
 				let video = document.createElement('div');
-				previewHandler.createDplayer(url, suffix, video);
+				previewHandler.createDplayer(urlTemp, suffix, video);
 				content.innerHTML = '';
 				content.append(video);
 				break;
@@ -730,7 +734,7 @@
 					loading.style.display = 'initial';
 					$.ajax({
 						type: 'GET',
-						url: url,
+						url: urlTemp,
 						dataType:"text",
 						complete: function () {loading.style.display = 'none';},
 						success: function (data) {
@@ -772,7 +776,7 @@
 				});
 				break;
 			case 'markdown':
-				renderMarkdown(url, false);
+				renderMarkdown(urlTemp, false);
 				content.style['text-align'] = 'initial';
 				break;
 			default:

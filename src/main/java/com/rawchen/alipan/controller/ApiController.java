@@ -127,7 +127,7 @@ public class ApiController {
 		JSONObject jsonObject = JSONObject.parseObject(result);
 		//如果请求到json体不是空且不可用就刷新token
 		if (jsonObject.getJSONArray("items") == null) {
-			log.error("获取文件夹列表错误: " + result + " " + DateUtil.date());
+			log.error("获取文件夹列表错误: {}", result);
 		}
 
 		if (jsonObject.get("code") != null
@@ -238,7 +238,7 @@ public class ApiController {
 		JSONObject jsonObject = JSONObject.parseObject(result);
 		//如果请求到json体不是空且不可用就刷新token
 		if (jsonObject.getJSONArray("items") == null) {
-			log.error("获取文件夹列表错误: " + result + " " + DateUtil.date());
+			log.error("获取文件夹列表错误: {}", result);
 		}
 
 		if (jsonObject.get("code") != null
