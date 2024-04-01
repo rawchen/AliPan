@@ -337,6 +337,16 @@
 	}
 
 	function renderFileList(files) {
+		if (files === null) {
+			location.reload();
+		}
+		// 缩略图
+		files.forEach(file => {
+			if (file.previewUrl !== null) {
+				let imgTemp = new Image();
+				imgTemp.src = file.previewUrl;
+			}
+		});
 		if (fullFileIdArr.length > 0) {
 			document.getElementById('arrow-back').style.color = '#545454';
 		}
@@ -357,13 +367,11 @@
 		fileList.innerHTML = '';
 
 		document.getElementById('readme').innerHTML = '';
-		if (files === null) {
-			location.reload();
-		}
 		if (files.length === 0) {
 			layer.msg('文件夹空的哦', {icon: 3, closeBtn: 2});
 
 		}
+
 		files.forEach(file => {
 			if (file.type === 'file' && (file.name.toLowerCase() === "readme.md")) {
 				renderMarkdown(file.url, true);
@@ -381,14 +389,6 @@
 						// 'https://fastly.jsdelivr.net/gh/rawchen/JsDelivr/static/blog/mail.jpg'
 					)
 				);
-			}
-		});
-
-		// 缩略图
-		files.forEach(file => {
-			if (file.previewUrl !== null) {
-				let imgTemp = new Image();
-				imgTemp.src = file.previewUrl;
 			}
 		});
 
@@ -675,7 +675,7 @@
 			$.ajax({
 				async: false,
 				type: 'POST',
-				url: "/getFile/" + fileId,
+				url: "/getDownloadUrl/" + fileId,
 				headers: {'Content-Type': 'application/x-www-form-urlencoded'},
 				complete: function () {loading.style.display = 'none';},
 				success: function (file) {

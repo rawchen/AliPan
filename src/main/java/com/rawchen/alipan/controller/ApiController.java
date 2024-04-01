@@ -329,10 +329,11 @@ public class ApiController {
 		Map<String, String> headerMap = new HashMap<>();
 		headerMap.put("Content-Type", "application/json");
 		headerMap.put("Referer", refererURL);
-		headerMap.put("Authorization", "Bearer " + Constants.ACCESS_TOKEN);
+		headerMap.put("Authorization", "Bearer " + Constants.ACCESS_TOKEN_OPEN);
 
-		String result = HttpClientUtil.doPost(apiUrl + "/file/get_download_url",
+		String result = HttpClientUtil.doPost(openApiUrl + "/adrive/v1.0/openFile/getDownloadUrl",
 				requestJson.toString(), headerMap);
+//		log.info("result: " + result);
 		JSONObject jsonObject = JSONObject.parseObject(result);
 
 		PanFile file = new PanFile();
