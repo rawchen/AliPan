@@ -11,8 +11,8 @@ alipan:
   # 开发者V3AppId
   app_id: 5dde4e1bdf9e4966b387ba58f4b3fdc3
   # AList开发者获取token
-  oauth_token_url: https://api.nn.ci/alist/ali_open/token
-#  oauth_token_url: https://api.xhofe.top/alist/ali_open/token
+#  oauth_token_url: https://api.nn.ci/alist/ali_open/token
+  oauth_token_url: https://api.xhofe.top/alist/ali_open/token
   # 自定义配置存放密码的文件名
   password_file_name: password
 
