@@ -3,10 +3,7 @@ alipan:
   parent_file_id: root
   # 阿里云盘API，默认不改动
   api_url: https://api.aliyundrive.com/v2
-  api_url_v3: https://api.aliyundrive.com/adrive/v3
-  # 阿里云盘请求来源
-  referer_url: https://www.aliyundrive.com
-  # 阿里云盘开放平台请求来源
+  # 阿里云盘开放平台
   open_api_url: https://open.aliyundrive.com
   # 开发者应用AppId
   app_id: 432fe7ab15fd4ce7bc27c1c407eab9a9

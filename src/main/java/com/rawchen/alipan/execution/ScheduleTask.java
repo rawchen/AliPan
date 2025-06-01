@@ -40,6 +40,7 @@ public class ScheduleTask {
 	 */
 	@Scheduled(fixedRate = 7200 * 1000)
 	private void scheduleTask() {
+
 		log.info("刷新access_token: " + DateUtil.date());
 		JSONObject paramJson = new JSONObject();
 		paramJson.put("grant_type", "refresh_token");
@@ -50,25 +51,15 @@ public class ScheduleTask {
 		Constants.setDefaultDriveId((String) jsonObject.get("default_drive_id"));
 		Constants.setUserId((String) jsonObject.get("user_id"));
 		Constants.setDeviceId((String) jsonObject.get("device_id"));
+
 		log.info("刷新access_token_open: " + DateUtil.date());
 		TokenBody tokenBodyOpen = new TokenBody();
 		tokenBodyOpen.setGrantType("refresh_token");
 		tokenBodyOpen.setRefreshToken(Constants.getRefreshTokenOpen());
 		String resultOpen = HttpClientUtil.doPost(oauthTokenUrl, JSON.toJSONString(tokenBodyOpen));
-		if (!resultOpen.toLowerCase().contains("502 bad gateway")) {
-			JSONObject jsonObjectOpen = JSONObject.parseObject(resultOpen);
-			if ("Too Many Requests".equals(jsonObjectOpen.getString("code"))) {
-				log.error("定时获取access_token_open: Too Many Requests. " + DateUtil.date());
-			} else if (!StrUtil.isEmpty(jsonObjectOpen.getString("access_token"))) {
-				Constants.setAccessTokenOpen(jsonObjectOpen.getString("access_token"));
-				Constants.setDefaultDriveId(jsonObjectOpen.getString("default_drive_id"));
-			} else {
-				log.info("定时获取access_token_open: " + resultOpen);
-			}
-		} else {
-			// 将导致token过期
-			log.error("定时获取access_token_open: 502 bad gateway. ");
-		}
+		JSONObject jsonObjectOpen = JSONObject.parseObject(resultOpen);
+		Constants.setAccessTokenOpen(jsonObjectOpen.getString("access_token"));
+		Constants.setDefaultDriveId(jsonObjectOpen.getString("default_drive_id"));
 	}
 
 	/**
