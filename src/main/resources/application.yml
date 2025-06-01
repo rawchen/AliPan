@@ -8,11 +8,12 @@ alipan:
   referer_url: https://www.aliyundrive.com
   # 阿里云盘开放平台请求来源
   open_api_url: https://open.aliyundrive.com
-  # 开发者V3AppId
-  app_id: 5dde4e1bdf9e4966b387ba58f4b3fdc3
+  # 开发者应用AppId
+  app_id: 432fe7ab15fd4ce7bc27c1c407eab9a9
+  # 开发者应用AppSecret
+  app_secret: a8b0xxxxxxxxxxxxxxxxxxxxx
   # AList开发者获取token
-#  oauth_token_url: https://api.nn.ci/alist/ali_open/token
-  oauth_token_url: https://api.xhofe.top/alist/ali_open/token
+  oauth_token_url: https://pan.rawchen.com/api/token
   # 自定义配置存放密码的文件名
   password_file_name: password
 

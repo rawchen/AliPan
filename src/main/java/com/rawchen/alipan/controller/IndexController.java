@@ -46,7 +46,12 @@ public class IndexController {
 	}
 
 	@RequestMapping("/token")
-	public String token() {
-		return "token";
+	public String toToken() {
+		return "redirect:" + "https://www.alipan.com/o/oauth/authorize?client_id=432fe7ab15fd4ce7bc27c1c407eab9a9&redirect_uri=https%3A%2F%2Fpan.rawchen.com%2Fcallback&scope=user:base,file:all:read,file:all:write&state=Ojo=&response_type=code&relogin=true";
 	}
+
+//	@RequestMapping("/token")
+//	public String token() {
+//		return "token";
+//	}
 }

@@ -167,7 +167,7 @@
 			loading.style.display = 'initial';
 			$.ajax({
 				type: 'POST',
-				url: "/getFolder/" + "[[${fileId}]]",
+				url: "/getFolderOpen/" + "[[${fileId}]]",
 				headers: {'Content-Type': 'application/x-www-form-urlencoded'},
 				complete: function () {loading.style.display = 'none';},
 				success: function (files) {
@@ -192,7 +192,7 @@
 			loading.style.display = 'initial';
 			$.ajax({
 				type: 'POST',
-				url: "/getFile/" + "[[${fileId}]]",
+				url: "/getFileOpen/" + "[[${fileId}]]",
 				headers: {'Content-Type': 'application/x-www-form-urlencoded'},
 				complete: function () {loading.style.display = 'none';},
 				success: function (file) {
@@ -317,7 +317,7 @@
 		loading.style.display = 'initial';
 		$.ajax({
 			type: 'POST',
-			url: "/getFolder/" + parentFileId,
+			url: "/getFolderOpen/" + parentFileId,
 			headers: {'Content-Type': 'application/x-www-form-urlencoded'},
 			complete: function () {loading.style.display = 'none';},
 			success: function (files) {
@@ -342,7 +342,8 @@
 		}
 		// 缩略图
 		files.forEach(file => {
-			if (file.previewUrl !== null) {
+			// 判断file.previewUrl不是undefined且非空
+			if (file.previewUrl !== undefined && file.previewUrl !== null && file.previewUrl !== '') {
 				let imgTemp = new Image();
 				imgTemp.src = file.previewUrl;
 			}
@@ -734,7 +735,7 @@
 					loading.style.display = 'initial';
 					$.ajax({
 						type: 'GET',
-						url: urlTemp,
+							url: urlTemp,
 						dataType:"text",
 						complete: function () {loading.style.display = 'none';},
 						success: function (data) {
@@ -833,7 +834,7 @@
 				loading.style.display = 'initial';
 				$.ajax({
 					type: 'POST',
-					url: "/getFolder/" + fileId,
+					url: "/getFolderOpen/" + fileId,
 					data: {password: passwd},
 					headers: {'Content-Type': 'application/x-www-form-urlencoded'},
 					complete: function () {loading.style.display = 'none';},
@@ -871,7 +872,7 @@
 				loading.style.display = 'initial';
 				$.ajax({
 					type: 'POST',
-					url: "/getFolder/" + fileId,
+					url: "/getFolderOpen/" + fileId,
 					headers: {'Content-Type': 'application/x-www-form-urlencoded'},
 					complete: function () {loading.style.display = 'none';},
 					success: function (files) {
@@ -927,7 +928,7 @@
 				loading.style.display = 'initial';
 				$.ajax({
 					type: 'POST',
-					url: "/getFolder/" + fileId,
+					url: "/getFolderOpen/" + fileId,
 					headers: {'Content-Type': 'application/x-www-form-urlencoded'},
 					complete: function () {loading.style.display = 'none';},
 					success: function (files) {
@@ -1106,7 +1107,7 @@
 			loading.style.display = 'initial';
 			$.ajax({
 				type: 'POST',
-				url: "/getFolder/" + fileId,
+				url: "/getFolderOpen/" + fileId,
 				headers: {'Content-Type': 'application/x-www-form-urlencoded'},
 				complete: function () {loading.style.display = 'none';},
 				success: function (files) {
@@ -1119,7 +1120,7 @@
 			loading.style.display = 'initial';
 			$.ajax({
 				type: 'POST',
-				url: "/getFile/" + fileId,
+				url: "/getFileOpen/" + fileId,
 				headers: {'Content-Type': 'application/x-www-form-urlencoded'},
 				complete: function () {loading.style.display = 'none';},
 				success: function (file) {

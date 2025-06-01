@@ -2,9 +2,11 @@ package com.rawchen.alipan.execution;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.rawchen.alipan.config.Constants;
 import com.rawchen.alipan.controller.ApiController;
+import com.rawchen.alipan.entity.TokenBody;
 import com.rawchen.alipan.utils.HttpClientUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,12 +51,10 @@ public class ScheduleTask {
 		Constants.setUserId((String) jsonObject.get("user_id"));
 		Constants.setDeviceId((String) jsonObject.get("device_id"));
 		log.info("刷新access_token_open: " + DateUtil.date());
-		JSONObject paramJsonOpen = new JSONObject();
-		paramJsonOpen.put("client_id", "");
-		paramJsonOpen.put("client_secret", "");
-		paramJsonOpen.put("grant_type", "refresh_token");
-		paramJsonOpen.put("refresh_token", Constants.getRefreshTokenOpen());
-		String resultOpen = HttpClientUtil.doPost(oauthTokenUrl, paramJsonOpen.toString());
+		TokenBody tokenBodyOpen = new TokenBody();
+		tokenBodyOpen.setGrantType("refresh_token");
+		tokenBodyOpen.setRefreshToken(Constants.getRefreshTokenOpen());
+		String resultOpen = HttpClientUtil.doPost(oauthTokenUrl, JSON.toJSONString(tokenBodyOpen));
 		if (!resultOpen.toLowerCase().contains("502 bad gateway")) {
 			JSONObject jsonObjectOpen = JSONObject.parseObject(resultOpen);
 			if ("Too Many Requests".equals(jsonObjectOpen.getString("code"))) {

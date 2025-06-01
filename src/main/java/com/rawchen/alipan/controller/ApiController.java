@@ -1,11 +1,14 @@
 package com.rawchen.alipan.controller;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpRequest;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.rawchen.alipan.config.Constants;
 import com.rawchen.alipan.entity.PanFile;
+import com.rawchen.alipan.entity.TokenBody;
 import com.rawchen.alipan.utils.FileUtil;
 import com.rawchen.alipan.utils.HttpClientUtil;
 import com.rawchen.alipan.utils.SignUtil;
@@ -50,12 +53,16 @@ public class ApiController {
 	@Value("${alipan.app_id}")
 	String appId;
 
+	@Value("${alipan.app_secret}")
+	String appSecret;
+
 	/**
 	 * 文件对象
 	 *
 	 * @param fileId
 	 * @return
 	 */
+	@Deprecated
 	@ResponseBody
 	@PostMapping(value = "/getFile/{fileId}")
 	public PanFile getFile(@PathVariable("fileId") String fileId) {
@@ -85,7 +92,52 @@ public class ApiController {
 		file.setFileExtension((String) jsonObject.get("file_extension"));
 		file.setParentFileId((String) jsonObject.get("parent_file_id"));
 		file.setSize(((Number) jsonObject.get("size")).longValue());
-		file.setUrl((String) jsonObject.get("url"));
+		String url =  jsonObject.getString("url");
+		url = (StrUtil.isEmpty(url)) ? "https://" : url;
+		file.setUrl(url);
+		return file;
+	}
+
+	/**
+	 * 文件对象(Open)
+	 *
+	 * @param fileId
+	 * @return
+	 */
+	@ResponseBody
+	@PostMapping(value = "/getFileOpen/{fileId}")
+	public PanFile getFileOpen(@PathVariable("fileId") String fileId) {
+
+//		List<String> sign = SignUtil.sign(appId, Constants.DEVICE_ID, Constants.USER_ID, "0");
+//		createSession(sign.get(0), sign.get(2));
+
+		JSONObject requestJson = new JSONObject();
+		requestJson.put("drive_id", Constants.DEFAULT_DRIVE_ID);
+		requestJson.put("file_id", fileId);
+		requestJson.put("fields", "url,name_path");
+		requestJson.put("video_thumbnail_width", 120);
+		requestJson.put("image_thumbnail_width", 1920);
+		Map<String, String> headerMap = new HashMap<>();
+		headerMap.put("Content-Type", "application/json");
+//		headerMap.put("Referer", refererURL);
+		headerMap.put("Authorization", "Bearer " + Constants.ACCESS_TOKEN_OPEN);
+//		headerMap.put("x-canary", "client=web,app=adrive,version=v3.17.0");
+//		headerMap.put("x-device-id", Constants.DEVICE_ID);
+//		headerMap.put("x-signature", sign.get(2));
+
+		String result = HttpClientUtil.doPost(openApiUrl + "/adrive/v1.0/openFile/get", requestJson.toString(), headerMap);
+		JSONObject jsonObject = JSONObject.parseObject(result);
+		PanFile file = new PanFile();
+		file.setFileId((String) jsonObject.get("file_id"));
+		file.setType((String) jsonObject.get("type"));
+		file.setName((String) jsonObject.get("name"));
+		file.setCreatedAt((String) jsonObject.get("created_at"));
+		file.setFileExtension((String) jsonObject.get("file_extension"));
+		file.setParentFileId((String) jsonObject.get("parent_file_id"));
+		file.setSize(((Number) jsonObject.get("size")).longValue());
+		String url = jsonObject.getString("url");
+		url = (StrUtil.isEmpty(url)) ? "https://" : url;
+		file.setUrl(url);
 		return file;
 	}
 
@@ -95,6 +147,7 @@ public class ApiController {
 	 * @param fileId
 	 * @return
 	 */
+	@Deprecated
 	@ResponseBody
 	@PostMapping(value = "/getFolderV1/{fileId}")
 	public List<PanFile> getFolderV1(@PathVariable("fileId") String fileId, @RequestParam(required = false) String password) {
@@ -207,32 +260,34 @@ public class ApiController {
 	 * @return
 	 */
 	@ResponseBody
-	@PostMapping(value = "/getFolder/{fileId}")
+	@PostMapping(value = "/getFolderOpen/{fileId}")
 	public List<PanFile> getFolder(@PathVariable("fileId") String fileId, @RequestParam(required = false) String password) {
 
-		List<String> sign = SignUtil.sign(appId, Constants.DEVICE_ID, Constants.USER_ID, "0");
-		createSession(sign.get(0), sign.get(2));
+//		List<String> sign = SignUtil.sign(appId, Constants.DEVICE_ID, Constants.USER_ID, "0");
+//		createSession(sign.get(0), sign.get(2));
 
 		JSONObject requestJson = new JSONObject();
 		requestJson.put("all", false);
 		requestJson.put("drive_id", Constants.DEFAULT_DRIVE_ID);
 		requestJson.put("fields", "*");
-		requestJson.put("image_thumbnail_process", "image/resize,w_256/format,avif");
-		requestJson.put("image_url_process", "image/resize,w_1920/format,avif");
+//		requestJson.put("image_thumbnail_process", "image/resize,w_256/format,avif");
+//		requestJson.put("image_url_process", "image/resize,w_1920/format,avif");
 		requestJson.put("limit", 100);
 		requestJson.put("marker", "");
 		requestJson.put("url_expire_sec", 14400);
 		requestJson.put("order_by", "name");
 		requestJson.put("order_direction", "ASC");
 		requestJson.put("parent_file_id", fileId);
-		requestJson.put("video_thumbnail_process", "video/snapshot,t_120000,f_jpg,m_lfit,w_256,ar_auto,m_fast");
+//		requestJson.put("video_thumbnail_process", "video/snapshot,t_120000,f_jpg,m_lfit,w_256,ar_auto,m_fast");
+		requestJson.put("video_thumbnail_width", 120);
+		requestJson.put("image_thumbnail_width", 1920);
 
 		Map<String, String> headerMap = new HashMap<>();
 		headerMap.put("Content-Type", "application/json");
 		headerMap.put("Authorization", "Bearer " + Constants.ACCESS_TOKEN_OPEN);
-		headerMap.put("x-canary", "client=web,app=adrive,version=v3.17.0");
-		headerMap.put("x-device-id", Constants.DEVICE_ID);
-		headerMap.put("x-signature", sign.get(2));
+//		headerMap.put("x-canary", "client=web,app=adrive,version=v3.17.0");
+//		headerMap.put("x-device-id", Constants.DEVICE_ID);
+//		headerMap.put("x-signature", sign.get(2));
 
 		String result = HttpClientUtil.doPost(openApiUrl + "/adrive/v1.0/openFile/list", requestJson.toString(), headerMap);
 		JSONObject jsonObject = JSONObject.parseObject(result);
@@ -250,8 +305,8 @@ public class ApiController {
 			log.info(oauthRefreshToken());
 			headerMap.put("Authorization", "Bearer " + Constants.ACCESS_TOKEN_OPEN);
 			requestJson.put("drive_id", Constants.DEFAULT_DRIVE_ID);
-			List<String> signRetry = SignUtil.sign(appId, Constants.DEVICE_ID, Constants.USER_ID, "0");
-			createSession(signRetry.get(0), signRetry.get(2));
+//			List<String> signRetry = SignUtil.sign(appId, Constants.DEVICE_ID, Constants.USER_ID, "0");
+//			createSession(signRetry.get(0), signRetry.get(2));
 			result = HttpClientUtil.doPost(openApiUrl + "/adrive/v1.0/openFile/list", requestJson.toString(), headerMap);
 			jsonObject = JSONObject.parseObject(result);
 		}
@@ -328,7 +383,7 @@ public class ApiController {
 		requestJson.put("expire_sec", 14400);
 		Map<String, String> headerMap = new HashMap<>();
 		headerMap.put("Content-Type", "application/json");
-		headerMap.put("Referer", refererURL);
+//		headerMap.put("Referer", refererURL);
 		headerMap.put("Authorization", "Bearer " + Constants.ACCESS_TOKEN_OPEN);
 
 		String result = HttpClientUtil.doPost(openApiUrl + "/adrive/v1.0/openFile/getDownloadUrl",
@@ -383,7 +438,7 @@ public class ApiController {
 		requestJson.put("expire_sec", 14400);
 		Map<String, String> headerMap = new HashMap<>();
 		headerMap.put("Content-Type", "application/json");
-		headerMap.put("Referer", refererURL);
+//		headerMap.put("Referer", refererURL);
 		headerMap.put("Authorization", "Bearer " + Constants.ACCESS_TOKEN_OPEN);
 
 		String result = HttpClientUtil.doPost(openApiUrl + "/adrive/v1.0/openFile/getDownloadUrl",
@@ -443,7 +498,7 @@ public class ApiController {
 		requestJson.put("file_id", fileId);
 		Map<String, String> headerMap = new HashMap<>();
 		headerMap.put("Content-Type", "application/json");
-		headerMap.put("Referer", refererURL);
+//		headerMap.put("Referer", refererURL);
 		headerMap.put("Authorization", "Bearer " + Constants.ACCESS_TOKEN);
 
 		String result = HttpClientUtil.doPost(apiUrl + "/file/get_office_preview_url",
@@ -514,13 +569,10 @@ public class ApiController {
 			return "确认配置文件 AliPanConfig 首行是否为你的 refresh_token！";
 		}
 		Constants.setRefreshTokenOpen(s);
-		JSONObject requestJson = new JSONObject();
-		requestJson.put("client_id", "");
-		requestJson.put("client_secret", "");
-		requestJson.put("grant_type", "refresh_token");
-		requestJson.put("refresh_token", Constants.getRefreshTokenOpen());
-
-		String result = HttpClientUtil.doPost(oauthTokenUrl, requestJson.toString());
+		TokenBody tokenBodyOpen = new TokenBody();
+		tokenBodyOpen.setGrantType("refresh_token");
+		tokenBodyOpen.setRefreshToken(Constants.getRefreshTokenOpen());
+		String result = HttpClientUtil.doPost(oauthTokenUrl, JSON.toJSONString(tokenBodyOpen));
 		if (StringUtil.isEmpty(result)) {
 			return "获取refresh_token失败，检查接口：" + oauthTokenUrl;
 		}
@@ -546,5 +598,43 @@ public class ApiController {
 			return "刷新配置文件成功，刷新 access_token(Open) 成功！";
 		}
 		return "其它问题，联系软件作者。";
+	}
+
+	/**
+	 * 授权 code 获取 access_token
+	 *
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/callback")
+	public JSONObject callback(String code) {
+		log.info("回调授权/callback，授权码: {}", code);
+		JSONObject paramJson = new JSONObject();
+		paramJson.put("client_id", appId);
+		paramJson.put("client_secret", appSecret);
+		paramJson.put("grant_type", "authorization_code");
+		paramJson.put("code", code);
+		String result = HttpClientUtil.doPost(openApiUrl + "/oauth/access_token", paramJson.toString());
+		JSONObject jsonObject = JSONObject.parseObject(result);
+		return jsonObject;
+	}
+
+	/**
+	 * 刷新Token
+	 *
+	 * @return
+	 */
+	@ResponseBody
+	@PostMapping(value = "/api/token")
+	public JSONObject token(@RequestBody TokenBody tokenBody) {
+		log.info("更新令牌/token，授权码: {}", tokenBody.getRefreshToken());
+		JSONObject paramJson = new JSONObject();
+		paramJson.put("client_id", appId);
+		paramJson.put("client_secret", appSecret);
+		paramJson.put("grant_type", tokenBody.getGrantType());
+		paramJson.put("refresh_token", tokenBody.getRefreshToken());
+		String result = HttpClientUtil.doPost(openApiUrl + "/oauth/access_token", paramJson.toString());
+		JSONObject jsonObject = JSONObject.parseObject(result);
+		return jsonObject;
 	}
 }
