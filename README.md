@@ -16,8 +16,9 @@
 
 * 确保java8及以上环境，下载项目后通过IDEA打开，可配置application.yml中的端口号等，通过Maven打包jar运行，没有IDEA也可配置Maven命令执行`mvn clean package`。
 
-**refresh_token获取方法：**
+**refresh_token获取方法(两个都要获取一次)：**
 > https://api.rawchen.com/alipan
+<br>
 > https://pan.rawchen.com/token
 
 
