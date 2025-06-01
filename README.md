@@ -8,16 +8,16 @@
 
 ## 使用
 
-* 确保java8及以上环境，在[releases](https://github.com/rawchen/AliPan/releases)页面下载jar运行文件。
+* 确保java8及以上环境，在[releases](https://github.com/rawchen/AliPan/releases)页面下载最新jar运行文件（最好下载最新源码后mvn打包）。
 * 通过`java -jar AliPan.jar`运行该程序，默认访问地址：[http://localhost:8899](http://localhost:8899)。
-* 通过以下 [refresh_token获取方法](https://api.qqil.cn/alipan)拿到后，粘贴到jar包同路径下生成的配置文件`AliPanConfig`中（可记事本编辑）。
+* 通过以下refresh_token获取方法拿到后，粘贴到jar包同路径下生成的配置文件`AliPanConfig`和`AliPanConfigOpen`中（可记事本编辑）。
 
 ## 开发
 
 * 确保java8及以上环境，下载项目后通过IDEA打开，可配置application.yml中的端口号等，通过Maven打包jar运行，没有IDEA也可配置Maven命令执行`mvn clean package`。
 
 **refresh_token获取方法：**
-> https://api.rawchen.com/alipan  
+> https://api.rawchen.com/alipan
 > https://pan.rawchen.com/token
 
 
@@ -49,6 +49,12 @@
 使用时如需密码保护一个文件夹及可在电脑上创建名为`password`的无任何后缀的文本文件，并通过记事本打开输入你要设定的密码。然后上传到云盘需要加密的文件夹内。开发时在`application.yml`可自定义加密文件的名称。
 
 开发时在`application.yml`中你可以自定义`parent_file_id`(要展示的根文件夹id，可通过对文件夹鼠标右键点击分享粘贴链接后查看id，默认为整个云盘根目录root)。
+
+## 问题反馈
+
+Q: 为什么要获取两个refresh_token存到两个文件？
+<br>
+A: 因为云盘开放平台支持标准OAuth2.0授权协议管理，易于管理大部分接口，所以使用的开放平台应用授权。但是原生文档预览接口开放平台并不提供需要原生接口支持，所以要获取原生refresh_token。
 
 ## 案例截图
 
