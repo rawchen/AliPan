@@ -18,7 +18,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -249,9 +248,7 @@ public class ApiController {
 	@ResponseBody
 	@Cacheable(value = "folderCache", key = "#fileId")
 	@PostMapping(value = "/getFolderOpen/{fileId}")
-	public List<PanFile> getFolder(@PathVariable("fileId") String fileId, @RequestParam(required = false) String password, HttpServletResponse response) {
-
-		response.addHeader("Cache-Control", "public, max-age=7200");
+	public List<PanFile> getFolder(@PathVariable("fileId") String fileId, @RequestParam(required = false) String password) {
 
 		JSONObject requestJson = new JSONObject();
 		requestJson.put("all", false);

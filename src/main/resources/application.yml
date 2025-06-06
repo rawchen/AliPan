@@ -32,7 +32,7 @@ spring:
   cache:
     type: caffeine
     caffeine:
-      spec: maximumSize=1000,expireAfterWrite=5m
+      spec: maximumSize=1000,expireAfterWrite=1h
 
   # 热部署
   devtools:
