@@ -1,7 +1,6 @@
 package com.rawchen.alipan.execution;
 
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.rawchen.alipan.config.Constants;
@@ -62,11 +61,11 @@ public class ScheduleTask {
 		Constants.setDefaultDriveId(jsonObjectOpen.getString("default_drive_id"));
 	}
 
-	/**
-	 * 调用目录接口，第一次延迟1分钟后执行，之后按每1小时调用一次
-	 */
-	@Scheduled(initialDelay = 60 * 1000, fixedRate = 3600 * 1000)
-	private void scheduleTaskToGetFolder() {
-		apiController.getFolder("root", null);
-	}
+//	/**
+//	 * 调用目录接口，第一次延迟1分钟后执行，之后按每1小时调用一次
+//	 */
+//	@Scheduled(initialDelay = 60 * 1000, fixedRate = 3600 * 1000)
+//	private void scheduleTaskToGetFolder() {
+//		apiController.getFolder("root", null);
+//	}
 }

@@ -28,6 +28,12 @@ spring:
             enabled: true
             paths: /**
 
+  # 缓存
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=1000,expireAfterWrite=5m
+
   # 热部署
   devtools:
     restart:

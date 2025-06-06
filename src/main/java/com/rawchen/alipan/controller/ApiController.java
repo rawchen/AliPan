@@ -1,6 +1,5 @@
 package com.rawchen.alipan.controller;
 
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpRequest;
 import com.alibaba.fastjson.JSON;
@@ -15,9 +14,11 @@ import com.rawchen.alipan.utils.SignUtil;
 import com.rawchen.alipan.utils.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -246,8 +247,11 @@ public class ApiController {
 	 * @return
 	 */
 	@ResponseBody
+	@Cacheable(value = "folderCache", key = "#fileId")
 	@PostMapping(value = "/getFolderOpen/{fileId}")
-	public List<PanFile> getFolder(@PathVariable("fileId") String fileId, @RequestParam(required = false) String password) {
+	public List<PanFile> getFolder(@PathVariable("fileId") String fileId, @RequestParam(required = false) String password, HttpServletResponse response) {
+
+		response.addHeader("Cache-Control", "public, max-age=7200");
 
 		JSONObject requestJson = new JSONObject();
 		requestJson.put("all", false);
