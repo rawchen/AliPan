@@ -18,11 +18,9 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @CrossOrigin
 @Controller
@@ -246,10 +244,16 @@ public class ApiController {
 	 * @return
 	 */
 	@ResponseBody
-	@Cacheable(value = "folderCache", key = "#fileId")
+	@Cacheable(value = "folderCache",
+			key = "#fileId + '_' + #request.getHeader('X-Session-Id')",
+			unless = "#result == null or #result.isEmpty() or (#result.size() == 1 and #result.get(0).encrypted)")
 	@PostMapping(value = "/getFolderOpen/{fileId}")
-	public List<PanFile> getFolder(@PathVariable("fileId") String fileId, @RequestParam(required = false) String password) {
+	public List<PanFile> getFolder(@PathVariable("fileId") String fileId, @RequestParam(required = false) String password, HttpServletRequest request) {
 
+		String sessionId = request.getHeader("X-Session-Id");
+		if (sessionId == null) {
+			return Collections.emptyList();
+		}
 		JSONObject requestJson = new JSONObject();
 		requestJson.put("all", false);
 		requestJson.put("drive_id", Constants.DEFAULT_DRIVE_ID);
@@ -305,6 +309,12 @@ public class ApiController {
 					String url = items.getJSONObject(i).getString("url");
 					url = (url == null) ? "https://" : url;
 					file.setUrl(url);
+					// 超过100M的图片不显示预览图（开放平台不提供）
+					if (StrUtil.isNotEmpty(file.getFileExtension())
+							&& (file.getFileExtension().equalsIgnoreCase("jpg") || file.getFileExtension().equalsIgnoreCase("jpeg") || file.getFileExtension().equalsIgnoreCase("png"))
+							&& file.getSize() >= 104857600) {
+						file.setPreviewUrl(null);
+					}
 				}
 				panFiles.add(file);
 			}

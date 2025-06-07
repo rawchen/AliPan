@@ -144,6 +144,8 @@
 	let fullFileIdArr = [];
 	let watchFileState = false;
 
+	let sessionId = getOrCreateSessionId();
+
 	let loading = document.querySelector('.loading');
 
 	$right = $('.right');
@@ -168,7 +170,7 @@
 			$.ajax({
 				type: 'POST',
 				url: "/getFolderOpen/" + "[[${fileId}]]",
-				headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+				headers: {'Content-Type': 'application/x-www-form-urlencoded', 'X-Session-Id': sessionId},
 				complete: function () {loading.style.display = 'none';},
 				success: function (files) {
 					if (window.localStorage.getItem("thumbnailState") === "1") {
@@ -318,7 +320,7 @@
 		$.ajax({
 			type: 'POST',
 			url: "/getFolderOpen/" + parentFileId,
-			headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+			headers: {'Content-Type': 'application/x-www-form-urlencoded', 'X-Session-Id': sessionId},
 			complete: function () {loading.style.display = 'none';},
 			success: function (files) {
 				dealFiles(files, parentFileId, true);
@@ -345,11 +347,12 @@
 			// 判断file.previewUrl不是undefined且非空
 			if (file.previewUrl !== undefined && file.previewUrl !== null && file.previewUrl !== '') {
 				let imgTemp = new Image();
+				imgTemp.referrerPolicy = 'no-referrer';
 				imgTemp.src = file.previewUrl;
 			}
 		});
 		if (fullFileIdArr.length > 0) {
-			document.getElementById('arrow-back').style.color = '#545454';
+			document.getElementById('arrow-back').style.color = '#000000';
 		}
 		watchFileState = false;
 
@@ -658,7 +661,7 @@
 		if (fullFileIdArr[fullFileIdArr.length - 1] !== fileId) {
 			fullFileIdArr.push(fileId);
 		}
-		document.getElementById('arrow-back').style.color = '#545454';
+		document.getElementById('arrow-back').style.color = '#000000';
 		switchRightDisplay('preview');
 		watchFileState = true;
 
@@ -686,20 +689,26 @@
 		}
 		switch (contentType) {
 			case 'image':
-				let img = new Image();
-				img.style.maxWidth = '100%';
-				img.style.border = '4px dotted #94b4d1';
-				img.style.padding = '6px';
-				img.src = urlTemp;
-				let fancy = document.createElement('a');
-				// fancy.setAttribute('data-fancybox', 'image');
-				fancy.href = img.src;
-				fancy.target = '_blank';
-				fancy.append(img);
-				content.innerHTML = '';
-				content.append(fancy);
-				// layer.msg('低分辨率预览中, 请自行下载原图', {icon: 3, closeBtn: 2});
-				break;
+				if ((size.indexOf(' MB') >= 0 && size.split(' ')[0] > 100) || (size.indexOf(' GB') >= 0)) {
+					content.style['text-align'] = 'center';
+					content.innerHTML = '该图片超过100MB不支持预览';
+					break;
+				} else {
+					let img = new Image();
+					img.style.maxWidth = '100%';
+					img.style.border = '4px dotted #94b4d1';
+					img.style.padding = '6px';
+					img.src = urlTemp;
+					let fancy = document.createElement('a');
+					// fancy.setAttribute('data-fancybox', 'image');
+					fancy.href = img.src;
+					fancy.target = '_blank';
+					fancy.append(img);
+					content.innerHTML = '';
+					content.append(fancy);
+					// layer.msg('低分辨率预览中, 请自行下载原图', {icon: 3, closeBtn: 2});
+					break;
+				}
 			case 'audio':
 				let audio = new Audio();
 				audio.style.outline = 'none';
@@ -836,7 +845,7 @@
 					type: 'POST',
 					url: "/getFolderOpen/" + fileId,
 					data: {password: passwd},
-					headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+					headers: {'Content-Type': 'application/x-www-form-urlencoded', 'X-Session-Id': sessionId},
 					complete: function () {loading.style.display = 'none';},
 					success: function (files) {
 						//密码错了
@@ -873,7 +882,7 @@
 				$.ajax({
 					type: 'POST',
 					url: "/getFolderOpen/" + fileId,
-					headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+					headers: {'Content-Type': 'application/x-www-form-urlencoded', 'X-Session-Id': sessionId},
 					complete: function () {loading.style.display = 'none';},
 					success: function (files) {
 						dealFiles(files, fileId, false);
@@ -929,7 +938,7 @@
 				$.ajax({
 					type: 'POST',
 					url: "/getFolderOpen/" + fileId,
-					headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+					headers: {'Content-Type': 'application/x-www-form-urlencoded', 'X-Session-Id': sessionId},
 					complete: function () {loading.style.display = 'none';},
 					success: function (files) {
 						dealFiles(files, fileId, false);
@@ -1108,7 +1117,7 @@
 			$.ajax({
 				type: 'POST',
 				url: "/getFolderOpen/" + fileId,
-				headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+				headers: {'Content-Type': 'application/x-www-form-urlencoded', 'X-Session-Id': sessionId},
 				complete: function () {loading.style.display = 'none';},
 				success: function (files) {
 					renderFileList(files);
@@ -1241,5 +1250,34 @@
 			context.style.display = "none";
 		});
 	}
+
+	// 生成 UUID（简洁版本）
+	function generateSessionId() {
+		return ([1e7]+-1e3+-4e3+-8e3+-1e11)
+				.replace(/[018]/g, c =>
+						(c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+				);
+	}
+
+	// 设置 Cookie，带有效期（单位：秒）
+	function setCookie(name, value, maxAgeSeconds) {
+		document.cookie = `${name}=${value}; path=/; max-age=${maxAgeSeconds}; SameSite=Lax`;
+	}
+
+	// 获取 Cookie 值
+	function getCookie(name) {
+		const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+		return match ? match[2] : null;
+	}
+
+	function getOrCreateSessionId() {
+		let sessionId = getCookie('anon_sessionid');
+		if (!sessionId) {
+			sessionId = generateSessionId();
+			setCookie('anon_sessionid', sessionId, 7200); // 2 小时有效
+		}
+		return sessionId;
+	}
+
 </script>
 </html>
