@@ -285,7 +285,6 @@ public class ApiController {
 				|| ("ForbiddenDriveNotValid".equals(jsonObject.get("code"))))) {
 			log.info(refreshOpen());
 			headerMap.put("Authorization", "Bearer " + Constants.ACCESS_TOKEN_OPEN);
-			requestJson.put("drive_id", Constants.DEFAULT_DRIVE_ID);
 			result = HttpClientUtil.doPost(openApiUrl + "/adrive/v1.0/openFile/list", requestJson.toString(), headerMap);
 			jsonObject = JSONObject.parseObject(result);
 		}
@@ -523,31 +522,35 @@ public class ApiController {
 	@ResponseBody
 	@GetMapping(value = "/refresh_original")
 	public String refreshOriginal() {
-		log.info("执行刷新refresh_token");
-		String s = FileUtil.textFileToString(new File(System.getProperty("user.dir") +
-				File.separator + "AliPanConfig"));
-		Constants.setRefreshToken(s);
+		log.info("执行刷新refresh_token_original");
+//		String s = FileUtil.textFileToString(new File(System.getProperty("user.dir") +
+//				File.separator + "AliPanConfig"));
+//		Constants.setRefreshToken(s);
 		JSONObject requestJson = new JSONObject();
 		requestJson.put("grant_type", "refresh_token");
 		requestJson.put("refresh_token", Constants.getRefreshToken());
 
 		String result = HttpClientUtil.doPost(apiUrl + "/account/token", requestJson.toString());
+		if (StringUtil.isEmpty(result)) {
+			return "refreshOriginal()出错：，检查接口：" + apiUrl + "/account/token";
+		}
 		JSONObject jsonObject = JSONObject.parseObject(result);
 		if (jsonObject.get("code") != null) {
-			return "确认配置文件 AliPanConfig 首行是否为你的 refresh_token！";
+			return "refreshOriginal()出错：" + result;
 		}
 
 		if (jsonObject.get("code") == null && jsonObject.get("access_token") != null) {
 			//刷新一次refresh_token到AliPanConfig
-			String refreshToken = (String) jsonObject.get("refresh_token");
-			if (refreshToken != null  && !"".equals(refreshToken)) {
-				FileUtil.stringToTextFile(refreshToken, new File(System.getProperty("user.dir") +
-						File.separator + "AliPanConfig"));
-			}
+//			String refreshToken = (String) jsonObject.get("refresh_token");
+//			if (refreshToken != null  && !"".equals(refreshToken)) {
+//				FileUtil.stringToTextFile(refreshToken, new File(System.getProperty("user.dir") +
+//						File.separator + "AliPanConfig"));
+//			}
 			//更新一次access_token到Constants
 			Constants.setAccessToken((String) jsonObject.get("access_token"));
-			Constants.setRefreshToken(refreshToken);
-			Constants.setDefaultDriveId((String) jsonObject.get("default_drive_id"));
+//			Constants.setRefreshToken(refreshToken);
+//			Constants.setDefaultDriveId((String) jsonObject.get("default_drive_id"));
+//			log.info("refreshOriginal() default_drive_id: {}", Constants.getDefaultDriveId());
 			return "刷新配置文件成功，刷新 access_token 成功！";
 		}
 		return "其它问题，联系软件作者。";
@@ -561,39 +564,34 @@ public class ApiController {
 	@ResponseBody
 	@GetMapping(value = "/refresh_open")
 	public String refreshOpen() {
-		File configFile = new File(System.getProperty("user.dir") +
-				File.separator + "AliPanConfigOpen");
-		String s = FileUtil.textFileToString(configFile);
-		if (StringUtil.isEmpty(s)) {
-			return "确认配置文件 AliPanConfig 首行是否为你的 refresh_token！";
-		}
-		Constants.setRefreshTokenOpen(s);
+		log.info("执行刷新refresh_token_open");
+//		File configFile = new File(System.getProperty("user.dir") +
+//				File.separator + "AliPanConfigOpen");
+//		String s = FileUtil.textFileToString(configFile);
+//		if (StringUtil.isEmpty(s)) {
+//			return "确认配置文件 AliPanConfig 首行是否为你的 refresh_token！";
+//		}
+//		Constants.setRefreshTokenOpen(s);
 		TokenBody tokenBodyOpen = new TokenBody();
 		tokenBodyOpen.setGrantType("refresh_token");
 		tokenBodyOpen.setRefreshToken(Constants.getRefreshTokenOpen());
 		String result = HttpClientUtil.doPost(oauthTokenUrl, JSON.toJSONString(tokenBodyOpen));
 		if (StringUtil.isEmpty(result)) {
-			return "获取refresh_token失败，检查接口：" + oauthTokenUrl;
+			return "refreshOpen()出错：，检查接口：" + oauthTokenUrl;
 		}
 		JSONObject jsonObject = JSONObject.parseObject(result);
-		if (!StringUtil.isEmpty(jsonObject.getString("code")) && "Too Many Requests".equals(jsonObject.getString("code"))) {
-			return "请求刷新Token接口频率过快 Too Many Requests";
+		if (jsonObject.get("code") != null) {
+			return "refreshOpen()出错：" + result;
 		}
 		if (!StringUtil.isEmpty(jsonObject.getString("access_token"))) {
 			//刷新一次refresh_token到AliPanConfig
-			String refreshToken = jsonObject.getString("refresh_token");
-			if (!StringUtil.isEmpty(refreshToken)) {
-				FileUtil.stringToTextFile(refreshToken, configFile);
-			}
+//			String refreshToken = jsonObject.getString("refresh_token");
+//			if (!StringUtil.isEmpty(refreshToken)) {
+//				FileUtil.stringToTextFile(refreshToken, configFile);
+//			}
 			//更新一次access_token到Constants
 			Constants.setAccessTokenOpen(jsonObject.getString("access_token"));
-			Constants.setRefreshTokenOpen(refreshToken);
-			//设置default_drive_id
-			Map<String, String> headers = new HashMap<>();
-			headers.put("Authorization", "Bearer " + jsonObject.getString("access_token"));
-			String driveResult = HttpClientUtil.doPost(openApiUrl + "/adrive/v1.0/user/getDriveInfo", null, headers);
-			JSONObject jsonDriveObject = JSONObject.parseObject(driveResult);
-			Constants.setDefaultDriveId(jsonDriveObject.getString("default_drive_id"));
+//			Constants.setRefreshTokenOpen(refreshToken);
 			return "刷新配置文件成功，刷新 access_token(Open) 成功！";
 		}
 		return "其它问题，联系软件作者。";
@@ -626,7 +624,7 @@ public class ApiController {
 	@ResponseBody
 	@PostMapping(value = "/api/token")
 	public JSONObject token(@RequestBody TokenBody tokenBody) {
-		log.info("更新令牌/token，授权码: {}", tokenBody.getRefreshToken());
+		log.info("更新令牌/token，授权码: {}", StringUtil.subStringShort(tokenBody.getRefreshToken()));
 		JSONObject paramJson = new JSONObject();
 		paramJson.put("client_id", appId);
 		paramJson.put("client_secret", appSecret);

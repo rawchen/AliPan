@@ -1,5 +1,7 @@
 package com.rawchen.alipan.utils;
 
+import cn.hutool.core.util.StrUtil;
+
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -70,5 +72,13 @@ public class StringUtil {
 	 */
 	public static boolean isEmpty(String s) {
 		return s == null || "".equals(s);
+	}
+
+	public static String subStringShort(String refreshToken) {
+		if (StrUtil.isEmpty(refreshToken)) {
+			return null;
+		} else {
+			return refreshToken.substring(0, 30) + "...";
+		}
 	}
 }

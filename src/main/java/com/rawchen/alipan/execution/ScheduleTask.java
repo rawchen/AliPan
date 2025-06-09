@@ -8,11 +8,15 @@ import com.rawchen.alipan.controller.ApiController;
 import com.rawchen.alipan.entity.TokenBody;
 import com.rawchen.alipan.utils.HttpClientUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.units.qual.C;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Spring Boot定时任务
@@ -28,6 +32,9 @@ public class ScheduleTask {
 	@Value("${alipan.api_url}")
 	String apiUrl;
 
+	@Value("${alipan.open_api_url}")
+	String openApiUrl;
+
 	@Value("${alipan.oauth_token_url}")
 	String oauthTokenUrl;
 
@@ -40,32 +47,36 @@ public class ScheduleTask {
 	@Scheduled(fixedRate = 7200 * 1000)
 	private void scheduleTask() {
 
-		log.info("刷新access_token: " + DateUtil.date());
+		log.info("刷新access_token: {}", DateUtil.date());
 		JSONObject paramJson = new JSONObject();
 		paramJson.put("grant_type", "refresh_token");
 		paramJson.put("refresh_token", Constants.getRefreshToken());
 		String result = HttpClientUtil.doPost(apiUrl + "/account/token", paramJson.toString());
 		JSONObject jsonObject = JSONObject.parseObject(result);
+		if (jsonObject.get("code") != null) {
+			log.error("scheduleTask()刷新access_token出错：{}", result);
+		}
 		Constants.setAccessToken((String) jsonObject.get("access_token"));
-		Constants.setDefaultDriveId((String) jsonObject.get("default_drive_id"));
 		Constants.setUserId((String) jsonObject.get("user_id"));
 		Constants.setDeviceId((String) jsonObject.get("device_id"));
 
-		log.info("刷新access_token_open: " + DateUtil.date());
+		log.info("刷新access_token_open: {}", DateUtil.date());
 		TokenBody tokenBodyOpen = new TokenBody();
 		tokenBodyOpen.setGrantType("refresh_token");
 		tokenBodyOpen.setRefreshToken(Constants.getRefreshTokenOpen());
 		String resultOpen = HttpClientUtil.doPost(oauthTokenUrl, JSON.toJSONString(tokenBodyOpen));
 		JSONObject jsonObjectOpen = JSONObject.parseObject(resultOpen);
+		if (jsonObjectOpen.get("code") != null) {
+			log.error("scheduleTask()刷新access_token_open出错：{}", resultOpen);
+		}
 		Constants.setAccessTokenOpen(jsonObjectOpen.getString("access_token"));
-		Constants.setDefaultDriveId(jsonObjectOpen.getString("default_drive_id"));
-	}
 
-//	/**
-//	 * 调用目录接口，第一次延迟1分钟后执行，之后按每1小时调用一次
-//	 */
-//	@Scheduled(initialDelay = 60 * 1000, fixedRate = 3600 * 1000)
-//	private void scheduleTaskToGetFolder() {
-//		apiController.getFolder("root", null);
-//	}
+		log.info("设置default_drive_id: {}", DateUtil.date());
+		Map<String, String> headers = new HashMap<>();
+		headers.put("Authorization", "Bearer " + Constants.ACCESS_TOKEN_OPEN);
+		String driveResult = HttpClientUtil.doPost(openApiUrl + "/adrive/v1.0/user/getDriveInfo", null, headers);
+		JSONObject jsonDriveObject = JSONObject.parseObject(driveResult);
+		Constants.setDefaultDriveId(jsonDriveObject.getString("default_drive_id"));
+
+	}
 }
