@@ -386,30 +386,29 @@ public class ApiController {
 	 * @param fileId
 	 * @return
 	 */
-//	@GetMapping(value = "/d/{fileId}")
-//	public String download(@PathVariable("fileId") String fileId) {
-//
-//		List<String> sign = SignUtil.sign(appId, Constants.DEVICE_ID, Constants.USER_ID, "0");
-//		createSession(sign.get(0), sign.get(2));
-//
-//		JSONObject requestJson = new JSONObject();
-//		requestJson.put("drive_id", Constants.DEFAULT_DRIVE_ID);
-//		requestJson.put("file_id", fileId);
-//		requestJson.put("expire_sec", 14400);
-//		Map<String, String> headerMap = new HashMap<>();
-//		headerMap.put("Content-Type", "application/json");
-//		headerMap.put("Referer", refererURL);
-//		headerMap.put("Authorization", "Bearer " + Constants.ACCESS_TOKEN);
-//
-//		headerMap.put("x-canary", "client=web,app=adrive,version=v3.17.0");
-//		headerMap.put("x-device-id", Constants.DEVICE_ID);
-//		headerMap.put("x-signature", sign.get(2));
-//
-//		String result = HttpClientUtil.doPost(apiUrl + "/file/get_download_url",
-//				requestJson.toString(), headerMap);
-//		JSONObject jsonObject = JSONObject.parseObject(result);
-//		return "redirect:" + jsonObject.get("url");
-//	}
+//	@GetMapping(value = "/dOpen/{fileId}")
+	public String download(@PathVariable("fileId") String fileId) {
+
+		List<String> sign = SignUtil.sign(appId, Constants.DEVICE_ID, Constants.USER_ID, "0");
+		createSession(sign.get(0), sign.get(2));
+
+		JSONObject requestJson = new JSONObject();
+		requestJson.put("drive_id", Constants.DEFAULT_DRIVE_ID);
+		requestJson.put("file_id", fileId);
+		requestJson.put("expire_sec", 14400);
+		Map<String, String> headerMap = new HashMap<>();
+		headerMap.put("Content-Type", "application/json");
+		headerMap.put("Authorization", "Bearer " + Constants.ACCESS_TOKEN);
+
+		headerMap.put("x-canary", "client=web,app=adrive,version=v3.17.0");
+		headerMap.put("x-device-id", Constants.DEVICE_ID);
+		headerMap.put("x-signature", sign.get(2));
+
+		String result = HttpClientUtil.doPost(apiUrl + "/file/get_download_url",
+				requestJson.toString(), headerMap);
+		JSONObject jsonObject = JSONObject.parseObject(result);
+		return "redirect:" + jsonObject.get("url");
+	}
 
 	/**
 	 * 下载文件(Open)
@@ -523,13 +522,9 @@ public class ApiController {
 	@GetMapping(value = "/refresh_original")
 	public String refreshOriginal() {
 		log.info("执行刷新refresh_token_original");
-//		String s = FileUtil.textFileToString(new File(System.getProperty("user.dir") +
-//				File.separator + "AliPanConfig"));
-//		Constants.setRefreshToken(s);
 		JSONObject requestJson = new JSONObject();
 		requestJson.put("grant_type", "refresh_token");
 		requestJson.put("refresh_token", Constants.getRefreshToken());
-
 		String result = HttpClientUtil.doPost(apiUrl + "/account/token", requestJson.toString());
 		if (StringUtil.isEmpty(result)) {
 			return "refreshOriginal()出错：，检查接口：" + apiUrl + "/account/token";
@@ -538,19 +533,8 @@ public class ApiController {
 		if (jsonObject.get("code") != null) {
 			return "refreshOriginal()出错：" + result;
 		}
-
 		if (jsonObject.get("code") == null && jsonObject.get("access_token") != null) {
-			//刷新一次refresh_token到AliPanConfig
-//			String refreshToken = (String) jsonObject.get("refresh_token");
-//			if (refreshToken != null  && !"".equals(refreshToken)) {
-//				FileUtil.stringToTextFile(refreshToken, new File(System.getProperty("user.dir") +
-//						File.separator + "AliPanConfig"));
-//			}
-			//更新一次access_token到Constants
 			Constants.setAccessToken((String) jsonObject.get("access_token"));
-//			Constants.setRefreshToken(refreshToken);
-//			Constants.setDefaultDriveId((String) jsonObject.get("default_drive_id"));
-//			log.info("refreshOriginal() default_drive_id: {}", Constants.getDefaultDriveId());
 			return "刷新配置文件成功，刷新 access_token 成功！";
 		}
 		return "其它问题，联系软件作者。";
@@ -565,13 +549,6 @@ public class ApiController {
 	@GetMapping(value = "/refresh_open")
 	public String refreshOpen() {
 		log.info("执行刷新refresh_token_open");
-//		File configFile = new File(System.getProperty("user.dir") +
-//				File.separator + "AliPanConfigOpen");
-//		String s = FileUtil.textFileToString(configFile);
-//		if (StringUtil.isEmpty(s)) {
-//			return "确认配置文件 AliPanConfig 首行是否为你的 refresh_token！";
-//		}
-//		Constants.setRefreshTokenOpen(s);
 		TokenBody tokenBodyOpen = new TokenBody();
 		tokenBodyOpen.setGrantType("refresh_token");
 		tokenBodyOpen.setRefreshToken(Constants.getRefreshTokenOpen());
@@ -584,14 +561,7 @@ public class ApiController {
 			return "refreshOpen()出错：" + result;
 		}
 		if (!StringUtil.isEmpty(jsonObject.getString("access_token"))) {
-			//刷新一次refresh_token到AliPanConfig
-//			String refreshToken = jsonObject.getString("refresh_token");
-//			if (!StringUtil.isEmpty(refreshToken)) {
-//				FileUtil.stringToTextFile(refreshToken, configFile);
-//			}
-			//更新一次access_token到Constants
 			Constants.setAccessTokenOpen(jsonObject.getString("access_token"));
-//			Constants.setRefreshTokenOpen(refreshToken);
 			return "刷新配置文件成功，刷新 access_token(Open) 成功！";
 		}
 		return "其它问题，联系软件作者。";

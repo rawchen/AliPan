@@ -6,7 +6,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.rawchen.alipan.config.Constants;
 import com.rawchen.alipan.controller.ApiController;
 import com.rawchen.alipan.entity.TokenBody;
+import com.rawchen.alipan.utils.FileUtil;
 import com.rawchen.alipan.utils.HttpClientUtil;
+import com.rawchen.alipan.utils.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.units.qual.C;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,6 +59,10 @@ public class ScheduleTask {
 		if (jsonObject.get("code") != null) {
 			log.error("scheduleTask()刷新access_token出错：{}", result);
 		}
+		// 刷新一次refresh_token到AliPanConfig
+		String refreshToken = (String) jsonObject.get("refresh_token");
+		FileUtil.stringToTextFile(refreshToken, new File(System.getProperty("user.dir") + File.separator + "AliPanConfig"));
+		Constants.setRefreshToken(refreshToken);
 		Constants.setAccessToken((String) jsonObject.get("access_token"));
 		Constants.setUserId((String) jsonObject.get("user_id"));
 		Constants.setDeviceId((String) jsonObject.get("device_id"));
@@ -69,6 +76,10 @@ public class ScheduleTask {
 		if (jsonObjectOpen.get("code") != null) {
 			log.error("scheduleTask()刷新access_token_open出错：{}", resultOpen);
 		}
+		// 刷新一次refresh_token到AliPanConfigOpen
+		String refreshTokenOpen = jsonObjectOpen.getString("refresh_token");
+		FileUtil.stringToTextFile(refreshTokenOpen, new File(System.getProperty("user.dir") + File.separator + "AliPanConfigOpen"));
+		Constants.setRefreshTokenOpen(refreshTokenOpen);
 		Constants.setAccessTokenOpen(jsonObjectOpen.getString("access_token"));
 
 		log.info("设置default_drive_id: {}", DateUtil.date());

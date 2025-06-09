@@ -57,4 +57,9 @@ spring:
 logging:
   level:
     root: info
+    org:
+      apache:
+        coyote:
+          http11:
+            Http11Processor: ERROR
 #    org.springframework.web: trace
