@@ -508,9 +508,10 @@ public class ApiController {
 	 */
 	@ResponseBody
 	@GetMapping(value = "/refresh")
-	public void refresh() {
+	public String refresh() {
 		log.info(refreshOriginal());
 		log.info(refreshOpen());
+		return "后台查看刷新结果";
 	}
 
 	/**
