@@ -2,6 +2,7 @@ package com.rawchen.alipan.controller;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpRequest;
+import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -47,6 +48,8 @@ public class ApiController {
 
 	@Value("${alipan.app_secret}")
 	String appSecret;
+
+	private final String querryApi = "https://passport.aliyundrive.com/newlogin/qrcode/query.do?appName=aliyun_drive&fromSite=52&_bx-v=2.0.31";
 
 	/**
 	 * 文件对象
@@ -604,5 +607,15 @@ public class ApiController {
 		String result = HttpClientUtil.doPost(openApiUrl + "/oauth/access_token", paramJson.toString());
 		JSONObject jsonObject = JSONObject.parseObject(result);
 		return jsonObject;
+	}
+
+	@ResponseBody
+	@PostMapping("/api/original_token/query")
+	public JSONObject query(String t, String ck) {
+		Map<String, Object> param = new HashMap<>();
+		param.put("t", t);
+		param.put("ck", ck);
+		String post = HttpUtil.post(querryApi, param);
+		return JSONObject.parseObject(post);
 	}
 }

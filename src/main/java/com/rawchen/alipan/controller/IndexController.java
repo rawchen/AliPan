@@ -1,8 +1,13 @@
 package com.rawchen.alipan.controller;
 
+import cn.hutool.http.HttpRequest;
+import cn.hutool.http.HttpResponse;
+import cn.hutool.http.HttpUtil;
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -14,6 +19,8 @@ public class IndexController {
 
 	@Value("${alipan.password_file_name}")
 	String passwordFileName;
+
+	private final String mobileLoginTokenApi = "https://passport.aliyundrive.com/newlogin/qrcode/generate.do?appName=aliyun_drive&isMobile=true";
 
 	@RequestMapping("/")
 	public String toIndexHtml(Model model) {
@@ -45,13 +52,25 @@ public class IndexController {
 		return "index";
 	}
 
-	@RequestMapping("/token")
+	@RequestMapping("/open_token")
 	public String toToken() {
 		return "redirect:" + "https://www.alipan.com/o/oauth/authorize?client_id=432fe7ab15fd4ce7bc27c1c407eab9a9&redirect_uri=https%3A%2F%2Fpan.rawchen.com%2Fcallback&scope=user:base,file:all:read,file:all:write&state=Ojo=&response_type=code&relogin=true";
 	}
 
-//	@RequestMapping("/token")
-//	public String token() {
-//		return "token";
-//	}
+	@GetMapping("/original_token")
+	public String alipan(Model model) {
+		HttpRequest request = HttpUtil.createGet(mobileLoginTokenApi);
+		HttpResponse response = request.execute();
+		JSONObject jsonObject = JSONObject.parseObject(response.body());
+		JSONObject content = (JSONObject) jsonObject.get("content");
+		JSONObject data = (JSONObject) content.get("data");
+		String codeContent = data.getString("codeContent");
+		String t = data.getString("t");
+		String ck = data.getString("ck");
+		model.addAttribute("codeContent", codeContent);
+		model.addAttribute("qrcode", "https://api.rawchen.com/api/qrcode?url=" + codeContent);
+		model.addAttribute("t", t);
+		model.addAttribute("ck", ck);
+		return "original_token";
+	}
 }
