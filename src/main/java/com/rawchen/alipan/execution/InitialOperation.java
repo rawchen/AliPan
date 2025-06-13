@@ -25,7 +25,7 @@ public class InitialOperation implements CommandLineRunner {
 		//如果jar同级目录不存在该配置文件则重新创建
 		String absAddress = System.getProperty("user.dir");
 		log.info("JAR同级目录：" + absAddress);
-		File file = new File(absAddress + File.separator + "AliPanConfig");
+		File file = new File(absAddress + File.separator + "original-token.txt");
 		if (!file.exists()) {
 			file.createNewFile();
 		}
@@ -33,7 +33,7 @@ public class InitialOperation implements CommandLineRunner {
 		String s = FileUtil.textFileToString(file);
 		Constants.setRefreshToken(s);
 
-		File fileOpen = new File(absAddress + File.separator + "AliPanConfigOpen");
+		File fileOpen = new File(absAddress + File.separator + "open-token.txt");
 		if (!fileOpen.exists()) {
 			fileOpen.createNewFile();
 		}

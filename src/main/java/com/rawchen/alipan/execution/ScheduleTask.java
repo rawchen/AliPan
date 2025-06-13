@@ -59,9 +59,9 @@ public class ScheduleTask {
 		if (jsonObject.get("code") != null) {
 			log.error("scheduleTask()刷新access_token出错：{}", result);
 		}
-		// 刷新一次refresh_token到AliPanConfig
+		// 刷新一次refresh_token到original-token.txt
 		String refreshToken = (String) jsonObject.get("refresh_token");
-		FileUtil.stringToTextFile(refreshToken, new File(System.getProperty("user.dir") + File.separator + "AliPanConfig"));
+		FileUtil.stringToTextFile(refreshToken, new File(System.getProperty("user.dir") + File.separator + "original-token.txt"));
 		Constants.setRefreshToken(refreshToken);
 		Constants.setAccessToken((String) jsonObject.get("access_token"));
 		Constants.setUserId((String) jsonObject.get("user_id"));
@@ -76,9 +76,9 @@ public class ScheduleTask {
 		if (jsonObjectOpen.get("code") != null) {
 			log.error("scheduleTask()刷新access_token_open出错：{}", resultOpen);
 		}
-		// 刷新一次refresh_token到AliPanConfigOpen
+		// 刷新一次refresh_token到open-token.txt
 		String refreshTokenOpen = jsonObjectOpen.getString("refresh_token");
-		FileUtil.stringToTextFile(refreshTokenOpen, new File(System.getProperty("user.dir") + File.separator + "AliPanConfigOpen"));
+		FileUtil.stringToTextFile(refreshTokenOpen, new File(System.getProperty("user.dir") + File.separator + "open-token.txt"));
 		Constants.setRefreshTokenOpen(refreshTokenOpen);
 		Constants.setAccessTokenOpen(jsonObjectOpen.getString("access_token"));
 
