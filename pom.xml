@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.rawchen</groupId>
-	<artifactId>AliPan</artifactId>
+	<artifactId>alipan</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>AliPan</name>
-	<description>AliPan</description>
+	<name>alipan</name>
+	<description>alipan</description>
 	<properties>
 		<java.version>1.8</java.version>
 	</properties>

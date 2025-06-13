@@ -6,10 +6,10 @@ import org.springframework.cache.annotation.EnableCaching;
 
 @SpringBootApplication
 @EnableCaching
-public class AliPanApplication {
+public class Application {
 
 	public static void main(String[] args) {
-		SpringApplication.run(AliPanApplication.class, args);
+		SpringApplication.run(Application.class, args);
 	}
 
 }

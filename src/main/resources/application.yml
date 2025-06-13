@@ -19,7 +19,7 @@ server:
 
 spring:
   application:
-    name: AliPan
+    name: alipan
   web:
     resources:
       chain:
