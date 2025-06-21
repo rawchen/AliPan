@@ -77,7 +77,11 @@ public class StringUtil {
 	public static String subStringShort(String refreshToken) {
 		if (StrUtil.isEmpty(refreshToken)) {
 			return null;
+		} else if (refreshToken.length() <= 30) {
+			// 如果字符串长度小于等于30，直接返回原字符串
+			return refreshToken;
 		} else {
+			// 如果字符串长度大于30，截取前30个字符并添加省略号
 			return refreshToken.substring(0, 30) + "...";
 		}
 	}

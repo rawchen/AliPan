@@ -598,7 +598,7 @@ public class ApiController {
 	@ResponseBody
 	@PostMapping(value = "/api/token")
 	public JSONObject token(@RequestBody TokenBody tokenBody) {
-		log.info("更新令牌/token，授权码: {}", StringUtil.subStringShort(tokenBody.getRefreshToken()));
+		log.info("更新令牌/token，刷新token: {}", StringUtil.subStringShort(tokenBody.getRefreshToken()));
 		JSONObject paramJson = new JSONObject();
 		paramJson.put("client_id", appId);
 		paramJson.put("client_secret", appSecret);
