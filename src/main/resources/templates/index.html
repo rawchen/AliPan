@@ -99,7 +99,7 @@
 					<div class="btn download">下载</div>
 					<div class="btn thunder" id="thunder">迅雷</div>
 					<div class="btn share">分享</div>
-					<div class="btn potplayer" id="potplayer">PotPlayer</div>
+					<div class="btn potplayer" id="potplayer">Play</div>
 				</div>
 				<div class="content"></div>
 			</div>
@@ -622,8 +622,28 @@
 			// 		location.href = "potplayer://" + file.url;
 			// 	}
 			// });
-			location.href = "potplayer://" + document.location.protocol + "//" + window.location.host +  "/d/" + fileId;
+			// location.href = "potplayer://" + document.location.protocol + "//" + window.location.host +  "/d/" + fileId;
 			loading.style.display = 'none';
+			//页面层
+
+			let video_url = document.location.protocol + "//" + window.location.host +  "/d/" + "626ea52d14490bec03ee43cfa25e791c00100cfa";
+			layer.open({
+				type: 1,
+				shadeClose: true,
+				// title: "打开方式",
+				title: false,
+				anim: 5,
+				closeBtn: false,
+				skin: 'layui-layer-rounded',
+				area: ['420px', '283px'], //宽高
+				content: `<div class="modal-buttons">
+							  <button class="btn-potplayer" onclick="location.href='potplayer://${video_url}'">PotPlayer</button>
+							  <button class="btn-vlc" onclick="location.href='vlc://${video_url}'">VLC</button>
+							  <button class="btn-iina" onclick="location.href='iina://weblink?url=${video_url}'">IINA</button>
+							  <button class="btn-nplayer" onclick="location.href='nplayer-${video_url}'">nPlayer</button>
+							</div>
+						`
+			});
 		}
 
 		document.querySelector('.btn.thunder').onclick = () => {

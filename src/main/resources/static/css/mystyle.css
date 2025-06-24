@@ -81,9 +81,9 @@ pre * {
 	overflow: hidden;
 }
 
-#potplayer {
-	width: 72px;
-}
+/*#potplayer {*/
+/*	width: 72px;*/
+/*}*/
 
 #thunder {
 	display: block;
@@ -770,6 +770,114 @@ body {
 /*	height: 0px;*/
 /*	border-width: 4px;*/
 /*}*/
+
+.layui-layer-rounded {
+	border-radius: 12px !important;
+	overflow: hidden; /* 可选，防止内容超出 */
+}
+
+.modal-buttons {
+	display: flex;
+	flex-direction: column; /* 垂直排列 */
+	gap: 12px;              /* 按钮间距 */
+	padding: 16px;
+	align-items: stretch;   /* 每个按钮宽度相同 */
+}
+
+.modal-buttons button {
+	padding: 12px 20px;
+	font-size: 16px;
+	border: none;
+	border-radius: 8px;
+	/*background-color: #4A90E2; !* 蓝色主色 *!*/
+	color: white;
+	cursor: pointer;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+	/*transition: background-color 0.25s, transform 0.2s;*/
+}
+
+.modal-buttons button:hover {
+	/*background-color: #357ABD;*/
+	transform: translateY(-1px);
+}
+
+.modal-buttons button:active {
+	/*background-color: #2E5EA7;*/
+	transform: scale(0.98);
+}
+
+.btn-potplayer {
+	background-color: #f6e14b;
+}
+.btn-potplayer:hover {
+	background-color: #dfcc44;
+}
+
+.btn-vlc {
+	background-color: #f19f40;
+}
+.btn-vlc:hover {
+	background-color: #e1943a;
+}
+
+/*.btn-iina {*/
+/*	background-color: #5dc2f7;*/
+/*}*/
+/*.btn-iina:hover {*/
+/*	background-color: #4797c1;*/
+/*}*/
+
+.btn-iina {
+	padding: 12px 20px;
+	font-size: 16px;
+	color: white;
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+	background-image: linear-gradient(
+			135deg,
+			#3431f5 0px,
+			#5dc2f7 160px
+	);
+	background-size: 200% 200%;
+	background-position: 0% 50%;
+	transition: background-position 0.5s ease;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-iina:hover {
+	background-position: 10% 50%;
+}
+
+.btn-nplayer {
+	padding: 12px 20px;
+	font-size: 16px;
+	color: white;
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+	background-image: repeating-linear-gradient(
+			135deg,
+			#fbed53 0px,
+			#fbed53 40px,
+			#aaf056 40px,
+			#aaf056 80px,
+			#5fc7ec 80px,
+			#5fc7ec 120px,
+			#eb4834 120px,
+			#eb4834 160px
+	);
+	background-size: 200% 200%;
+	background-position: 0% 50%;
+	transition: background-position 0.5s ease;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-nplayer:hover {
+	background-position: 10% 50%;
+}
+
+
 
 @media screen and (max-width: 1000px) {
 	.left {
