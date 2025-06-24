@@ -626,7 +626,7 @@
 			loading.style.display = 'none';
 			//页面层
 
-			let video_url = document.location.protocol + "//" + window.location.host +  "/d/" + "626ea52d14490bec03ee43cfa25e791c00100cfa";
+			let video_url = document.location.protocol + "//" + window.location.host +  "/d/" + fileId;
 			layer.open({
 				type: 1,
 				shadeClose: true,
@@ -637,12 +637,31 @@
 				skin: 'layui-layer-rounded',
 				area: ['420px', '283px'], //宽高
 				content: `<div class="modal-buttons">
-							  <button class="btn-potplayer" onclick="location.href='potplayer://${video_url}'">PotPlayer</button>
-							  <button class="btn-vlc" onclick="location.href='vlc://${video_url}'">VLC</button>
-							  <button class="btn-iina" onclick="location.href='iina://weblink?url=${video_url}'">IINA</button>
-							  <button class="btn-nplayer" onclick="location.href='nplayer-${video_url}'">nPlayer</button>
+							  <button class="btn-potplayer" onclick="location.href=''">PotPlayer</button>
+							  <button class="btn-vlc" onclick="location.href=''">VLC</button>
+							  <button class="btn-iina" onclick="location.href=''">IINA</button>
+							  <button class="btn-nplayer" onclick="location.href=''">nPlayer</button>
 							</div>
-						`
+						`,
+				success: function(layero, index) {
+					// 把不同按钮绑定到不同地址
+					layero.find('.btn-potplayer').on('click', function() {
+						layer.close(index); // 关闭弹窗
+						location.href = 'potplayer://' + video_url;
+					});
+					layero.find('.btn-vlc').on('click', function() {
+						layer.close(index);
+						location.href = 'vlc://' + video_url;
+					});
+					layero.find('.btn-iina').on('click', function() {
+						layer.close(index);
+						location.href = 'iina://weblink?url=' + video_url;
+					});
+					layero.find('.btn-nplayer').on('click', function() {
+						layer.close(index);
+						location.href = 'nplayer-' + video_url;
+					});
+				}
 			});
 		}
 
