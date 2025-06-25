@@ -4,20 +4,20 @@
 
 > https://pan.rawchen.com
 >
-> JDK 8 + IDEA 2021.2.3
+> JDK 8 + IDEA
 
 ## 使用
 
-* 确保java8及以上环境，在[releases](https://github.com/rawchen/alipan/releases)页面下载最新jar运行文件（最好下载最新源码后mvn打包）。
+* 确保JRE8及以上环境，在[releases](https://github.com/rawchen/alipan/releases)页面下载最新jar运行文件（最好下载最新源码后mvn打包）。
 * 通过`java -jar alipan.jar`运行该程序，默认访问地址：[http://localhost:8899](http://localhost:8899)。
-* 通过以下refresh_token获取方法拿到后，粘贴到jar包同路径下生成的配置文件`AliPanConfig`和`AliPanConfigOpen`中（可记事本编辑）。
-
-## 开发
-
-* 确保java8及以上环境，下载项目后通过IDEA打开，可配置application.yml中的端口号等，通过Maven打包jar运行，没有IDEA也可配置Maven命令执行`mvn clean package`。
+* 通过以下方法拿到token文本后，粘贴到jar包同路径下生成的配置文件`open-token.txt`和`original-token.txt`中（开发则为项目根目录）。
 
 **refresh_token获取方法(两个都要获取一次)：**
 > https://pan.rawchen.com/open_token <br> https://pan.rawchen.com/original_token
+
+## 开发
+
+* 确保JDK8及以上环境，下载项目后通过IDEA打开，可配置application.yml中的端口号等，通过Maven打包jar运行，没有IDEA也可配置Maven命令执行`mvn clean package`。
 
 
 ## 功能（持续开发中）
